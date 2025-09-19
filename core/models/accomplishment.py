@@ -18,7 +18,7 @@ class Accomplishment(models.Model):
     created_by = models.ForeignKey(
         FamilyUser,
         on_delete=models.CASCADE,
-        related_name="custom_user_id"
+        # related_name="custom_user_id"  #TODO: Find a different name
     )
     accomplishment_type_id = models.ForeignKey(
         AccomplishmentType,
@@ -30,4 +30,3 @@ class Accomplishment(models.Model):
         on_delete=models.CASCADE,
         related_name="measurement_type_id"
     )
-    
