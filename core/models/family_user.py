@@ -4,6 +4,7 @@ from django.db import models
 from .family import Family
 from .custom_user import CustomUser
 
+
 class FamilyUser(models.Model):
     id = models.UUIDField(
         primary_key=True,
