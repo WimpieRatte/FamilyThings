@@ -13,7 +13,7 @@ class FamilyUser(models.Model):
     family_id = models.ForeignKey(
         Family,
         on_delete=models.CASCADE,
-        related_name="family"
+        related_name="family_name"
     )
     custom_user_id = models.ForeignKey(
         CustomUser,
