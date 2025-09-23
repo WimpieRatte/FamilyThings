@@ -175,4 +175,6 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
-/core/migrations
+/user_uploads/
+/user_uploads/icons
+/user_uploads/backgrounds
