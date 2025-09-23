@@ -1,0 +1,8 @@
+{% load static %}
+<div id="overlay" class="vw-100 vh-100 overflow-hidden position-absolute" style="pointer-events: none;">
+    <svg id="cursor-base" class="position-absolute" style="display: none; z-index: 1040;" width="600" height="220" xmlns="">
+        <image id="cursor-shadow" x="7" y="4" eight="32" width="32" fill="black" href="{% static 'icons/cursor/cursor-regular-shadow.svg' %}" />
+        <image id="cursor-image" height="32" width="32" fill="white" href="{% static 'icons/cursor/cursor-regular.svg' %}" />
+    </svg>
+    <div id="tooltip" class="position-absolute p-2 rounded bg-primary bg-gradient border border-2 border-dark shadow-sm fs-sm" style="display: none; z-index: 1041; pointer-events: none;">Test</div>
+</div>

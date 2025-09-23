@@ -29,8 +29,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# Provide in your personal .env; multiple hosts need to be split using a comma.
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(",")
 
 # Application definition
 
@@ -59,7 +59,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,11 +123,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+#STATIC_ROOT = BASE_DIR / 'static/'
+
+STATICFILES_DIRS = (
+  'static/',
+)
+
+MEDIA_URL = '/user_uploads/'
+MEDIA_ROOT = BASE_DIR / 'user_uploads/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'core.CustomUser' 
+AUTH_USER_MODEL = 'core.CustomUser'

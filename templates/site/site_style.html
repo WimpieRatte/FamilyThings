@@ -1,0 +1,104 @@
+{% load static %}
+<style>
+    :root {
+        --bs-blue-font: #dee2e6;
+        --bs-indigo-font: #dee2e6;
+        --bs-pink-font: #212529;
+        --bs-red-font: #212529;
+        --bs-orange-font: #212529;
+        --bs-yellow-font: #212529;
+        --bs-teal-font: #212529;
+        --bs-cyan-font: #212529;
+        --bs-blue: #4b85d9;
+        --bs-pink: #d05f97;
+        --bs-red: #c84855;
+        --bs-orange: #df7823;
+        --bs-yellow: #d5af3c;
+        --bs-indigo: #8c4df2;
+        --bs-teal: #1cb789;
+        --bs-cyan: #64cbdf;
+    }
+
+    html, :root, head, body, main, footer, a, textarea, button, [type="button"]:not(:disabled), [type="reset"]:not(:disabled), [type="submit"]:not(:disabled), button:not(:disabled) {
+        cursor:none;
+    }
+
+    .bg-primary, .btn-primary {
+        {% if request.user.color %}
+            background-color: var(--bs-{{request.user.color}}) !important;
+            color: var(--bs-{{request.user.color}}-font);
+        {% else %}
+            background-color: var(--bs-blue) !important;
+            color: var(--bs-blue-font);
+        {% endif %}
+    }
+
+    .border-primary {
+        border-color: var(--bs-{{request.user.color}}) !important;
+    }
+
+    .bg-dark {
+        --bs-bg-opacity: 0.8
+    }
+
+    .fs-sm {
+        font-size: 0.9em;
+    }
+
+    #user-icon-preview, #dropdown-user-icon {
+        border-radius: 500px;
+        pointer-events: auto;
+    }
+
+    body {
+        font-family: "Sour Gummy", sans-serif !important;
+        background: 0 !important; /* Remove background-color to make space for the root's background */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @media (max-width: 1350px) {
+        html {
+            background-size: 220vh !important;
+            background-position: top center !important;
+        }
+    }
+
+    @media (max-width: 800px) {
+        #nav-item-label, #app-info,
+        #dropdownMenuButton span {
+            display: none !important;
+        }
+        #nav-item-icon { font-size: 1.4em !important; }
+        #task-item-icon, #new-accomplishment-icon { font-size: 2em !important; }
+        .section {
+            width: 100% !important;
+        }
+    }
+
+    @media (max-width: 700px) {
+        :root {
+            font-size: 1.1em;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        #drowdown-wrapper {
+            padding-left: 1rem !important;
+            padding-right: 0rem !important;
+        }
+        #dropdown-user-icon {
+            width: 35px !important;
+            height: 35px !important;
+        }
+    }
+
+    /* // Large devices (desktops, 992px and up) */
+    @media (min-width: 992px) {}
+
+    /* // X-Large devices (large desktops, 1200px and up) */
+    @media (min-width: 1200px) {}
+
+    /* // XX-Large devices (larger desktops, 1400px and up) */
+    @media (min-width: 1400px) {}
+
+</style>

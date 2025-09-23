@@ -1,0 +1,18 @@
+{% extends "site/site_base.html" %}
+{% block content %}
+<div class="p-2" style="max-height: 1800px">
+    <div id="todo-section" class="container-sm pb-4 w-100">
+        <div id="settings" class="container rounded bg-dark p-2 h-25 mh-25">
+            <div id="logo" class="m-auto text-center" style="font-size: 4em;">FamilyThings</div>
+            <form method="post" class="m-auto" style="width: fit-content !important;">
+                {% csrf_token %}
+                {% include 'registration/form_field_small.html' with id="username" field=form.username %}
+                <br>
+                {% include 'registration/form_field_small.html' with id="password" field=form.password %}
+                <br>
+                <button id="button-log-in" class="btn btn-primary mt-2 px-3 m-auto text-center" type="submit">Log In</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
