@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Accomplishment, FamilyUserAccomplishment
+from .models import CustomUser, FamilyUser, Family
 
 
 # Register your models here.
@@ -9,12 +9,11 @@ class UserAdmin(admin.ModelAdmin):
     list_editable = ['color', 'background_image']
 
 
-@admin.register(Accomplishment)
-class AccomplishmentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'icon']
-    list_editable = ['name', 'icon']
+@admin.register(Family)
+class FamilyAdmin(admin.ModelAdmin):
+    pass
 
 
-@admin.register(FamilyUserAccomplishment)
-class FamilyUserAccomplishmentAdmin(admin.ModelAdmin):
-    list_display = ['id']
+@admin.register(FamilyUser)
+class FamilyUserAdmin(admin.ModelAdmin):
+    pass

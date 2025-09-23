@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from django.utils import timezone
+# from django.utils import timezone
 from django.contrib.auth import logout
-from .models.accomplishment import Accomplishment
-from .models.custom_user import CustomUser
+from core.models.custom_user import CustomUser
+from accomplishment.models.accomplishment import Accomplishment
 
 
 # Create your views here.

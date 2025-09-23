@@ -1,8 +1,8 @@
 import uuid
 from django.db import models
 
-from .family_user import FamilyUser
-from .custom_user import CustomUser
+from core.models.family_user import FamilyUser
+from core.models.custom_user import CustomUser
 from .accomplishment import Accomplishment
 
 
@@ -33,3 +33,7 @@ class FamilyUserAccomplishment(models.Model):
         on_delete=models.CASCADE,
         related_name="custom_user_id"
     )
+
+    class Meta:
+        verbose_name = " Family User Accomplishment"
+        verbose_name_plural = " Family User Accomplishments"
