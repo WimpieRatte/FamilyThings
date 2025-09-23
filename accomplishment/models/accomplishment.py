@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
-from .family_user import FamilyUser
+from core.models.family_user import FamilyUser
 from .accomplishment_type import AccomplishmentType
 from .measurement_type import MeasurementType
 
@@ -41,3 +41,8 @@ class Accomplishment(models.Model):
         blank=True,
         null=True  # TODO: strip out once debugging is finished
     )
+
+    class Meta:
+        # White space as workaround for the ordering.
+        verbose_name = "  Accomplishment"
+        verbose_name_plural = "  Accomplishments"

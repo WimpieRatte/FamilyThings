@@ -1,6 +1,6 @@
 from django.db import models
-
 from .currency import Currency
+
 
 class ExchangeRate(models.Model):
     id = models.BigIntegerField(
@@ -19,3 +19,7 @@ class ExchangeRate(models.Model):
     )
     from_date = models.DateTimeField()
     to_date = models.DateTimeField()
+
+    class Meta:
+        verbose_name = "Exchange Rate"
+        verbose_name_plural = "Exchange Rates"

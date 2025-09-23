@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class BusinessEntity(models.Model):
     id = models.BigIntegerField(
         primary_key=True,
@@ -7,3 +8,7 @@ class BusinessEntity(models.Model):
         )
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
+
+    class Meta:
+        verbose_name = "Business Entity"
+        verbose_name_plural = "Business Entities"

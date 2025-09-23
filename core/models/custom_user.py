@@ -56,3 +56,8 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return f"user {self.username}"
+
+    class Meta:
+        # White space as workaround for the ordering.
+        verbose_name = "  User"
+        verbose_name_plural = "  Users"

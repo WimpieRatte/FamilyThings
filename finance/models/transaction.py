@@ -2,6 +2,7 @@ from django.db import models
 from .business_entity import BusinessEntity
 from .currency import Currency
 
+
 class Transaction(models.Model):
     id = models.BigIntegerField(
         primary_key=True,
@@ -17,9 +18,16 @@ class Transaction(models.Model):
         on_delete=models.CASCADE,
         related_name="business_entity_id"
     )
-    amount = models.DecimalField()
+    amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=18
+    )
     currency = models.ForeignKey(
         Currency,
         on_delete=models.CASCADE,
         related_name="currency"
     )
+
+    class Meta:
+        verbose_name = " Transaction"
+        verbose_name_plural = " Transactions"

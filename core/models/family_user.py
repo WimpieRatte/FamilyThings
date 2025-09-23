@@ -24,3 +24,7 @@ class FamilyUser(models.Model):
     join_date = models.DateTimeField(
         auto_now_add=True
     )
+
+    class Meta:
+        verbose_name = "Family User"
+        verbose_name_plural = "Family Users"
