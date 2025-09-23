@@ -3,6 +3,8 @@ from django.db import models
 
 from .family_user import FamilyUser
 from .custom_user import CustomUser
+from .accomplishment import Accomplishment
+
 
 class FamilyUserAccomplishment(models.Model):
     id = models.UUIDField(
@@ -16,7 +18,7 @@ class FamilyUserAccomplishment(models.Model):
         related_name="family_user"
     )
     accomplishment_id = models.ForeignKey(
-        CustomUser,
+        Accomplishment,
         on_delete=models.CASCADE,
         related_name="accomplishment_id"
     )
@@ -31,4 +33,3 @@ class FamilyUserAccomplishment(models.Model):
         on_delete=models.CASCADE,
         related_name="custom_user_id"
     )
-    

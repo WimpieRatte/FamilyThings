@@ -1,0 +1,34 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-bs-theme="dark" 
+{% if request.user.background_image %}
+  style="background-image: url({{host}}/user_uploads/{{request.user.background_image}}); background-size: 105vw; background-position-y: -3em;
+{% else %}
+  style="background-image: url({% static 'default_background.jpg' %}); background-size: 105vw; background-position-y: -3em;
+{% endif %}
+  ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FamilyThings{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  {% include 'site/site_style.html' %}
+</head>
+{% include 'site/site_overlay.html' %}
+{% include 'site/site_header.html' %}
+<body">
+  {# Header #}
+  <main class="container-sm px-4 mt-3 m-auto">
+    {% block content %}
+    {# Content will be injected here #}
+    {% endblock %}
+  </main>
+</body>
+{% include 'site/site_footer.html' %}
+{% include 'site/site_js.html' %}
+</html>

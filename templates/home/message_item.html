@@ -1,0 +1,4 @@
+<div id="message-{{sender}}" class="container rounded w-100 bg-primary shadow flex-column p-2 my-3 fs-sm tooltip-source" data-tooltip-content="Sent Sep 22nd, 2025">
+    <p id="message-sender-{{sender}}" class="my-0 {% if sender != 'You' %}text-end{% endif %} fw-bold">{{sender}}</p>
+    <p id="message-content-{{sender}}" class="my-0 {% if sender != 'You' %}text-end{% endif %}">{{content}}</p>
+</div>
