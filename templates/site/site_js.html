@@ -5,30 +5,34 @@
 <script>
     /* Custon Cursor & Little Background Movement based on the Cursor's position */
     const root = document.querySelector(":root");
+    const screenTransition = document.querySelector("#screen-transition");
     const cursor = document.querySelector('#cursor-base');
     const cursorImage = document.querySelector('#cursor-image');
     const cursorShadow = document.querySelector('#cursor-shadow');
+    const loadingArrow = document.querySelector('#loading-arrow');
     const tooltip = document.querySelector('#tooltip');
 
     const imgCursorRegular = 'cursor-regular';
     const imgCursorText = 'cursor-text';
 
+    cursor.style.display = "none";
 
     const updateCursorPosition = (e)=> {
         root.style.backgroundPositionX = e.clientX*-.01 + "px";
         root.style.backgroundPositionY = e.clientY*-.01 + "px";
+
+        cursor.style.display = "block";
         cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
         tooltip.style.transform = `translate3d(calc(${e.clientX}px + 30px), calc(${e.clientY}px + 30px), 0)`;
 
-        cursor.style.display = "block";
-        cursorShadow.style.display = "block";
         cursorImage.src = "{{HOST}}/static/icons/cursor/" + imgCursorRegular + ".svg";
         cursorShadow.src = "{{HOST}}/static/icons/cursor/" + imgCursorRegular + "-shadow.svg";
     }
     window.addEventListener('mousemove', updateCursorPosition);
+    window.addEventListener('mouseleave', updateCursorPosition);
+    window.addEventListener('mouseout', updateCursorPosition);
 
     $("a").on( "mouseover", function() {
-        console.log("bruh")
         cursorImage.src = "{{HOST}}/static/icons/cursor/" + imgCursorText + ".svg";
     });
 
@@ -36,10 +40,16 @@
     $(".tooltip-source").on( "mouseover", function() {
         let text = $(this).attr('data-tooltip-content')
 
-        if (text != "" && cursor.style.display != "none"){
+        if (text && text != "" 
+            && screenTransition.style.backgroundColor == "rgba(0, 0, 0, 0)" 
+            && cursor.style.display != "none"){
             tooltip.style.display = "block";
             tooltip.textContent = $(this).attr('data-tooltip-content');
         }
+        else {
+            tooltip.style.display = "none";
+        }
+
     });
 
     addEventListener("mouseout", (event) => {
@@ -57,25 +67,35 @@
     }
 
     /* Localization */
-    $.getJSON("{% static '/localization/lang_de.json' %}", function(json) {
-        console.log(Object.entries(json))
+    let file = '/static/localization/lang_{{lang_code}}.json'
+    console.log(file)
+    $.getJSON(file, function(json) {
         let json_entries = Object.entries(json)
 
         for (let i = 0; i < json_entries.length; i++) {
-            let element = document.querySelector("#" + json_entries[i][0]);
+            let target = json_entries[i][0];
+            let new_text = json_entries[i][1];
+
+            let element = document.querySelector("#" + target);
+
             if (element) {
                 switch (element.localName) {
                     case "textarea":
-                        element.placeholder = json_entries[i][1];
+                        element.placeholder = new_text;
                         break;
                     default:
-                        element.textContent = json_entries[i][1];
+                        element.textContent = new_text;
                         break;
                 }
             }
         }
     });
 
+    /* Loading Animation */
+    setTimeout(function(){
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)"; 
+        loadingArrow.style = "opacity: 0";
+    }, 50 + (Math.random() * 100) );
 
     /* update_low_priority();
     setInterval(update_low_priority, 20000);
