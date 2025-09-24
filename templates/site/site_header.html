@@ -7,7 +7,7 @@
           {% include 'header/nav_item.html' with id='accomplishments' icon='award' label='Accomplishments' color="#ddc67f" href='core:home' tooltip='See and manage all of your Accomplishments.' %}
           {% include 'header/nav_item.html' with id='finance' icon='piggy-bank' label='Finance' color="#ee7b7b" href='core:home' tooltip='Keep your finances in check.' %}
           {% include 'header/nav_item.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='core:home' tooltip='An overview of upcoming events, holidays, etc.' %}
-          {% include 'header/nav_item.html' with id='notifications' icon='bell' label='Notifications' color="#d99d51" href='core:home' tooltip='Check out all Notifications.' %}
+          <!-- {% include 'header/nav_item.html' with id='notifications' icon='bell' label='Notifications' color="#d99d51" href='core:home' tooltip='Check out all Notifications.' %} -->
         {% endif %}
       </ul>
       {% if request.user.is_authenticated%}
@@ -23,7 +23,7 @@
             {% if request.user.is_manager %}
             {% include 'header/dropdown_item.html' with href='#' id="family-settings" icon='person-arms-up' label='Manage Family' %}
             {% endif %}
-            {% include 'header/dropdown_item.html' with href='/log_out' id="log-out" icon='box-arrow-right' label='Log Out' %}
+            {% include 'header/dropdown_item.html' with href='/logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
           </div>
       </ul>
       {% endif %}

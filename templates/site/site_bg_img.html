@@ -1,0 +1,6 @@
+{% load static %}
+{% if request.user.background_image %}
+  style="background-image: url({{host}}/user_uploads/{{request.user.background_image}});"
+{% else %}
+  style="background-image: url({% static 'default_background.jpg' %});"
+{% endif %}
