@@ -31,7 +31,7 @@ def update_session(request, lang_code: str = ""):
 def home(request, lang_code: str = ""):
     """The landing page."""
     update_session(request=request, lang_code=lang_code)
-
+    list(messages.get_messages(request))
     target: HttpResponse = render(
         request, "home/home.html",
         {})
