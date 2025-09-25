@@ -31,7 +31,7 @@ class CustomUser(AbstractUser):
 
     # Overriding Django's built-in AbstractUser
     email = models.EmailField(unique=True)
-    last_name = None  # Overwritten to be removed, as it's not required.
+    last_name = models.CharField(max_length=20, null=True)  # Overwritten to be removed, as it's not required.
 
     # TODO: Check if 'created' is required
     # Django has 'date_joined' built-in, which has the same function

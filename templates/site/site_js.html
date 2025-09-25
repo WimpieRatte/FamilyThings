@@ -97,6 +97,14 @@
         loadingArrow.style = "opacity: 0";
     }, 50 + (Math.random() * 100) );
 
+    setTimeout(function() {
+    let alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+      let bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close(); // removes element from DOM
+    });
+  }, 10000);
+
     /* update_low_priority();
     setInterval(update_low_priority, 20000);
     async function update_low_priority(){
