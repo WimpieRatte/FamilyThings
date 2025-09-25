@@ -1,18 +1,13 @@
-import uuid
 from django.db import models
 from django.utils import timezone
 
-from core.models.family_user import FamilyUser
+from core.models.family_user import CustomUser
 from .accomplishment_type import AccomplishmentType
 from .measurement_type import MeasurementType
 
 
 class Accomplishment(models.Model):
-    id = models.BigIntegerField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
     icon = models.CharField(max_length=20, blank=True, default="")
@@ -20,7 +15,7 @@ class Accomplishment(models.Model):
         default=timezone.now
     )
     created_by = models.ForeignKey(
-        FamilyUser,
+        CustomUser,
         on_delete=models.PROTECT,
         # related_name="custom_user_id"  #TODO: Find a different name
         blank=True  # TODO: strip out once debugging is finished

@@ -67,7 +67,7 @@
     }
 
     /* Localization */
-    let file = '/static/localization/lang_{{lang_code}}.json'
+    let file = '/static/localization/lang_{{request.session.lang_code}}.json'
     console.log(file)
     $.getJSON(file, function(json) {
         let json_entries = Object.entries(json)

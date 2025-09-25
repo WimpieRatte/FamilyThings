@@ -1,5 +1,5 @@
 {
-    "nav-item-label-home": "Übersicht", 
+    "nav-item-label-home": "Übersicht",
     "nav-item-label-accomplishments": "Errungenschaften",
     "nav-item-label-finance": "Finanzen",
     "nav-item-label-calendar": "Kalender",
@@ -9,6 +9,7 @@
     "section-label-message-wall": "Nachrichten",
     "section-label-family-feed": "Familien-Aktivität",
     "section-label-calendar": "Kalender",
+    "section-label-user-settings": "Einstellungen",
     "dropdown-item-label-user-settings": "Einstellungen",
     "dropdown-item-label-family-settings": "Familie verwalten",
     "dropdown-item-label-admin": "Admin-Seite",
@@ -19,7 +20,16 @@
     "footer-contact": "Kontakt",
     "form-label-username": "Nutzername",
     "form-label-password": "Passwort",
+    "form-label-language": "Sprache",
     "button-log-in": "Einloggen",
+    "button-message-wall": "Posten",
     "textarea-message-wall": "Nachricht verfassen...",
-    "button-message-wall": "Posten"
+    "label-joined": "Konto erstellt am",
+    "label-icon": "Profilbild",
+    "label-background": "Hintergrundbild",
+    "label-color-scheme": "Farbpalette",
+    "label-color-example": "Text wird so erscheinen.",
+    "role-user": "Nutzer",
+    "role-manager": "Manager",
+    "role-admin": "Administrator"
 }

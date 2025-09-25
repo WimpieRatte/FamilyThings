@@ -5,7 +5,7 @@ from .models import Accomplishment, FamilyUserAccomplishment, MeasurementType
 # Register your models here.
 @admin.register(Accomplishment)
 class AccomplishmentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'icon']
+    list_display = ['id', 'created_by', 'name', 'icon']
     list_editable = ['name', 'icon']
 
 

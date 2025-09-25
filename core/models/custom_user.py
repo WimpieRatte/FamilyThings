@@ -4,6 +4,9 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
+    """The default User class of FamilyThings."""
+    # Color constants; used as the site's primary color.
+    # The associated field can be found under 'Personalization-related fields'
     BLUE = "blue"
     INDIGO = "indigo"
     PURPLE = "purple"
@@ -15,49 +18,61 @@ class CustomUser(AbstractUser):
     TEAL = "teal"
     CYAN = "cyan"
     COLOR_CHOICES = {
-        BLUE: "Blue",
-        INDIGO: "Indigo",
-        PURPLE: "Purple",
-        PINK: "Pink",
-        RED: "Red",
-        ORANGE: "Orange",
-        YELLOW: "Yellow",
-        GREEN: "Green",
-        TEAL: "Teal",
-        CYAN: "Cyan"
+        BLUE: "Blue", INDIGO: "Indigo", PURPLE: "Purple",
+        PINK: "Pink", RED: "Red", ORANGE: "Orange",
+        YELLOW: "Yellow", GREEN: "Green", TEAL: "Teal", CYAN: "Cyan"
     }
 
-    email = models.EmailField(
-         unique=True
-    )
-    created = models.DateTimeField(
-        default=timezone.now
-    )
-    updated = models.DateTimeField(
-        default=timezone.now
-    )
-    last_login = models.DateTimeField(
-        default=timezone.now
-    )
-    last_name = None
-    is_manager = models.BooleanField(
-        default=False
-    )
+    ENGLISH = "en"
+    GERMAN = "de"
+    LANG_CHOICES = {
+        ENGLISH: "English", GERMAN: "German"
+    }
+
+    # Overriding Django's built-in AbstractUser
+    email = models.EmailField(unique=True)
+    last_name = None  # Overwritten to be removed, as it's not required.
+
+    # TODO: Check if 'created' is required
+    # Django has 'date_joined' built-in, which has the same function
+    # created = models.DateTimeField(default=timezone.now)
+
+    # Login/Settings tracking
+    updated = models.DateTimeField(default=timezone.now)
+    last_login = models.DateTimeField(default=timezone.now)
+
+    # Used to define an User as Family Manager
+    is_manager = models.BooleanField(default=False)
+
+    # Personalization-related fields
     first_name = models.CharField(max_length=20)
     birthday = models.DateField(blank=True, null=True)
     color = models.CharField(
         max_length=6,
         choices=COLOR_CHOICES,
         default=BLUE)
-    icon = models.ImageField(upload_to="icons",
-                             blank=True, null=True)
-    background_image = models.ImageField(upload_to="backgrounds/",
-                                         blank=True, null=True)
+    icon = models.ImageField(
+        blank=True, null=True,
+        upload_to="icons")
+    background_image = models.ImageField(
+        blank=True, null=True,
+        upload_to="backgrounds/")
+
+    # Misc. settings
+    lang_code = models.CharField(
+        max_length=3,
+        choices=LANG_CHOICES,
+        default="")
+    cursor = models.BooleanField(
+        default=True
+    )
 
     def __str__(self):
-        return f"user {self.username}"
+        """Return the Username as the model's default string representation."""
+        return self.username
 
     class Meta:
-        # White space as workaround for the ordering.
+        # White space is used as a workaround
+        # for the ordering in the Admin page.
         verbose_name = "  User"
         verbose_name_plural = "  Users"

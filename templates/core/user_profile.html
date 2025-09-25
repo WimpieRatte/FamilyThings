@@ -1,0 +1,55 @@
+{% extends "site/site_base.html" %}
+{% block content %}
+<div class="d-md-flex justify-content-evenly p-2" style="max-height: 1800px">
+    <div id="todo-section" class="section container-sm pb-4" style="width: 340px;">
+        {% include 'site/heading_section.html' with id="todays-accomplishments" label="Today's Accomplishments" value=1 %}
+        <div class="flex-column bg-dark rounded p-1">
+            {% include 'home/user_accomplishment_item.html' with title='Visited the site' icon='person-arms-up' %}
+        </div>
+        <div id="new-accomplishment-wrapper" class="w-auto m-auto">
+            <a id="new-accomplishment-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="/" data-tooltip-content="Add New">
+                <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
+                <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></h6>
+            </a>
+        </div>
+        <br>
+        {% include 'site/heading_section.html' with id="recent-activities" label='Recent Activities' %}
+        <div class="flex-column bg-dark rounded p-1">
+            
+            {% include 'home/user_accomplishment_item.html' with title='Visited the site' icon='person-arms-up' %}
+        </div>
+    </div>
+    <div id="messager-section" class="section container-sm pb-4" style="width: 430px;">
+        {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
+        <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 h-50 mh-50 overflow-scroll fs-sm" style="overflow-x: visible !important;">
+            <div id="message-wall" class="container rounded bg-light-subtle">
+                <div id="message-list" class="p-1">
+                    {% include 'home/message_item.html' with sender='You' content='Hey Thomas, ever heard of Ligma?' %}
+                    {% include 'home/message_item.html' with sender='Thomas' content="... Don't even try." %}
+                    {% include 'home/message_item.html' with sender='Wimpie' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
+                    {% include 'home/message_item.html' with sender='Padma' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
+                </div>
+            </div>
+        </div>
+        <br>
+        <!-- {% include 'site/heading_section.html' with label='Write Message'%} -->
+        <div id="message-box-wrapper" class="container rounded bg-dark rounded p-2 fs-sm">
+            <textarea id="textarea-message-wall" class="form-control" rows="3" placeholder="Write message..."></textarea>
+            <button id="button-message-wall" class="btn btn-primary mt-2 px-3" type="submit">Post</button>
+        </div>
+    </div>
+    <div id="feed-section" class="section container-sm pb-4" style="width: 340px;">
+        {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
+        <div class="flex-column bg-dark rounded p-1">
+            {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
+            {% include 'home/family_accomplishment_item.html' with title='Did the Dishes' icon='android' color='purple'%}
+            {% include 'home/family_accomplishment_item.html' with title='Brushed their Teeth' icon='apple' color='green'%}
+            {% include 'home/family_accomplishment_item.html' with title='Cleaned up their Room' icon='android' color='purple'%}
+        </div>
+        <br>
+        {% include 'site/heading_section.html' with id="calendar" label='Calendar'%}
+        <div id="calendar-wrapper" class="container rounded bg-dark rounded p-2 h-25 mh-25">
+        </div>
+    </div>
+</div>
+{% endblock %}
