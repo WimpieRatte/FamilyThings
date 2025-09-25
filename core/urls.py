@@ -1,29 +1,30 @@
-from django.urls import path, include
+from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView
 from . import views
 
-app_name = "core"  # ideally, name it the same as the foldername of your app
+# Ideally, its name is identical with the folder's
+app_name = "core"
 
 core_urls = [
     # path(<URL>, <view>, <name>)
     path("", views.home, name="home"),
-    path("accounts/profile/", views.home, name="home"),
-    path("login", LoginView.as_view(), name="login"),  # Django's default
-    path("logout", views.user_logout, name="logout"),
-    path("settings", views.user_settings, name="user_settings"),
+    path("login/", LoginView.as_view(), name="login"),  # Django's default
+    path("logout/", views.user_logout, name="logout"),
+    path("profile/", views.user_profile, name="user_profile"),
+    path("settings/", views.user_settings, name="user_settings"),
 
     # Unused
-    path("settings/update", views.update_user_settings,
+    path("settings/update/", views.update_user_settings,
          name="user_settings_update"),
-    path("test", views.update_user_settings, name="update_user_settings"),
+    path("test/", views.update_user_settings, name="update_user_settings"),
 ]
 
 urlpatterns = [
     # Import core_urls twice to include variants
     # with and without a provided language code
-    path("<str:lang_code>/", include(core_urls)),
+    re_path(r"^(?P<lang_code>[a-z]{2,3})/", include(core_urls)),
     path("", include(core_urls)),
 ]
 

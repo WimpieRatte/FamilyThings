@@ -3,36 +3,35 @@
 {% block content %}
 <div class="p-2" style="max-height: 1800px">
     <div id="todo-section" class="container-sm pb-4 w-100">
-        {% include 'home/section_header.html' with label="User Settings" %}
+        {% include 'site/heading_section.html' with id="user-settings" label="User Settings" %}
         <div id="settings" class="container rounded bg-dark p-2 h-25 mh-25">
             <div id="settings-wrapper" class="container d-flex flex-wrap rounded py-2">
                 <div id="details-section" class="p-3 w-50 mw-50">
+                    <p><span id="label-joined">Joined</span>: {{request.user.date_joined}}</p>
                     <div class="mb-3 pe-5">
-                        <label for="exampleFormControlInput1" class="form-labe m-0">Name</label>
-                        <input type="email" class="form-control w-75 mb-2" id="exampleFormControlInput1" placeholder="{{request.user.username}}">
-                        <label for="exampleFormControlInput1" class="form-label m-0">Email address</label>
-                        <input type="email" class="form-control w-75 mb-2" id="exampleFormControlInput1" placeholder="{{request.user.email}}">
+                        {% include 'registration/form_field_small.html' with id="username" field=form.name %}
+                        {% include 'registration/form_field_small.html' with id="language" field=form.language %}
                     </div>
                 </div>
                 <div id="image-section" class="d-flex p-3 w-50 mw-50">
                     <div id="user-icon-setting" class="w-25">
-                        <h6>Icon</h6>
+                        {% include 'site/heading_small.html' with id="icon" title='Icon' %}
                         <img id="user-icon-preview" src="user_uploads/{{request.user.background_image}}" class="border border-5 border-primary mb-1" height="75" width="75" alt="...">
                         <input id="user-icon" class="form-control fs-sm w-75" type="file">
                     </div>
                     <div id="background-setting" class="w-50 ms-5">
-                        <h6>Background</h6>
+                        {% include 'site/heading_small.html' with id="background" title='Background' %}
                         <img id="background-preview" src="user_uploads/{{request.user.background_image}}" class="img-thumbnail" alt="...">
                         <input id="background-image" class="form-control fs-sm" type="file">
                     </div>
                 </div>
                 <div class="w-50"></div>
                 <div id="color-section" class="p-3">
-                    <h6>Appearance</h6>
+                    {% include 'site/heading_small.html' with id="color-scheme" title='Color Scheme' %}
                     {% for color in colors.keys %}
                         <button id="{{color}}" onclick="change_color(this.id)", value="{{color}}" class="rounded"><i class="bi bi-square-fill h4 p-0 m-0" style="color: var(--bs-{{color}});"></i></button></i>
                     {% endfor %}
-                    <div class="bg-primary rounded mt-2 p-2 w-100 fs-sm">Text will appear like this.</div>
+                    <div id="label-color-example" class="bg-primary rounded mt-2 p-2 w-100 fs-sm">Text will appear like this.</div>
                 </div>
             </div>
         </div>

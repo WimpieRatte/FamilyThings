@@ -1,7 +1,7 @@
 {% if superuser %}
-<span class="text-danger-emphasis">Admin</span>
+<span id="role-admin" class="text-danger-emphasis">Admin</span>
 {% elif manager %}
-<span class="text-info-emphasis">Manager</span>
+<span id="role-manager" class="text-info-emphasis">Manager</span>
 {% else %}
-<span class="text-success-emphasis">User</span>
+<span id="role-user" class="text-success-emphasis">User</span>
 {% endif %}
