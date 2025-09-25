@@ -10,23 +10,25 @@
           {% include 'header/nav_item.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='core:user_profile' tooltip='An overview of upcoming events, holidays, etc.' %}
         {% endif %}
       </ul>
-      {% if request.user.is_authenticated%}
       <button class="dropdown-toggle text-end me-4" style="border: 0; background: 0;" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <img id="dropdown-user-icon" class="border border-3 border-primary" src="user_uploads/{{request.user.background_image}}" height="30" width="30" alt="..."><span class="ms-2">{{request.user.first_name}}</span>
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {% if not request.user.is_authenticated %}
+              {% include 'header/dropdown_item.html' with href='/login' id="log-in" icon='box-arrow-right' label='Log In' %}
+            {% else %}
             <small class="dropdown-item">{% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.user.is_manager %}</small>
-            {% include 'header/dropdown_item.html' with href='/settings' id="user-settings" icon='gear' label='Settings' %}
-            {% if request.user.is_superuser %}
-            {% include 'header/dropdown_item.html' with href='/admin' id="admin" icon='sliders' label='Admin Page' new_tab='True' %}
+              {% include 'header/dropdown_item.html' with href='/settings' id="user-settings" icon='gear' label='Settings' %}
+              {% if request.user.is_superuser %}
+                {% include 'header/dropdown_item.html' with href='/admin' id="admin" icon='sliders' label='Admin Page' new_tab='True' %}
+              {% endif %}
+              {% if request.user.is_manager %}
+                {% include 'header/dropdown_item.html' with href='#' id="family-settings" icon='person-arms-up' label='Manage Family' %}
+              {% endif %}
+              {% include 'header/dropdown_item.html' with href='/logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
             {% endif %}
-            {% if request.user.is_manager %}
-            {% include 'header/dropdown_item.html' with href='#' id="family-settings" icon='person-arms-up' label='Manage Family' %}
-            {% endif %}
-            {% include 'header/dropdown_item.html' with href='/logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
           </div>
       </ul>
-      {% endif %}
       </div>
   <small id="datetime-display" class="d-flex px-5 py-1">{{time}}</small>
   </div>
