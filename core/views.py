@@ -7,6 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from core.models.custom_user import CustomUser
 from core.forms.user_settings import UserSettingsForm
 from django.contrib import messages
+from core.session import update_session
 from accomplishment.models.accomplishment import Accomplishment
 
 
@@ -14,18 +15,8 @@ def render_if_logged_in(request, target: HttpResponse, lang_code: str = "en"):
     """Check if the User is logged in. Then, either proceed to the target page,
     or redirect them to the Login page."""
     if not request.user.is_authenticated:
-        # return user_login(request=request, lang_code=lang_code)
-        return redirect('core:login')
+        return redirect('core:user_login')
     return target
-
-
-def update_session(request, lang_code: str = ""):
-    if lang_code == "":
-        request.session['lang_code'] = request.session.get('lang_code', "en")
-    else:
-        request.session['lang_code'] = lang_code
-
-    print(request.session['lang_code'])
 
 
 def home(request, lang_code: str = ""):
@@ -37,7 +28,7 @@ def home(request, lang_code: str = ""):
         {})
 
     return target
-    
+
 def register(request):
 	if request.method == "POST":
 	# get posted fields:
@@ -54,7 +45,7 @@ def register(request):
 		if CustomUser.objects.filter(email=email).exists():
 			user_data_has_error = True
 			messages.error(request, "Email already exists")
-   
+
 		password_pattern = r'^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$'
 		if not re.match(password_pattern, password):
 			user_data_has_error = True
@@ -74,7 +65,7 @@ def register(request):
 			password=password
 			)
 			messages.success(request, "Account created. Login now")
-	
+
 			return redirect('core:login')
 	else:
 		return render(request,'registration/registration.html')
@@ -95,11 +86,29 @@ def user_settings(request, lang_code: str = ""):
     """The User's settings page."""
     update_session(request=request, lang_code=lang_code)
 
+    if (request.POST and isinstance(request.user, CustomUser)):
+        print(request.POST)
+        user: CustomUser = request.user
+        user.first_name = request.POST['name']
+        user.lang_code = request.POST['language']
+        user.color = request.POST['color']
+        user.cursor = True if request.POST['cursor'] == "on" else False
+        user.save()
+
+        return redirect('core:user_profile')
+
+    user: CustomUser = request.user
     target: HttpResponse = render(
         request, "core/user_settings.html",
         {
             'colors': CustomUser.COLOR_CHOICES,
-            'form': UserSettingsForm(data=request.POST)
+            'form': UserSettingsForm(
+                data={
+                    'name': user.first_name,
+                    'language': user.lang_code,
+                    'color': user.color,
+                    'cursor': user.cursor
+                })
         })
 
     return render_if_logged_in(request, target)
@@ -132,13 +141,13 @@ def user_login(request, lang_code: str = ""):
         if auth_user is not None:
             login(request, auth_user)
             auth_user.last_login = timezone.now()
-            return redirect('core:home')
+            return redirect('core:user_profile')
     else:
-        return render(request, "registration/login.html", {
+        return render(request, "core/user_login.html", {
             'form': AuthenticationForm(data=request.POST)
         })
 
 
 def user_logout(request):
     logout(request)
-    return redirect('core:login')
+    return redirect('core:user_login')

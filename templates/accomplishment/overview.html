@@ -3,13 +3,16 @@
 {% block content %}
 <div class="p-2" style="max-height: 1800px">
     <div id="todo-section" class="container-sm pb-4 w-100">
-        {% include 'site/heading_section.html' with label="Accomplishments" %}
+        {% include 'site/heading_section.html' with label="Accomplishments" id="accomplishments" %}
         <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
             <div id="accomplishments-wrapper" class="container d-flex flex-wrap rounded py-2">
                 <ul>
                     {% for entry in recent_accomplishments %}
                         <li>
-                            {{entry.name}}<br><small>{{entry.description}}</small><br><small>Accomplished on {{entry.created}}</small>
+                            {{entry.name}}<br><small>{{entry.description}}</small><br>
+                            <small>
+                                <span id="label-accomplished">Accomplished on</span> {{entry.created}}
+                            </small>
                         </li>
                     {% endfor %}
                 </ul>
