@@ -66,7 +66,7 @@ def register(request):
 			)
 			messages.success(request, "Account created. Login now")
 
-			return redirect('core:login')
+			return redirect('core:user_login')
 	else:
 		return render(request,'registration/registration.html')
 
