@@ -1,7 +1,7 @@
 from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib.auth.views import LoginView
+from core.session import update_session, change_language
 from . import views
 
 # Ideally, its name is identical with the folder's
@@ -10,10 +10,14 @@ app_name = "core"
 core_urls = [
     # path(<URL>, <view>, <name>)
     path("", views.home, name="home"),
-    path("login/", LoginView.as_view(), name="login"),  # Django's default
-    path("logout/", views.user_logout, name="logout"),
+    path("login/", views.user_login, name="user_login"),  # Django's default
+    path("logout/", views.user_logout, name="user_logout"),
     path("profile/", views.user_profile, name="user_profile"),
     path("settings/", views.user_settings, name="user_settings"),
+
+    # AJAX Urls
+    path("session/switchlanguage", change_language,
+         name="session_change_language"),
 
     # Unused
     path("settings/update/", views.update_user_settings,

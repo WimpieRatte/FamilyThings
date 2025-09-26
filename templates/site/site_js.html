@@ -5,6 +5,8 @@
 <script>
     /* Custon Cursor & Little Background Movement based on the Cursor's position */
     const root = document.querySelector(":root");
+    const body = document.querySelector("body");
+    const overlay = document.querySelector("#overlay");
     const screenTransition = document.querySelector("#screen-transition");
     const cursor = document.querySelector('#cursor-base');
     const cursorImage = document.querySelector('#cursor-image');
@@ -16,21 +18,26 @@
     const imgCursorText = 'cursor-text';
 
     cursor.style.display = "none";
+    overlay.style.height = `${body.clientHeight + 70}px`;
 
     const updateCursorPosition = (e)=> {
+        let mouseX = e.clientX
+        let mouseY = e.clientY + root.scrollTop
+
         root.style.backgroundPositionX = e.clientX*-.01 + "px";
         root.style.backgroundPositionY = e.clientY*-.01 + "px";
 
         cursor.style.display = "block";
-        cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-        tooltip.style.transform = `translate3d(calc(${e.clientX}px + 30px), calc(${e.clientY}px + 30px), 0)`;
+        cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+        tooltip.style.transform = `translate3d(calc(${mouseX}px + 30px), calc(${mouseY}px + 30px), 0)`;
 
         cursorImage.src = "{{HOST}}/static/icons/cursor/" + imgCursorRegular + ".svg";
         cursorShadow.src = "{{HOST}}/static/icons/cursor/" + imgCursorRegular + "-shadow.svg";
     }
     window.addEventListener('mousemove', updateCursorPosition);
     window.addEventListener('mouseleave', updateCursorPosition);
-    window.addEventListener('mouseout', updateCursorPosition);
+    window.addEventListener('mouseenter', updateCursorPosition);
+    window.addEventListener("scroll", updateCursorPosition);
 
     $("a").on( "mouseover", function() {
         cursorImage.src = "{{HOST}}/static/icons/cursor/" + imgCursorText + ".svg";
@@ -83,12 +90,39 @@
                     case "textarea":
                         element.placeholder = new_text;
                         break;
+                    case "select":
+                        let children = element.children;
+                            for (let i = 0; i < children.length; i++) {
+                                children[i].textContent = new_text[i]
+                            }
+                        break;
                     default:
                         element.textContent = new_text;
                         break;
                 }
             }
         }
+    });
+
+    /* Changing Language */
+    $(".language-btn").on( "click", function() {
+        let lang_code = $(this).attr('value');
+
+        $.ajax({ 
+            type: 'POST',
+            url: '{% url 'core:session_change_language' %}',
+            data: {
+                action: 'post',
+                lang_code: lang_code,
+                csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function(json) {
+                console.log(json.result);
+                location.reload();
+            },
+            error: function(xhr, errmsg, err) {
+                console.log(errmsg);
+            }
+        });
     });
 
     /* Loading Animation */

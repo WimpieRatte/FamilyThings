@@ -8,10 +8,16 @@
             <div id="settings-wrapper" class="container d-flex flex-wrap rounded py-2">
                 <div id="details-section" class="p-3 w-50 mw-50">
                     <p><span id="label-joined">Joined</span>: {{request.user.date_joined}}</p>
-                    <div class="mb-3 pe-5">
-                        {% include 'registration/form_field_small.html' with id="username" field=form.name %}
-                        {% include 'registration/form_field_small.html' with id="language" field=form.language %}
-                    </div>
+                    <form method="post" class="mb-3 pe-5" style="width: fit-content !important;">
+                        {% csrf_token %}
+                        {% include 'site/form_field_small.html' with id="name" field=form.name %}
+                        {% include 'site/form_field_small.html' with id="language" field=form.language %}
+                        {% include 'site/form_field_small.html' with id="color" field=form.color hidden=True %}
+                        {% include 'site/form_field_small.html' with id="user_icon" field=form.user_icon hidden=True %}
+                        {% include 'site/form_field_small.html' with id="background_image" field=form.background_image hidden=True %}
+                        {% include 'site/form_field_small.html' with id="cursor" field=form.cursor %}
+                        <button id="button-apply" class="btn btn-primary mt-4 m-auto p-2" type="submit">Apply</button>
+                    </form>
                 </div>
                 <div id="image-section" class="d-flex p-3 w-50 mw-50">
                     <div id="user-icon-setting" class="w-25">
@@ -29,7 +35,7 @@
                 <div id="color-section" class="p-3">
                     {% include 'site/heading_small.html' with id="color-scheme" title='Color Scheme' %}
                     {% for color in colors.keys %}
-                        <button id="{{color}}" onclick="change_color(this.id)", value="{{color}}" class="rounded"><i class="bi bi-square-fill h4 p-0 m-0" style="color: var(--bs-{{color}});"></i></button></i>
+                        <button id="color-btn-{{color}}" onclick="change_color(this.value)", value="{{color}}" class="rounded"><i class="bi bi-square-fill h4 p-0 m-0" style="color: var(--bs-{{color}});"></i></button></i>
                     {% endfor %}
                     <div id="label-color-example" class="bg-primary rounded mt-2 p-2 w-100 fs-sm">Text will appear like this.</div>
                 </div>
@@ -38,6 +44,8 @@
     </div>
 </div>
 <script>
+    const colorChoiceField = document.getElementById("id_color")
+
     async function change_color(color){
       const bgPrimary = document.getElementsByClassName("bg-primary");
       for (let i = 0; i < bgPrimary.length; i++) {
@@ -49,10 +57,12 @@
         borderPrimary.item(i).setAttribute( 'style', 'border-color: var(--bs-' + color + ') !important;');
       }
 
-      update_user_settings({
+      colorChoiceField.value = color
+
+      /*update_user_settings({
         color: color,
         csrfmiddlewaretoken: '{{ csrf_token }}',
-        action: 'post'})
+        action: 'post'})*/
     }
 
     /* Background settings */
@@ -87,15 +97,15 @@
 
     function update_user_settings(data) {
         $.ajax({  // do a hidden postback to the url(view) below
-        type: 'POST',
-        url: '{% url 'core:update_user_settings' %}',
-        data: data,
-        success: function(json) {
-            console.log("Success.")
-        },
-        error: function(xhr, errmsg, err) {
-            console.log(errmsg);
-        }
+            type: 'POST',
+            url: '{% url 'core:update_user_settings' %}',
+            data: data,
+            success: function(json) {
+                console.log("Success.")
+            },
+            error: function(xhr, errmsg, err) {
+                console.log(errmsg);
+            }
         });
     }
 </script>
