@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
@@ -5,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from core.models.custom_user import CustomUser
 from core.forms.user_settings import UserSettingsForm
+from django.contrib import messages
 from core.session import update_session
 from accomplishment.models.accomplishment import Accomplishment
 
@@ -20,12 +22,53 @@ def render_if_logged_in(request, target: HttpResponse, lang_code: str = "en"):
 def home(request, lang_code: str = ""):
     """The landing page."""
     update_session(request=request, lang_code=lang_code)
-
+    list(messages.get_messages(request))
     target: HttpResponse = render(
         request, "home/home.html",
         {})
 
     return target
+
+def register(request):
+	if request.method == "POST":
+	# get posted fields:
+		first_name = request.POST.get('first_name')
+		last_name = request.POST.get('last_name')
+		username = request.POST.get('username')
+		email = request.POST.get('email')
+		password = request.POST.get('password')
+		# field validation:
+		user_data_has_error = False
+		if CustomUser.objects.filter(username=username).exists():
+			user_data_has_error = True
+			messages.error(request, "Username already exists")
+		if CustomUser.objects.filter(email=email).exists():
+			user_data_has_error = True
+			messages.error(request, "Email already exists")
+
+		password_pattern = r'^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$'
+		if not re.match(password_pattern, password):
+			user_data_has_error = True
+			messages.error(
+                request,
+                "Password must be at least 8 characters long, include one uppercase letter, and one special character"
+            )
+		if user_data_has_error:
+			return redirect('core:registration')
+		else:
+			# create new user in database:
+			CustomUser.objects.create_user(
+			first_name=first_name,
+			last_name=last_name,
+			email=email,
+			username=username,
+			password=password
+			)
+			messages.success(request, "Account created. Login now")
+
+			return redirect('core:login')
+	else:
+		return render(request,'registration/registration.html')
 
 
 def user_profile(request, lang_code: str = ""):

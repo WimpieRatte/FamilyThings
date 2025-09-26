@@ -14,6 +14,8 @@ core_urls = [
     path("logout/", views.user_logout, name="user_logout"),
     path("profile/", views.user_profile, name="user_profile"),
     path("settings/", views.user_settings, name="user_settings"),
+    path("accounts/profile/", views.home, name="home"),  # default landing page
+    path("registration/", views.register, name="registration"),
 
     # AJAX Urls
     path("session/switchlanguage", change_language,

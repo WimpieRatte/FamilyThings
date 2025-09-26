@@ -1,0 +1,59 @@
+{% extends "site/site_base.html" %}
+{% block content %}
+<div class="container rounded bg-dark p-2 h-25 mh-25" style="min-height: 600px; max-height: 700px; overflow-y: auto; overflow-x: hidden">
+    <div id="logo" class="m-auto text-center pb-2" style="font-size: 4em;">Create account</div>
+    <div class="row justify-content-center">
+        <div class="col-md-4 pb-5">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "error" %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-{{ message.tags }}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <form method="POST" action="">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" name="first_name" id="first_name" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" name="last_name" id="last_name" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" name="username" id="username" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" name="email" id="email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" minlength="5" required>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div class="mb-0">Already have an account? 
+                        <a href="{% url 'core:login' %}">Login</a>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

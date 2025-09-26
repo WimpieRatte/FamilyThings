@@ -5,13 +5,21 @@
         <div id="settings" class="container rounded bg-dark p-2 h-25 mh-25">
             <div id="logo" class="m-auto text-center pb-2" style="font-size: 4em;">FamilyThings</div>
             {{error_messages}}
-            <form method="post" class="m-auto mb-3" style="width: fit-content !important;">
+            <!-- Display messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <form method="post" class="m-auto" style="width: fit-content !important;">
                 {% csrf_token %}
                 {% include 'site/form_field_small.html' with id="username" field=form.username %}
                 {% include 'site/form_field_small.html' with id="password" field=form.password %}
                 <button id="button-log-in" class="btn btn-primary mt-4 m-auto text-center d-block" type="submit">Log In</button>
             </form>
-            <a id="label-registration-hint" class="text-center d-block" href="">Not registered yet? Click here.</a>
+            <a href="{% url 'core:registration' %}" id="label-registration-hint" class="text-center d-block" href="">Not registered yet? Click here.</a>
         </div>
     </div>
 </div>
