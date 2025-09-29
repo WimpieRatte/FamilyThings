@@ -1,13 +1,19 @@
 {% extends "site/site_base.html" %}
+{% load static %}
+{% block title %}Profile -{% endblock %}
 {% block content %}
-<div class="d-md-flex justify-content-evenly p-2" style="max-height: 1800px">
+<div class="d-md-flex justify-content-evenly" style="max-height: 1800px">
     <div id="todo-section" class="section container-sm pb-4" style="width: 340px;">
-        {% include 'site/heading_section.html' with id="todays-accomplishments" label="Today's Accomplishments" value=1 %}
+        {% include 'site/heading_section.html' with id="todays-accomplishments" label="Today's Accomplishments" value=todays_accomplishments.length %}
+        {% if todays_accomplishments %}
         <div class="flex-column bg-dark rounded p-1">
-            {% include 'home/user_accomplishment_item.html' with title='Visited the site' icon='person-arms-up' %}
+            {% for entry in todays_accomplishments %}
+                {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
+            {% endfor %}
         </div>
+        {% endif %}
         <div id="new-accomplishment-wrapper" class="w-auto m-auto">
-            <a id="new-accomplishment-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="/" data-tooltip-content="Add New">
+            <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="/" data-tooltip-context="Add New">
                 <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
                 <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></h6>
             </a>
@@ -15,41 +21,89 @@
         <br>
         {% include 'site/heading_section.html' with id="recent-activities" label='Recent Activities' %}
         <div class="flex-column bg-dark rounded p-1">
-            
-            {% include 'home/user_accomplishment_item.html' with title='Visited the site' icon='person-arms-up' %}
+            {% for entry in recent_accomplishments %}
+                {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
+            {% endfor %}
         </div>
     </div>
-    <div id="messager-section" class="section container-sm pb-4" style="width: 430px;">
-        {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
-        <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 h-50 mh-50 overflow-scroll fs-sm" style="overflow-x: visible !important;">
-            <div id="message-wall" class="container rounded bg-light-subtle">
-                <div id="message-list" class="p-1">
-                    {% include 'home/message_item.html' with sender='You' content='Hey Thomas, ever heard of Ligma?' %}
-                    {% include 'home/message_item.html' with sender='Thomas' content="... Don't even try." %}
-                    {% include 'home/message_item.html' with sender='Wimpie' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
-                    {% include 'home/message_item.html' with sender='Padma' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
+    {% if is_family_member %}
+        <div style="width: 430px;">
+            {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
+            <div id="messager-section" class="pb-3 w-100" style="height: 23em;">
+                <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 mb-2 h-100 fs-sm overflow-y-scroll" style="overflow-x: visible !important;">
+                    <div id="message-wall" class="container rounded bg-light-subtle h-100">
+                        <div id="message-list" class="p-1">
+                            {% include 'home/message_item.html' with sender='You' content='Hey Thomas, ever heard of Ligma?' %}
+                            {% include 'home/message_item.html' with sender='Thomas' content="... Don't even try." %}
+                            {% include 'home/message_item.html' with sender='Wimpie' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
+                            {% include 'home/message_item.html' with sender='Padma' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
+                        </div>
+                    </div>
                 </div>
             </div>
+            <!-- {% include 'site/heading_section.html' with label='Write Message'%} -->
+            <div id="message-box-wrapper" class="container rounded bg-dark rounded p-2 fs-sm"  style="width: 430px; height: 10em;">
+                <textarea id="textarea-message-wall" class="form-control" rows="3" placeholder="Write message..."></textarea>
+                <button id="button-message-wall" class="btn btn-primary mt-2 px-3" type="submit">Post</button>
+            </div>
         </div>
-        <br>
-        <!-- {% include 'site/heading_section.html' with label='Write Message'%} -->
-        <div id="message-box-wrapper" class="container rounded bg-dark rounded p-2 fs-sm">
-            <textarea id="textarea-message-wall" class="form-control" rows="3" placeholder="Write message..."></textarea>
-            <button id="button-message-wall" class="btn btn-primary mt-2 px-3" type="submit">Post</button>
-        </div>
-    </div>
+    {% endif %}
     <div id="feed-section" class="section container-sm pb-4" style="width: 340px;">
-        {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
-        <div class="flex-column bg-dark rounded p-1">
-            {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
-            {% include 'home/family_accomplishment_item.html' with title='Did the Dishes' icon='android' color='purple'%}
-            {% include 'home/family_accomplishment_item.html' with title='Brushed their Teeth' icon='apple' color='green'%}
-            {% include 'home/family_accomplishment_item.html' with title='Cleaned up their Room' icon='android' color='purple'%}
-        </div>
-        <br>
+        {% if is_family_member %}
+            <div id="family-feed" style="height: 16em;">
+                {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
+                <div class="flex-column bg-dark rounded p-1 mh-25">
+                        {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
+                        {% include 'home/family_accomplishment_item.html' with title='Did the Dishes' icon='android' color='purple'%}
+                        {% include 'home/family_accomplishment_item.html' with title='Brushed their Teeth' icon='apple' color='green'%}
+                        {% include 'home/family_accomplishment_item.html' with title='Cleaned up their Room' icon='android' color='purple'%}
+                </div>
+            </div>
+        {% endif %}
         {% include 'site/heading_section.html' with id="calendar" label='Calendar'%}
-        <div id="calendar-wrapper" class="container rounded bg-dark rounded p-2 h-25 mh-25">
+        <div id="calendar" style="height: 16em;">
+            <div id="calendar-wrapper" class="container rounded bg-dark rounded p-2 h-100 mh-100 overflow-visible">
+                <form action="#" class="row h-100">
+                    <div id="rome-calendar"></div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+<link href="{% static 'calendar/rome.css'%}" rel="stylesheet">
+<script src="{% static 'calendar/rome.js'%}"></script>
+<script>
+    let current_date = new Date();
+    rome(document.getElementById('rome-calendar'), 
+    { 
+        "time": false,
+        "styles": {
+            "back": "rd-back",
+            "container": "rd-container bg-body-tertiary rounded rounded-4 text-center p-2 d-block h-100",
+            "date": "rd-date",
+            "dayBody": "rd-days-body bg-dark d-block rounded rounded-3",
+            "dayBodyElem": "rd-day-body", /*"rd-day-body",*/
+            "dayConcealed": "rd-day-concealed",
+            "dayDisabled": "rd-day-disabled",
+            "dayHead": "rd-days-head",
+            "dayHeadElem": "rd-day-head",
+            "dayRow": "rd-days-row",
+            "dayTable": "pt-1 d-block",
+            "month": "rd-month",
+            "next": "rd-next",
+            "positioned": "rd-container-attachment",
+            "selectedDay": "rd-day-selected",
+            "selectedTime": "rd-time-selected",
+            "time": "rd-time",
+            "timeList": "rd-time-list",
+            "timeOption": "rd-time-option"
+        },
+        "weekStart": current_date.getDay()
+    });
+</script>
+<style>
+    .rd-day-selected {
+        background-color: var(--bs-{{request.user.color}}) !important; /*#f67280;*/
+    }
+</style>
 {% endblock %}

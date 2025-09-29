@@ -1,26 +1,46 @@
 {% extends "site/site_base.html" %}
+{% block title %}Log In -{% endblock %}
 {% block content %}
-<div class="p-2" style="max-height: 1800px">
-    <div id="settings-section" class="container-sm pb-4 w-100">
-        <div id="settings" class="container rounded bg-dark p-2 h-25 mh-25">
-            <div id="logo" class="m-auto text-center pb-2" style="font-size: 4em;">FamilyThings</div>
-            {{error_messages}}
-            <!-- Display messages -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-            <form method="post" class="m-auto" style="width: fit-content !important;">
-                {% csrf_token %}
-                {% include 'site/form_field_small.html' with id="username" field=form.username %}
-                {% include 'site/form_field_small.html' with id="password" field=form.password %}
-                <button id="button-log-in" class="btn btn-primary mt-4 m-auto text-center d-block" type="submit">Log In</button>
-            </form>
-            <a href="{% url 'core:registration' %}" id="label-registration-hint" class="text-center d-block" href="">Not registered yet? Click here.</a>
+<div id="login-section" class="container">
+    <div id="login" class="container rounded bg-dark p-2 pb-4 h-25 mh-25">
+        <div id="logo" class="m-auto text-center" style="font-size: 4em;">FamilyThings</div>
+        <hr>
+        <form id="login-form" enctype="multipart/form-data" method="post" class="m-auto" style="width: fit-content !important;">
+            {% csrf_token %}
+            {% include 'site/form_field.html' with id="username" field=form.username %}
+            {% include 'site/form_field.html' with id="password" field=form.password %}
+            <button id="button-log-in" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="submit">Log In</button>
+        </form>
+        <br>
+        <div class="text-center d-block">
+            <span id="label-registration-hint">Not registered yet?</span> 
+            <a id="label-registration-hint-2" href="{% url 'core:user_register' %}">Click here.</a>
         </div>
     </div>
 </div>
+<script>
+    // AJAX-based Log In
+    $("#button-log-in").click(function(event) {
+        event.preventDefault(); // Prevents the button from creating the default HTTPRequest
+        event.target.disabled = true; //  Disables the log in button
+
+        enable_loading_screen();  // Function is defined in site_js
+
+        let form_data = $("#login-form")
+        $.ajax({ 
+            type: 'POST', url: '{% url "core:request_login" %}',
+            data: form_data.serializeArray(),
+            success: function(json) {
+                disable_loading_screen();
+                createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
+                setTimeout(function() {window.location.replace("{% url "core:user_profile" %}");}, 1000);
+            },
+            error: function(xhr, errmsg, err) {
+                event.target.disabled = false;
+                disable_loading_screen();
+                createAlert(xhr.responseText, key="", type="danger");
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,42 @@
+{% extends "site/site_base.html" %}
+{% block title %}Create Account -{% endblock %}
+{% block content %}
+<div id="register-section" class="container">
+    <div id="register" class="container rounded bg-dark p-2 pb-4 h-25 mh-25">
+        <div id="label-create-account" class="m-auto text-center" style="font-size: 4em;">Create account</div>
+        <hr>
+        <form method="post" class="m-auto" style="width: fit-content !important;">
+            {% csrf_token %}
+            <div class="required-fields bg-body-tertiary rounded p-2 pb-3">
+                <div class="d-flex justify-content-between px-3" style="gap: 20px;">
+                    {% include 'site/form_field.html' with id="username" field=form.username %}
+                    {% include 'site/form_field.html' with id="email" field=form.email %}
+                </div>
+                <div class="d-block m-auto text-center" style="width: fit-content;">
+                    {% include 'site/form_field.html' with id="password" field=form.password %}
+                </div>
+                <div id="password-hint" class="w-100 m-auto text-center fs-sm">
+                    <span id="label-password-hint">Password must be at least 8 characters long,</span><br>
+                    <span id="label-password-hint2">include one uppercase letter, and one special character.</span>
+                </div>
+            </div>
+            <div class="optional-fields bg-body-tertiary rounded p-2 pb-3 mt-3">
+                <div class="d-flex justify-content-between px-3">
+                    {% include 'site/form_field.html' with id="first-name" field=form.first_name optional=True %}
+                    {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}
+                </div>
+                <div id="name-hint" class="w-100 m-auto text-center fs-sm">
+                    <span id="label-name-hint">You can always set up your full, or just first, name in the Settings.</span><br>
+                    <span id="label-name-hint-2">(Only you, as well as your Family, can see it.)</span>
+                </div>
+            </div>
+            <button id="button-register" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="submit">Register</button>
+        </form>
+        <br>
+        <div class="text-center d-block">
+            <span id="label-login-hint">Already have an account?</span> 
+            <a id="label-login-hint-2" href="{% url 'core:user_login' %}">Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

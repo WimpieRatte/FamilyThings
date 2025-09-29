@@ -1,3 +1,26 @@
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script>
-    document.querySelector("#screen-transition").style.backgroundColor = "black";
+    /* Load the translated JSON into browser memory. */
+    var alert_locale = null
+
+    $.getJSON('/static/localization/{{request.session.lang_code}}/alerts.json', 
+    function(json_data){alert_locale = json_data})
+
+    function autoCloseAlert(alert){
+        setTimeout(function() {
+            alert.close();
+        }, 5000);
+    }
+
+    function createAlert(text = "", key = "", type = "warning") {
+
+        if (alert_locale && alert_locale[key]){
+            text = alert_locale[key];
+            console.log(text)
+        }
+        
+        var new_alert = new bootstrap.Alert($("#alert-container").append(
+            `<div class="alert alert-dismissible fade show m-0 mt-1 alert-${type}" role="alert" style="pointer-events: auto;"><span>${text}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`));
+    }
 </script>
