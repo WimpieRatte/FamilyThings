@@ -1,9 +1,13 @@
 {% load static %}
 <div id="overlay" class="vw-100 position-absolute overflow-hidden" style="min-height: 100vh; pointer-events: none; z-index: 1050;">
-    <svg id="cursor-base" class="position-absolute" style="display: none; z-index: 1040;" width="600" height="220" xmlns="">
-        <image id="cursor-shadow" x="7" y="4" eight="32" width="32" fill="black" href="{% static 'icons/cursor/cursor-regular-shadow.svg' %}" />
-        <image id="cursor-image" height="32" width="32" fill="white" href="{% static 'icons/cursor/cursor-regular.svg' %}" />
+    <svg id="cursor-base" class="position-absolute overflow-visible" style="display: none; z-index: 1040;" width="600" height="220" xmlns="">
+        <image id="cursor-image" height="32" width="32" style="filter: drop-shadow(7px 4px 2px black);" href="{% static 'icons/cursor/cursor-regular.svg' %}" />
     </svg>
+    <div id="alert-container" class="w-25 mw-25 position-absolute start-50 text-center translate-middle-x pt-1" style="z-index: 1011;">
+        {% for message in messages %}
+            {% include 'site/site_alert.html' with message=message tags=message.tags %}
+        {% endfor %}
+    </div>
     <div id="screen-transition" class="position-absolute vw-100 vh-100 top-0 start-0" style="z-index: 1010;">
         <img id="loading-arrow" class="m-auto d-block position-absolute top-50 start-50" height="150" width="150" src="{% static 'icons/cursor/arrow-repeat.svg' %}" alt="">
     </div>

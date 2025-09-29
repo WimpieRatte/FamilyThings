@@ -1,67 +1,86 @@
 {% load static %}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script>
-    /* Custon Cursor & Little Background Movement based on the Cursor's position */
+
+    /* Constants & Initialization for the entire Overlay */
     const root = document.querySelector(":root");
     const body = document.querySelector("body");
+
     const overlay = document.querySelector("#overlay");
     const screenTransition = document.querySelector("#screen-transition");
     const cursor = document.querySelector('#cursor-base');
     const cursorImage = document.querySelector('#cursor-image');
-    const cursorShadow = document.querySelector('#cursor-shadow');
     const loadingArrow = document.querySelector('#loading-arrow');
     const tooltip = document.querySelector('#tooltip');
 
-    const imgCursorRegular = 'cursor-regular';
-    const imgCursorText = 'cursor-text';
+    const imgCursorRegular = '/static/icons/cursor/cursor-regular.svg';
+    const imgCursorLink = '/static/icons/cursor/cursor-link.svg';
+    const imgCursorText = '/static/icons/cursor/cursor-text.svg';
 
     cursor.style.display = "none";
     overlay.style.height = `${body.clientHeight + 70}px`;
 
-    const updateCursorPosition = (e)=> {
-        let mouseX = e.clientX
-        let mouseY = e.clientY + root.scrollTop
+    if ('{{request.session.use_custom_cursor}}' != 'False'){
+        /* Reposition the cursor according to the mouse position */
+        const updateCursorPosition = (e)=> {
+            let mouseX = e.clientX
+            let mouseY = e.clientY + root.scrollTop
 
-        root.style.backgroundPositionX = e.clientX*-.01 + "px";
-        root.style.backgroundPositionY = e.clientY*-.01 + "px";
+            root.style.backgroundPositionX = e.clientX*-.01 + "px";
+            root.style.backgroundPositionY = e.clientY*-.01 + "px";
 
-        cursor.style.display = "block";
-        cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
-        tooltip.style.transform = `translate3d(calc(${mouseX}px + 30px), calc(${mouseY}px + 30px), 0)`;
+            cursor.style.display = "block";
+            cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+            tooltip.style.transform = `translate3d(calc(${mouseX}px + 30px), calc(${mouseY}px + 30px), 0)`;
+        }
+        window.addEventListener("mousemove", updateCursorPosition);
+        window.addEventListener("scroll", updateCursorPosition);
 
-        cursorImage.src = "{{HOST}}/static/icons/cursor/" + imgCursorRegular + ".svg";
-        cursorShadow.src = "{{HOST}}/static/icons/cursor/" + imgCursorRegular + "-shadow.svg";
+        const change_cursor_appearance = (img, x, y)=> {
+            cursorImage.setAttribute('href', img);
+            cursorImage.setAttribute('x', `${x}`);
+            cursorImage.setAttribute('y', `${y}`);
+        }
+
+        /* Change the appearance of the cursor depending on the element you're hovering at */
+        const link_selectors = 'a, button, select, option, input[type="checkbox"], .rd-day-body';
+        const text_selectors = 'textarea, input[type="text"], input[type="password"]';
+        const special_selectors = link_selectors + ", " + text_selectors
+
+        /* Variant for links, buttons, etc. */
+        $(link_selectors).on("mouseover", function() {change_cursor_appearance(imgCursorLink, 0, 0);});
+        $(link_selectors).on("mouseup", function() {change_cursor_appearance(imgCursorLink, 0, 0);});
+        $(link_selectors).on("mousedown", function() {change_cursor_appearance(imgCursorRegular, 0, 0);});
+
+        /* Variant for text areas */
+        $(text_selectors).on("mouseover", function() {change_cursor_appearance(imgCursorText, -20, -16);});
+
+        /* Default Cursor */
+        $(special_selectors).on("mouseleave", function() {change_cursor_appearance(imgCursorRegular, 0, 0);});
     }
-    window.addEventListener('mousemove', updateCursorPosition);
-    window.addEventListener('mouseleave', updateCursorPosition);
-    window.addEventListener('mouseenter', updateCursorPosition);
-    window.addEventListener("scroll", updateCursorPosition);
-
-    $("a").on( "mouseover", function() {
-        cursorImage.src = "{{HOST}}/static/icons/cursor/" + imgCursorText + ".svg";
-    });
 
     /* Tooltip */
-    $(".tooltip-source").on( "mouseover", function() {
-        let text = $(this).attr('data-tooltip-content')
+    $(".tooltip-source").on("mouseover", function() {
+        let text = $(this).attr('data-tooltip-context')
 
         if (text && text != "" 
             && screenTransition.style.backgroundColor == "rgba(0, 0, 0, 0)" 
             && cursor.style.display != "none"){
             tooltip.style.display = "block";
-            tooltip.textContent = $(this).attr('data-tooltip-content');
+
+            let context = $(this).attr('data-tooltip-context')
+            let content = $(this).attr('data-tooltip-content')
+            tooltip.textContent = context;
+            if (content){tooltip.textContent += ` ${content}`;}
         }
         else {
             tooltip.style.display = "none";
         }
-
     });
 
-    addEventListener("mouseout", (event) => {
-        tooltip.style.display = "none";
-    })
+    addEventListener("mouseout", (event) => {tooltip.style.display = "none";})
 
     /* Date&Time display */
     update_time()
@@ -73,36 +92,58 @@
         + ' ' + time.toLocaleTimeString();
     }
 
-    /* Localization */
-    let file = '/static/localization/lang_{{request.session.lang_code}}.json'
-    console.log(file)
-    $.getJSON(file, function(json) {
-        let json_entries = Object.entries(json)
+    /* Only proceed if a translation JSON was loaded beforehand;*/
+    /*'locale_json' has been defined in 'site_js_preload.html' already */
+    $.getJSON('/static/localization/{{request.session.lang_code}}/main.json', 
+    function(json_data){})
+    .done(function(json_data) {
+        Object.entries(json_data).forEach(function(entry) {
+            /* Each entry would normally be a Key/Value pair in JSON. */
+            let key = entry[0]; let text = entry[1];
+            let elements = document.querySelectorAll("#" + key);
 
-        for (let i = 0; i < json_entries.length; i++) {
-            let target = json_entries[i][0];
-            let new_text = json_entries[i][1];
-
-            let element = document.querySelector("#" + target);
-
-            if (element) {
+            /* Determine the HTML value based on the element type. */
+            elements.forEach(function(element) {
                 switch (element.localName) {
                     case "textarea":
-                        element.placeholder = new_text;
-                        break;
+                        /* 'placeholder' refers to the intangible text inside the textarea. */
+                        element.placeholder = text; break;
                     case "select":
+                        /* Select elements require access to their 'option' children. */
+                        /* When translating them, make sure to place all options inside of a list.*/
                         let children = element.children;
-                            for (let i = 0; i < children.length; i++) {
-                                children[i].textContent = new_text[i]
-                            }
+                        for (let i = 0; i < children.length; i++) {
+                            children[i].textContent = text[i]}
                         break;
                     default:
-                        element.textContent = new_text;
-                        break;
+                        element.textContent = text; break;
                 }
-            }
-        }
-    });
+            });
+        });
+    })
+
+    $.getJSON('/static/localization/{{request.session.lang_code}}/tooltip.json', 
+    function(json_data){})
+    .done(function(json_data) {
+        Object.entries(json_data).forEach(function(entry) {
+            /* Each entry would normally be a Key/Value pair in JSON. */
+            let key = entry[0]; let text = entry[1];
+
+            $("#"+key).attr("data-tooltip-context", text);
+            let elements = document.querySelectorAll("#" + key);
+
+            elements.forEach(function(element) {
+               //element.attr("data-tooltip-context") = "Test";
+            });
+        });
+    })
+    
+    function getLocaleText(key = "", default_text = ""){
+        if (locale_json[key])
+            return locale_json[key];
+        else
+            return default_text;
+    }
 
     /* Changing Language */
     $(".language-btn").on( "click", function() {
@@ -110,7 +151,7 @@
 
         $.ajax({ 
             type: 'POST',
-            url: '{% url 'core:session_change_language' %}',
+            url: '{% url "core:session_change_language" %}',
             data: {
                 action: 'post',
                 lang_code: lang_code,
@@ -126,29 +167,23 @@
     });
 
     /* Loading Animation */
-    setTimeout(function(){
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)"; 
+    function enable_loading_screen(){
+        loadingArrow.style = "opacity: 1";
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 1)";
+    }
+    function disable_loading_screen(){
         loadingArrow.style = "opacity: 0";
-    }, 50 + (Math.random() * 100) );
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    }
+    setTimeout(function(){disable_loading_screen()}, 40 + (Math.random() * 100));
 
+    /* Alerts */
     setTimeout(function() {
-    let alerts = document.querySelectorAll('.alert');
-    alerts.forEach(function(alert) {
-      let bsAlert = new bootstrap.Alert(alert);
-      bsAlert.close(); // removes element from DOM
-    });
-  }, 10000);
+        let alerts = document.querySelectorAll('.alert');
 
-    /* update_low_priority();
-    setInterval(update_low_priority, 20000);
-    async function update_low_priority(){
-        fetch('/test', { method: "GET",
-        headers: { "X-Requested-With": "XMLHttpRequest"}})
-        .then(response => response.json().then(json_data => ({
-            time: json_data['time']
-        }))
-        .then(result => {
-            /*document.getElementById("datetime-display").textContent = result.time;
-        })); 
-    }*/
+        alerts.forEach(function(alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close(); // removes element from DOM
+        });
+    }, 5000);
 </script>

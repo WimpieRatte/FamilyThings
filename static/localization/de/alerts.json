@@ -1,0 +1,14 @@
+{
+    "language-changed": "Sprache zu Deutsch gewechselt.",
+    "login-required": "Für diese Aktion musst du dich zunächst einloggen.",
+    "user-exists": "Dieser Nutzername wurde bereits benutzt.",
+    "email-used": "Es gibt bereits ein Konto, welches unter diese E-Mail läuft.",
+    "password-invalid": "Das Passwort muss aus acht Zeichen bestehen und ein Großbuchstaben sowie ein Sonderzeichen beinhalten.",
+    "account-created": "Das Konto wurde erfolgreich erstellt. Du kannst du dich nun anmelden.",
+    "logged-out": "Du wurdest erfolgreich ausgeloggt.",
+    "settings-updated": "Deine Einstellungen wurden übernommen.",
+    "login-success": "Willkommen zurück, %PLACEHOLDER%!",
+    "login-failed": "Nutzername und Passwort stimmen nicht überein.",
+    "logout-success": "Du wurdest erfolgreich ausgeloggt.",
+    "hint-changes": "Die Änderungen werden erst nach dem Speichern übernommen."
+}

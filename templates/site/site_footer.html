@@ -1,3 +1,4 @@
+{% load static %}
 <footer
     class="fixed-bottom d-flex flex-wrap justify-content-between align-items-center px-5 pt-3 pb-4 bg-body-tertiary border-top">
     <div id="app-info" class="d-flex justify-content-between" style="width: 100%;">
@@ -8,9 +9,9 @@
                             Licence</a><span id="footer-license-3">.</small></div>
         </div>
         <div>
-            <div class="text-end m-0 p-0">
-                <button class="language-btn" value="en" class="border-0 px-1 m-0">🇺🇸</button>
-                <button class="language-btn" value="de" class="border-0 px-1 m-0">🇩🇪</button>
+            <div class="text-end m-0">
+                <button class="language-btn m-0 p-0 px-1" value="en" class="border-0 m-0 p-0"><img src="{% static 'icons/flags/us.svg'%}" alt="" width="20"></button>
+                <button class="language-btn m-0 p-0 px-1" value="de" class="border-0 m-0 p-0"><img src="{% static 'icons/flags/de.svg'%}" alt="" width="20"></button>
             </div>
             <div class="text-end fs-sm">
                 <a id="footer-github" class="ms-1" href="https://github.com/WimpieRatte/FamilyThings" aria-label="Bootstrap">

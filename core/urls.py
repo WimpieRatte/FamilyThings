@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from core.session import update_session, change_language
 from . import views
+from . import user_auth
 
 # Ideally, its name is identical with the folder's
 app_name = "core"
@@ -10,21 +11,16 @@ app_name = "core"
 core_urls = [
     # path(<URL>, <view>, <name>)
     path("", views.home, name="home"),
-    path("login/", views.user_login, name="user_login"),  # Django's default
+    path("login/", views.user_login, name="user_login"),
     path("logout/", views.user_logout, name="user_logout"),
+    path("register/", views.user_register, name="user_register"),
     path("profile/", views.user_profile, name="user_profile"),
     path("settings/", views.user_settings, name="user_settings"),
-    path("accounts/profile/", views.home, name="home"),  # default landing page
-    path("registration/", views.register, name="registration"),
 
     # AJAX Urls
+    path("auth/login", user_auth.process_login, name="request_login"),
     path("session/switchlanguage", change_language,
          name="session_change_language"),
-
-    # Unused
-    path("settings/update/", views.update_user_settings,
-         name="user_settings_update"),
-    path("test/", views.update_user_settings, name="update_user_settings"),
 ]
 
 urlpatterns = [

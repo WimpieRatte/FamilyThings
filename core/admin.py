@@ -5,8 +5,8 @@ from .models import CustomUser, FamilyUser, Family
 # Register your models here.
 @admin.register(CustomUser)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['username', 'color', 'background_image']
-    list_editable = ['color', 'background_image']
+    list_display = ['username', 'first_name', 'birthday', 'color', 'icon', 'background_image']
+    list_editable = ['color', 'icon', 'background_image']
 
 
 @admin.register(Family)

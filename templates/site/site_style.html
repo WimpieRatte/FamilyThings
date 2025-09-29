@@ -21,10 +21,13 @@
         background-position-y: -3em;
     }
 
-    html, :root, head, body, main, footer, a, textarea, select, option,
-    button, [type="button"]:not(:disabled), [type="reset"]:not(:disabled), [type="submit"]:not(:disabled), button:not(:disabled) {
-        cursor:none;
-    }
+    {% if request.session.use_custom_cursor %}
+        html, :root, head, body, main, footer, a, textarea, select, option, input,
+        button, [type="button"]:not(:disabled), [type="reset"]:not(:disabled), [type="submit"]:not(:disabled), button:not(:disabled),
+        .rd-day-body, .rd-day-head {
+            cursor:none !important;
+        }
+    {% endif %}
 
     .bg-primary, .btn-primary {
         {% if request.user.color %}
@@ -36,21 +39,29 @@
         {% endif %}
     }
 
-    .border-primary {
-        border-color: var(--bs-{{request.user.color}}) !important;
+    .border-primary, button:not(.color-btn) {border-color: var(--bs-{{request.user.color}}) !important;}
+
+    .btn-primary:disabled {
+        filter: grayscale(80%);
+        color: #312e2e;
     }
 
-    .bg-dark {
-        --bs-bg-opacity: 0.8
-    }
+    .bg-dark {--bs-bg-opacity: 0.8}
 
-    .fs-sm {
-        font-size: 0.9em;
-    }
+    .fs-sm {font-size: 0.9em;}
 
     #user-icon-preview, #dropdown-user-icon {
         border-radius: 500px;
         pointer-events: auto;
+    }
+
+    .language-btn {
+        border: 0 !important;
+        background-color: var(--bs-tertiary-bg-rgb) !important;
+    }
+
+    .language-btn img {
+        border-radius: 2px;
     }
 
     body {
@@ -66,6 +77,35 @@
         overflow-x: hidden;
         overflow-y: auto;
         height: 95vh;
+    }
+
+    /* Form-related Styling */
+    select {margin-right: .25em;}
+
+    select > option {font-size: smaller;}
+
+    #user-icon-preview,
+    #background-preview,
+    #color-btn {
+        filter: brightness(1);
+        transition-duration: .25s;
+        transition-property: filter;
+        z-index: 100;
+    }
+
+    #user-icon-preview:hover,
+    #background-preview:hover,
+    #color-btn:hover {
+        filter: brightness(.2);
+        z-index: 80;
+    }
+
+    #dropdown-item-role {
+        pointer-events: none;
+    }
+
+    .nav-link:hover {
+        filter: brightness(1.5);
     }
 
     @media (max-width: 1350px) {
