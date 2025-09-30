@@ -1,10 +1,13 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script>
-    /* Load the translated JSON into browser memory. */
-    var alert_locale = null
+    /* Preload Constants */
+    console.log('{{request.session.lang_code}}')
+    const languageCode = '{{request.session.lang_code}}'
 
+    /* Load the translated JSON into browser memory. */
+    var localAlertText = null
     $.getJSON('/static/localization/{{request.session.lang_code}}/alerts.json', 
-    function(json_data){alert_locale = json_data})
+        function(json_data){localAlertText = json_data})
 
     function autoCloseAlert(alert){
         setTimeout(function() {
@@ -14,9 +17,9 @@
 
     function createAlert(text = "", key = "", type = "warning") {
 
-        if (alert_locale && alert_locale[key]){
-            text = alert_locale[key];
-            console.log(text)
+        if (localAlertText && localAlertText[key]){
+            text = localAlertText[key];
+            //console.log(text)
         }
         
         var new_alert = new bootstrap.Alert($("#alert-container").append(

@@ -1,5 +1,5 @@
 {% load static %}
-<div id="accomplishment-item" class="container w-100 my-1 p-2 rounded bg-primary bg-gradient shadow-sm tooltip-source" style="height: 2.5em;" data-tooltip-context="Accomplished" data-tooltip-content="{{date}}">
+<div id="accomplishment-item" class="container w-100 my-1 p-2 rounded bg-primary bg-gradient shadow-sm tooltip-source" style="height: 2.5em; pointer-events: visible;" data-tooltip-context="Accomplished on" data-tooltip-content="{{date}}">
     <div class="d-flex align-items-start p-0 position-relative">
         <div class="rounded position-relative" style="height: 1.5em; width: 1.5em; background-color: #bcdcec;">
             <img class="position-absolute top-50 start-50 translate-middle" src="{% static '/icons/task/'|add:icon|add:'.svg' %}" width="20" height="20" alt=""> {# position: relative; top: 0.15em; left: 0.25em; #}

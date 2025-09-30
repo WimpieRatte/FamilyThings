@@ -6,8 +6,6 @@ import json
 def update_session(request, lang_code: str = "", custom_cursor: bool = True):
     """Updates the User's session as needed"""
 
-    request.session['error'] = ""
-
     #  Apply a language code based on either the existing value,
     #  an User's own setting, or lastly, the browser's.
     if lang_code == "":
@@ -15,6 +13,10 @@ def update_session(request, lang_code: str = "", custom_cursor: bool = True):
             'lang_code', request.LANGUAGE_CODE)
     else:
         request.session['lang_code'] = lang_code
+
+    # Fallback if there is no language_code
+    if request.session['lang_code'] == "":
+        request.session['lang_code'] = "en"
 
     #  If a User disables the custom cursor, it needs to be
     #  passed onto the session.

@@ -16,7 +16,7 @@
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             {% if not request.user.is_authenticated %}
-              {% include 'header/dropdown_item.html' with href='/register' id="log-in" icon='pencil-square' label='Register' %}
+              {% include 'header/dropdown_item.html' with href='/register' id="register" icon='pencil-square' label='Register' %}
               {% include 'header/dropdown_item.html' with href='/login' id="log-in" icon='box-arrow-right' label='Log In' %}
             {% else %}
             <small id="dropdown-item-role" class="dropdown-item">{% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.user.is_manager %}</small>
