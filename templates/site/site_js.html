@@ -62,23 +62,26 @@
     }
 
     /* Tooltip */
-    $(".tooltip-source").on("mouseover", function() {
-        let text = $(this).attr('data-tooltip-context')
+    function updateTooltips(){
+        $(".tooltip-source").on("mouseover", function() {
+            let text = $(this).attr('data-tooltip-context')
 
-        if (text && text != "" 
-            && screenTransition.style.backgroundColor == "rgba(0, 0, 0, 0)" 
-            && cursor.style.display != "none"){
-            tooltip.style.display = "block";
+            if (text && text != "" 
+                && screenTransition.style.backgroundColor == "rgba(0, 0, 0, 0)" 
+                && cursor.style.display != "none"){
+                tooltip.style.display = "block";
 
-            let context = $(this).attr('data-tooltip-context')
-            let content = $(this).attr('data-tooltip-content')
-            tooltip.textContent = context;
-            if (content){tooltip.textContent += ` ${content}`;}
-        }
-        else {
-            tooltip.style.display = "none";
-        }
-    });
+                let context = $(this).attr('data-tooltip-context')
+                let content = $(this).attr('data-tooltip-content')
+                tooltip.textContent = context;
+                if (content){tooltip.textContent += ` ${content}`;}
+            }
+            else {
+                tooltip.style.display = "none";
+            }
+        });
+    }
+    updateTooltips()
 
     addEventListener("mouseout", (event) => {tooltip.style.display = "none";})
 
@@ -157,7 +160,7 @@
                 lang_code: lang_code,
                 csrfmiddlewaretoken: '{{ csrf_token }}'},
             success: function(json) {
-                console.log(json.result);
+                //console.log(json.result);
                 location.reload();
             },
             error: function(xhr, errmsg, err) {

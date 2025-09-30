@@ -2,34 +2,35 @@
 {% load static %}
 {% block title %}Profile -{% endblock %}
 {% block content %}
-<div class="d-md-flex justify-content-evenly" style="max-height: 1800px">
-    <div id="todo-section" class="section container-sm pb-4" style="width: 340px;">
+<div class="container-lg d-md-flex justify-content-evenly" style="max-height: 1800px">
+    <div id="accomplishments-section" class="section container pb-4" style="width: 340px;">
         {% include 'site/heading_section.html' with id="todays-accomplishments" label="Today's Accomplishments" value=todays_accomplishments.length %}
-        {% if todays_accomplishments %}
-        <div class="flex-column bg-dark rounded p-1">
-            {% for entry in todays_accomplishments %}
-                {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
-            {% endfor %}
+        <div style="height: 16em;">
+            <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2">
+                <!-- {% for entry in todays_accomplishments %}
+                    {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
+                {% endfor %} -->
+            </div>
+            <div id="new-accomplishment-wrapper" class="w-auto m-auto">
+                <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="/" data-tooltip-context="Add New">
+                    <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
+                    <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></h6>
+                </a>
+            </div>
         </div>
-        {% endif %}
-        <div id="new-accomplishment-wrapper" class="w-auto m-auto">
-            <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="/" data-tooltip-context="Add New">
-                <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
-                <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></h6>
-            </a>
-        </div>
-        <br>
         {% include 'site/heading_section.html' with id="recent-activities" label='Recent Activities' %}
-        <div class="flex-column bg-dark rounded p-1">
-            {% for entry in recent_accomplishments %}
-                {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
-            {% endfor %}
+        <div class="containe" style="height: 15em;">
+            <div id="recent-accomplishments-container" class="flex-column bg-dark rounded p-1">
+                <!-- {% for entry in recent_accomplishments %}
+                    {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
+                {% endfor %} -->
+            </div>
         </div>
     </div>
     {% if is_family_member %}
         <div style="width: 430px;">
             {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
-            <div id="messager-section" class="pb-3 w-100" style="height: 23em;">
+            <div id="messager-section" class="pb-3 w-100" style="height: 24em;">
                 <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 mb-2 h-100 fs-sm overflow-y-scroll" style="overflow-x: visible !important;">
                     <div id="message-wall" class="container rounded bg-light-subtle h-100">
                         <div id="message-list" class="p-1">
@@ -50,7 +51,7 @@
     {% endif %}
     <div id="feed-section" class="section container-sm pb-4" style="width: 340px;">
         {% if is_family_member %}
-            <div id="family-feed" style="height: 16em;">
+            <div id="family-feed" style="height: 17em;">
                 {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
                 <div class="flex-column bg-dark rounded p-1 mh-25">
                         {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
@@ -73,6 +74,7 @@
 <link href="{% static 'calendar/rome.css'%}" rel="stylesheet">
 <script src="{% static 'calendar/rome.js'%}"></script>
 <script>
+    /* Calendar powered by Rome */
     let current_date = new Date();
     rome(document.getElementById('rome-calendar'), 
     { 
@@ -100,6 +102,58 @@
         },
         "weekStart": current_date.getDay()
     });
+
+    /* Disable link to itself */
+    $("#nav-tooltip-profile").attr("style", "pointer-events: none; color: gray;")
+
+    const recentAccContainer = $("#recent-accomplishments-container")
+    const todaysAccContainer = $("#todays-accomplishments-container")
+
+    /* Get Recent Accomplishments */
+    $.get( "{% url 'accomplishment:get_recent' 5 %}", function() {})
+    .done(function(response) {
+        Object.entries(response.result).forEach(function(entry) {
+            let data = entry[1]; //The key (0) is blank while (1) is the content
+            /* Apply the accomplishment */
+            addAccomplishmentEntry(recentAccContainer, data)
+        });
+        updateTooltips(); // Required to make the new Entries interactable
+    })
+    .fail(function(err) {console.log(err);})
+
+    /* Get Today's Accomplishments */
+    $.get( "{% url 'accomplishment:obtained_today' 4 %}", function() {})
+    .done(function(response) {
+        Object.entries(response.result).forEach(function(entry) {
+            let data = entry[1]; //The key (0) is blank while (1) is the content
+            /* Apply the accomplishment */
+            addAccomplishmentEntry(todaysAccContainer, data)
+        });
+        updateTooltips(); // Required to make the new Entries interactable
+    })
+    .fail(function(err) {console.log(err);})
+
+    /* TODO: Move this + thie accomplishment functions to its own JS script/module of sorts */
+    var localContext = new Object()
+    $.getJSON('/static/localization/{{request.session.lang_code}}/context.json', 
+        function(json_data){localContext = json_data;})
+
+    /* Dynamically create Accomplishment entries */
+    const accomplishmentTemplate = `{% include "home/user_accomplishment_item.html" with title="%title%" icon="%icon%" date="%date%" %}`
+
+    function addAccomplishmentEntry(target_container, data){
+        let language = languageCode;
+        if (language == ""){language="en";}
+        date = new Date(data["created"]).toLocaleDateString(language, {
+            weekday: "short", year: "numeric",
+            month: "short", day: "numeric",})
+        target_container.append(
+            accomplishmentTemplate.replace("%title%", data["name"])
+            .replace("%date%", date)
+            .replace("%25icon%25", data["icon"])
+            .replace("Accomplished on", localContext["accomplished"])
+        )
+    }
 </script>
 <style>
     .rd-day-selected {

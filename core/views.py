@@ -84,7 +84,6 @@ def user_register(request):
                 type=None,
                 measurement=None
             )
-
             return redirect("core:user_login")
     else:
         return render(
@@ -99,14 +98,7 @@ def user_profile(request, lang_code: str = ""):
 
     target: HttpResponse = render(request, "core/user_profile.html", {
         'is_family_member': FamilyUser.objects.filter(
-            custom_user_id=request.user),
-        'todays_accomplishments': Accomplishment.objects.filter(
-                created_by=request.user,
-                created__year=today.year,
-                created__month=today.month,
-                created__day=today.day)[:4],
-        'recent_accomplishments': Accomplishment.objects.filter(
-                created_by=request.user)[:6]
+            custom_user_id=request.user)
     })
 
     return render_if_logged_in(request, target)
