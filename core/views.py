@@ -24,11 +24,9 @@ def render_if_logged_in(request, target: HttpResponse):
 
 
 def home(request, lang_code: str = ""):
-    """The landing page."""
+    """The Home page."""
     update_session(request=request, lang_code=lang_code)
-    target: HttpResponse = render(request, "home/home.html", {})
-
-    return target
+    return render(request, "home/home.html", {})
 
 
 PASSWORD_PATTERN = r"^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"

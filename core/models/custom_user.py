@@ -26,7 +26,7 @@ class CustomUser(AbstractUser):
     ENGLISH = "en"
     GERMAN = "de"
     LANG_CHOICES = {
-        ENGLISH: "🇺🇸 English", GERMAN: "🇩🇪 German"
+        ENGLISH: "English", GERMAN: "German"
     }
 
     # Overriding Django's built-in AbstractUser
