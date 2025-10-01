@@ -3039,6 +3039,11 @@ textarea.form-control-lg {
 }
 
 /* Added styling for the disabled button */
+input:disabled {
+    color: var(--bs-gray-800);
+    background-color: var(--bs-gray-600);
+}
+
 .btn-primary:disabled {
     filter: grayscale(80%);
     color: #312e2e;

@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from core.models.custom_user import CustomUser
-from core.session import create_alert, get_locale_text
+from core.session import create_alert, get_locale_text, JsonResponseAlert
 
 
 def process_login(request, lang_code: str = ""):

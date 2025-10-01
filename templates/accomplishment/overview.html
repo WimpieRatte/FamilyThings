@@ -4,17 +4,13 @@
 <div id="todo-section" class="container-sm pb-4 w-100">
     {% include 'site/heading_section.html' with label="Accomplishments" id="accomplishments" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
-        <div id="accomplishments-wrapper" class="container d-flex flex-wrap rounded py-2">
-            <ul>
-                {% for entry in recent_accomplishments %}
-                    <li>
-                        {{entry.name}}<br><small>{{entry.description}}</small><br>
-                        <small>
-                            <span id="label-accomplished">Accomplished on</span> {{entry.created}}
-                        </small>
-                    </li>
+        <div id="accomplishments-wrapper" class="container rounded py-2">
+            {% include 'site/heading_small.html' with label="Recent Additions" id="recent-additions" %}
+            <div class="w-75 d-flex flex-wrap gap-1">
+                {% for entry in recent_additions %}
+                    <a href="{% url 'accomplishment:add_new' entry.id %}"><div class="bg-primary rounded-2 p-1 ">{{entry.name}}</div></a>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
     </div>
 </div>

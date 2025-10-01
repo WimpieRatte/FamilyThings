@@ -76,3 +76,16 @@ def get_locale_text(request: dict, ID: str = "",
     # Otherwise, proceed with the default text.
     except (Exception):
         return default_text.replace("%PLACEHOLDER%", insert),
+
+
+class JsonResponseAlert(JsonResponse):
+    def __init__(self, request, message: str, ID: str = "",
+                 type: str = 'danger', insert: str = ""):
+        super().__init__(
+            data={
+                'alert-message': get_locale_text(
+                    request=request, ID=ID,
+                    default_text=message, insert=insert),
+                'alert-type': 'success'
+            }
+        )

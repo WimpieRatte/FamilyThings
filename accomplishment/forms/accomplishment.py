@@ -13,9 +13,12 @@ class AccomplishmentForm(forms.Form):
     accomplishment_type = forms.ChoiceField(
         label="Type", required=False)
     is_achievement = forms.BooleanField(required=False)
+    #  Used in case the user wants to repeat an existing one
+    is_repeat = forms.BooleanField(required=False)
 
     # By default, Django creates a Textarea with 10 rows, which is too much.
     description.widget.attrs.update({"rows": "3"})
 
     # The icon selection is handled through the page's JavaScript
     icon.widget.attrs.update({"style": "display: none;"})
+    is_repeat.widget.attrs.update({"style": "display: none;"})

@@ -3,7 +3,14 @@
 {% block content %}
 <div id="todo-section" class="container-sm pb-4 w-100">
     {% include 'site/heading_section.html' with label="Add New Accomplishment" id="create_accomplishment" %}
-    <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
+    <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25 position-relative">
+        <div id="duplicate-accomplishment-prompt" class="position-relative" style="display: none;">
+            <div id="duplicate-accomplishment-label" class="w-50 p-2 m-auto border border-2 border-dark text-bg-warning rounded-3 text-center">There already exists an Accomplishment with that name.<br>Did you intend on repeating it?</div>
+            <div class="d-flex justify-content-between w-50 m-auto position-absolute top-100 start-50 translate-middle">
+                <button id="button-accept" class="btn btn-primary text-bg-dark d-block" type="button">Accept</button>
+                <button id="button-undo" class="btn btn-primary text-bg-dark d-block" type="button">Undo</button>
+            </div>
+        </div>
         <div id="accomplishments-wrapper" class="container d-flex py-5">
             <form id="accomplishment-form" method="post" class="m-auto d-flex flex-wrap">
                 {% csrf_token %}
@@ -13,6 +20,8 @@
                     {% include 'site/form_field.html' with id="measurement" field=form.measurement optional=True %}
                     {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement optional=True %}
                     {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
+                    {# Hidden Fields #}
+                    {% include 'site/form_field.html' with id="is_repeat" field=form.is_repeat %}
                 </div>
                 <div class="w-50">
                     {% include 'site/form_field.html' with id="icon" field=form.icon optional=True %}
@@ -46,12 +55,26 @@
     }
 </style>
 <script>
-    async function input_change_value(button, input){
-        document.querySelector(input).value = button.value;
+    const duplicateAccomplishmentPrompt = document.getElementById("duplicate-accomplishment-prompt");
+    var duplicateAccomplishment = new Object()
+    const nameField = document.getElementById("id_name");
+    const iconField = document.getElementById("id_icon");
+    const descriptionField = document.getElementById("id_description");
+    const submitButton = document.getElementById("button-create");
 
-        document.querySelectorAll(".icon-btn").forEach(function(element, i) {
+    function unfocus_all(elements){
+        elements.forEach(function(element, i) {
             element.classList.remove("active");
         })
+    }
+
+    async function input_change_value(button, input){
+        if (document.querySelector(input).disabled){
+            return; /* Only accept changes if the input field is active */
+        }
+
+        document.querySelector(input).value = button.value;
+        unfocus_all(document.querySelectorAll(".icon-btn"));
 
         button.classList.add("active");
     }
@@ -60,18 +83,21 @@
     // AJAX Submission
     $("#button-create").click(function(event) {
         event.preventDefault(); // Prevents the button from creating the default HTTPRequest
-        event.target.disabled = true; //  Disables the log in button
+        submitButton.disabled = true; //  Disables the log in button
 
         enable_loading_screen();  // Function is defined in site_js
 
         let form_data = $("#accomplishment-form")
+        nameField.disabled = false;
+        descriptionField.disabled = false;
+        iconField.disabled = false;
         $.ajax({ 
             type: 'POST', url: '{% url "accomplishment:submit_new" %}',
             data: form_data.serializeArray(),
             success: function(json) {
                 disable_loading_screen();
                 createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-                /*setTimeout(function() {window.location.replace("{% url "core:user_profile" %}");}, 1000);*/
+                setTimeout(function() {window.location.replace('{% url "core:user_profile" %}');}, 1000);
             },
             error: function(xhr, errmsg, err) {
                 event.target.disabled = false;
@@ -80,5 +106,53 @@
             }
         });
     });
+
+    /* Duplicate Check */
+    var nameCheckURL = "{{HOST}}/accomplishments/get/name="
+
+    $("#id_name").focus(function(event) {
+        submitButton.disabled = true;
+    })
+
+    $("#id_name").focusout(function(event) {
+        let nameToCheck = nameField.value;
+
+        $.ajax({ 
+            type: 'POST', url: nameCheckURL + nameToCheck, data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                name: nameToCheck},
+            success: function(result) {
+                duplicateAccomplishmentPrompt.style.display = "block";
+                submitButton.disabled = true;
+                duplicateAccomplishment = result
+                nameField.disabled = true;
+            },
+            error: function(xhr, errmsg, err) {
+                submitButton.disabled = false;
+            }
+        });
+    })
+
+    $("#button-undo").click(function(event) {
+        nameField.disabled = false;
+        nameField.value = ""
+
+        submitButton.disabled = false;
+        duplicateAccomplishmentPrompt.style.display = "none";
+    })
+
+    $("#button-accept").click(function(event) {
+        descriptionField.value = duplicateAccomplishment.description;
+        
+        unfocus_all(document.querySelectorAll(".icon-btn"));
+        input_change_value(document.querySelector(`#icon-btn-${duplicateAccomplishment.icon}`), '#id_icon')
+
+        nameField.disabled = true;
+        descriptionField.disabled = true;
+        iconField.disabled = true;
+
+        submitButton.disabled = false;
+        duplicateAccomplishmentPrompt.style.display = "none";
+    })
 </script>
 {% endblock %}
