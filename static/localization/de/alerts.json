@@ -1,6 +1,7 @@
 {
     "language-changed": "Sprache zu Deutsch gewechselt.",
     "login-required": "Für diese Aktion musst du dich zunächst einloggen.",
+    "not-in-a-family": "Du bist nicht Teil einer Familie.",
     "user-exists": "Dieser Nutzername wurde bereits benutzt.",
     "email-used": "Es gibt bereits ein Konto, welches unter diese E-Mail läuft.",
     "password-invalid": "Das Passwort muss aus acht Zeichen bestehen und ein Großbuchstaben sowie ein Sonderzeichen beinhalten.",

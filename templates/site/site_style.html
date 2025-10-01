@@ -1,55 +1,5 @@
 {% load static %}
 <style>
-    :root {
-        --bs-blue-font: #dee2e6;
-        --bs-indigo-font: #dee2e6;
-        --bs-pink-font: #212529;
-        --bs-red-font: #212529;
-        --bs-orange-font: #212529;
-        --bs-yellow-font: #212529;
-        --bs-teal-font: #212529;
-        --bs-cyan-font: #212529;
-        --bs-blue: #4b85d9;
-        --bs-pink: #d05f97;
-        --bs-red: #c84855;
-        --bs-orange: #df7823;
-        --bs-yellow: #d5af3c;
-        --bs-indigo: #8c4df2;
-        --bs-teal: #1cb789;
-        --bs-cyan: #64cbdf;
-        background-size: 105vw;
-        background-position-y: -3em;
-    }
-
-    {% if request.session.use_custom_cursor %}
-        html, :root, head, body, main, footer, a, textarea, select, option, input,
-        button, [type="button"]:not(:disabled), [type="reset"]:not(:disabled), [type="submit"]:not(:disabled), button:not(:disabled),
-        .rd-day-body, .rd-day-head {
-            cursor:none !important;
-        }
-    {% endif %}
-
-    .bg-primary, .btn-primary {
-        {% if request.user.color %}
-            background-color: var(--bs-{{request.user.color}}) !important;
-            color: var(--bs-{{request.user.color}}-font);
-        {% else %}
-            background-color: var(--bs-blue) !important;
-            color: var(--bs-blue-font);
-        {% endif %}
-    }
-
-    .border-primary, button:not(.color-btn) {border-color: var(--bs-{{request.user.color}}) !important;}
-
-    .btn-primary:disabled {
-        filter: grayscale(80%);
-        color: #312e2e;
-    }
-
-    .bg-dark {--bs-bg-opacity: 0.8}
-
-    .fs-sm {font-size: 0.9em;}
-
     #user-icon-preview, #dropdown-user-icon {
         border-radius: 500px;
         pointer-events: auto;
@@ -63,26 +13,6 @@
     .language-btn img {
         border-radius: 2px;
     }
-
-    body {
-        font-family: "Sour Gummy", sans-serif !important;
-        background: 0 !important; /* Remove background-color to make space for the root's background */
-        margin-left: auto;
-        margin-right: auto;
-        overflow-x: hidden;
-        overflow-y: hidden;
-    }
-
-    main {
-        overflow-x: hidden;
-        overflow-y: auto;
-        height: 95vh;
-    }
-
-    /* Form-related Styling */
-    select {margin-right: .25em;}
-
-    select > option {font-size: smaller;}
 
     #user-icon-preview,
     #background-preview,
@@ -102,10 +32,6 @@
 
     #dropdown-item-role {
         pointer-events: none;
-    }
-
-    .nav-link:hover {
-        filter: brightness(1.5);
     }
 
     @media (max-width: 1350px) {
@@ -177,6 +103,7 @@
             transform:translate(-50%,-75%) rotate(360deg); 
         } 
     }
+
 
     /* // Large devices (desktops, 992px and up) */
     @media (min-width: 992px) {}
