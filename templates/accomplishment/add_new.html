@@ -11,20 +11,16 @@
                 <button id="button-undo" class="btn btn-primary text-bg-dark d-block" type="button">Undo</button>
             </div>
         </div>
-        <div id="accomplishments-wrapper" class="container d-flex py-5">
-            <form id="accomplishment-form" method="post" class="m-auto d-flex flex-wrap">
+        <div id="accomplishments-wrapper" class="d-flex py-5">
+            <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap">
                 {% csrf_token %}
-                <div class="w-50">
-                    {% include 'site/form_field.html' with id="name" field=form.name %}
+                <div class="ms-auto" style="width: 60%;">
+                    <div id="" class="d-flex gap-2">
+                        {% include 'site/form_field.html' with id="name" field=form.name %}
+                        {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
+                    </div>
                     {% include 'site/form_field.html' with id="description" field=form.description optional=True %}
-                    {% include 'site/form_field.html' with id="measurement" field=form.measurement optional=True %}
-                    {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement optional=True %}
-                    {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
-                    {# Hidden Fields #}
-                    {% include 'site/form_field.html' with id="is_repeat" field=form.is_repeat %}
-                </div>
-                <div class="w-50">
-                    {% include 'site/form_field.html' with id="icon" field=form.icon optional=True %}
+                    <div id="form-label-icon">Icon</div>
                     <div class="d-flex flex-wrap" style="width: 27em; gap:.125em">
                         <div class="d-flex flex-wrap w-100">
                         {% for icon in icons %}
@@ -40,9 +36,24 @@
                         {% endfor %}
                         </div>
                     </div>
+                    {# Hidden Fields #}
+                    {% include 'site/form_field.html' with id="icon" field=form.icon %}
+                    {% include 'site/form_field.html' with id="is_repeat" field=form.is_repeat %}
+                </div>
+                <div style="width: 40%;">
+                    <div id="form-label-measurement">Measurement</div>
+                    <div id="measurement-section" class="d-flex gap-2">
+                        {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
+                        {% include 'site/form_field.html' with id="" field=form.measurement %}
+                    </div>
+                    <div id="timeframe-section" class="flex-column gap-2">
+                        {% include 'site/form_field.html' with id="" field=form.date_from %}
+                        {% include 'site/form_field.html' with id="" field=form.date_to %}
+                    </div>
+                    {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement %}
                 </div>
                 <div>
-                    <button id="button-create" class="btn btn-primary border-primary mt-4 d-block" type="submit">Create</button>
+                    <button id="button-create" class="btn btn-primary border-primary mt-4 d-block ms-auto" type="submit">Create</button>
                 </div>
             </form>
         </div>

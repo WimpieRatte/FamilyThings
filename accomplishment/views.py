@@ -24,7 +24,8 @@ def overview_page(request, lang_code: str = ""):
     target: HttpResponse = render(
         request, "accomplishment/overview.html",
         {
-            'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=fam_user_acc_ids)))
+            'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=fam_user_acc_ids))),
+            'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan']
         })
 
     return render_if_logged_in(request, target)
@@ -40,7 +41,8 @@ def add_new_page(request, lang_code: str = "", ID: int = -1):
         form = AccomplishmentForm(initial={
             'name': accom.name,
             'description': accom.description,
-            'icon': accom.icon
+            'icon': accom.icon,
+            'measurement_quantity': 1
         })
 
     return render(

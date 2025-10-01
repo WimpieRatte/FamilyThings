@@ -8,7 +8,11 @@
             {% include 'site/heading_small.html' with label="Recent Additions" id="recent-additions" %}
             <div class="w-75 d-flex flex-wrap gap-1">
                 {% for entry in recent_additions %}
-                    <a href="{% url 'accomplishment:add_new' entry.id %}"><div class="bg-primary rounded-2 p-1 ">{{entry.name}}</div></a>
+                    <a href="{% url 'accomplishment:add_new' entry.id %}" class="link-underline link-underline-opacity-0">
+                        {% with color=colors|random %}
+                        <div class="rounded-2 p-1" style="color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});">{{entry.name}}</div>
+                        {% endwith %}
+                    </a>
                 {% endfor %}
             </div>
         </div>
