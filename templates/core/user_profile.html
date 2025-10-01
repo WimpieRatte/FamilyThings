@@ -12,7 +12,7 @@
                 {% endfor %} -->
             </div>
             <div id="new-accomplishment-wrapper" class="w-auto m-auto">
-                <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="/" data-tooltip-context="Add New">
+                <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
                     <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
                     <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></h6>
                 </a>
@@ -71,8 +71,8 @@
         </div>
     </div>
 </div>
-<link href="{% static 'calendar/rome.css'%}" rel="stylesheet">
-<script src="{% static 'calendar/rome.js'%}"></script>
+<link href="{% static 'rome/rome.css'%}" rel="stylesheet">
+<script src="{% static 'rome/rome.js'%}"></script>
 <script>
     /* Calendar powered by Rome */
     let current_date = new Date();

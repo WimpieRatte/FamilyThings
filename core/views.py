@@ -89,10 +89,14 @@ def user_register(request):
             {'form': form})
 
 
-def user_profile(request, lang_code: str = ""):
+def user_profile_page(request, lang_code: str = ""):
     """The User's overview section."""
     update_session(request=request, lang_code=lang_code)
-    today: timezone.datetime = timezone.now()
+
+    if not request.user.is_authenticated:
+        create_alert(request=request, ID="login-required", type="warning",
+            text="For this action, you need to login first.")
+        return redirect("core:user_login")
 
     target: HttpResponse = render(request, "core/user_profile.html", {
         'is_family_member': FamilyUser.objects.filter(
@@ -102,7 +106,7 @@ def user_profile(request, lang_code: str = ""):
     return render_if_logged_in(request, target)
 
 
-def user_settings(request, lang_code: str = ""):
+def user_settings_page(request, lang_code: str = ""):
     """The User's settings page."""
     update_session(request=request, lang_code=lang_code)
 
@@ -189,7 +193,7 @@ def user_settings(request, lang_code: str = ""):
     return render_if_logged_in(request=request, target=target)
 
 
-def user_login(request, lang_code: str = ""):
+def user_login_page(request, lang_code: str = ""):
     """Create the Login view and/or attempt to authenticate the User."""
     update_session(request=request, lang_code=lang_code)
 
@@ -200,10 +204,3 @@ def user_login(request, lang_code: str = ""):
     return render(
         request, "core/user_login.html", {
             "form": AuthenticationForm(data=request.POST)})
-
-
-def user_logout(request):
-    create_alert(request=request, ID="logout-success", type="warning",
-                    text="You were successfully logged out.")
-    logout(request)
-    return redirect("core:user_login")

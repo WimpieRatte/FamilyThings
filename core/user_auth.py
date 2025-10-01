@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils import timezone
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
 from core.models.custom_user import CustomUser
-from core.session import update_session, get_locale_text
+from core.session import create_alert, get_locale_text
 
 
 def process_login(request, lang_code: str = ""):
@@ -38,3 +37,9 @@ def process_login(request, lang_code: str = ""):
                         default_text="Username and password don't match up with an existing account."))
     else:
         return HttpResponseBadRequest()
+
+def process_logout(request):
+    create_alert(request=request, ID="logout-success", type="warning",
+                    text="You were successfully logged out.")
+    logout(request)
+    return redirect("core:user_login")

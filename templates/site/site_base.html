@@ -7,6 +7,9 @@
   <title>{% block title %}{% endblock %} FamilyThings</title>
   {% include 'site/site_style_imports.html' %}
   {% include 'site/site_style.html' %}
+  <style>
+    {% include 'site/site_style_overrides.html' with color=request.user.color cursor=request.session.use_custom_cursor %}
+  </style>
 </head>
 {% include 'site/site_js_preload.html' %}
 {% include 'site/site_overlay.html' with messages=messages %}

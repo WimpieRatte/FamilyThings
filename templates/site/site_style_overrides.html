@@ -1,0 +1,20 @@
+
+.bg-primary, .btn-primary {
+    {% if color %}
+        background-color: var(--bs-{{color}}) !important;
+        color: var(--bs-{{color}}-font);
+    {% else %}
+        background-color: var(--bs-blue) !important;
+        color: var(--bs-blue-font);
+    {% endif %}
+}
+
+.border-primary, button:not(.color-btn) {border-color: var(--bs-{{color}}) !important;}
+
+{% if cursor %}
+    html, :root, head, body, main, footer, a, textarea, select, option, input,
+    button, [type="button"]:not(:disabled), [type="reset"]:not(:disabled), [type="submit"]:not(:disabled), button:not(:disabled),
+    .rd-day-body, .rd-day-head {
+        cursor:none !important;
+    }
+{% endif %}

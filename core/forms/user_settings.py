@@ -26,3 +26,7 @@ class UserSettingsForm(forms.Form):
         label="Remove Icon", required=False)
     remove_background = forms.BooleanField(
         label="Remove Background", required=False)
+
+    #  Add Bootstrap classes to the fields
+    cursor.widget.attrs.update({"class": "form-check-input"})
+    language.widget.attrs.update({"class": ".form-select"})
