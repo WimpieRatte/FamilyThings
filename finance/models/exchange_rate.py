@@ -10,12 +10,12 @@ class ExchangeRate(models.Model):
     currency_from = models.ForeignKey(
         Currency,
         on_delete=models.CASCADE,
-        related_name="currency_from"
+        related_name="exchangerates_from"
     )
     currency_to = models.ForeignKey(
         Currency,
         on_delete=models.CASCADE,
-        related_name="currency_to"
+        related_name="exchangerates_to"
     )
     from_date = models.DateTimeField()
     to_date = models.DateTimeField()

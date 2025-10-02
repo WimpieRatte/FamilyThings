@@ -14,16 +14,17 @@ class FamilyUser(models.Model):
     family_id = models.ForeignKey(
         Family,
         on_delete=models.CASCADE,
-        related_name="family"
+        related_name="family_family_users"
     )
     custom_user_id = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="custom_user"
+        related_name="custom_user_family_users"
     )
     join_date = models.DateTimeField(
         auto_now_add=True
     )
+    is_manager = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Family User"

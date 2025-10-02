@@ -15,12 +15,12 @@ class FamilyUserAccomplishment(models.Model):
     family_user_id = models.ForeignKey(
         FamilyUser,
         on_delete=models.CASCADE,
-        related_name="family_user"
+        related_name="accomplishments"
     )
     accomplishment_id = models.ForeignKey(
         Accomplishment,
         on_delete=models.CASCADE,
-        related_name="accomplishment_id"
+        related_name="family_user_accomplishments"
     )
     measurement_quantity = models.BigIntegerField()
     created = models.DateTimeField(
@@ -31,7 +31,13 @@ class FamilyUserAccomplishment(models.Model):
     created_by = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="custom_user_id"
+        related_name="created_family_user_accomplishments"
+    )
+    chore_assignment_id = models.ForeignKey(
+        CustomUser,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="chore_completions"
     )
 
     class Meta:
