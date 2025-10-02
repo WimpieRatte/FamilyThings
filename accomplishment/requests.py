@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, Http404
 from django.utils import timezone
 from .models.accomplishment import Accomplishment
 from .models.family_user_accomplishment import FamilyUserAccomplishment
@@ -6,7 +6,7 @@ from .forms.accomplishment import AccomplishmentForm
 from core.models.family import Family
 from core.models.family_user import FamilyUser
 from core.models.custom_user import CustomUser
-from core.session import create_alert, get_locale_text
+from core.session import create_alert, get_locale_text, JsonResponseAlert
 from django.utils import timezone
 import uuid
 
@@ -17,12 +17,21 @@ def get_obtained_today(request, amount: int = 4):
         return HttpResponseBadRequest()
     else:
         today: timezone.datetime = timezone.now()
-        return JsonResponse(data={
-            'result': list(reversed(Accomplishment.objects.filter(
+        fam_acc_ids = FamilyUserAccomplishment.objects.filter(
                 created_by_id=request.user,
                 created__year=today.year,
                 created__month=today.month,
-                created__day=today.day).order_by('created').values()[:amount]))
+                created__day=today.day
+        ).order_by('created').reverse().values_list("accomplishment_id")[:amount]
+
+        _2 = []
+        for _ in fam_acc_ids:
+            _ = Accomplishment.objects.filter(id__in=_).values()
+            _2 += _
+        _2 = list(_2)
+
+        return JsonResponse(data={
+            'result': _2
         })
 
 
@@ -37,6 +46,24 @@ def get_recent(request, amount: int = 5):
         })
 
 
+def get_by_name(request, name: str):
+    """Return details about an Accomplishment if the name matches,
+    otherwise return Http404"""
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest()
+
+    try:
+        result: Accomplishment = Accomplishment.objects.get(name=name)
+        return JsonResponse(
+            data={
+                'name': result.name,
+                'description': result.description,
+                'icon': result.icon
+                })
+    except (Accomplishment.DoesNotExist):
+        return Http404
+
+
 def submit_accomplishment(request):
     if not request.user.is_authenticated:
         return HttpResponseBadRequest(
@@ -45,22 +72,23 @@ def submit_accomplishment(request):
                 text="For this action, you need to login first."))
 
     family_user: FamilyUser = FamilyUser.objects.get(custom_user_id=request.user)
-    if family_user == None:
+    if family_user is None:
         return HttpResponseBadRequest(
             get_locale_text(
                 request=request, ID="not-in-a-family",
                 default_text="You aren't part of a Family."))
-
-    print(request.POST)
 
     form = AccomplishmentForm(data=request.POST)
     if form.is_valid():
         new_acc, created = Accomplishment.objects.get_or_create(
             created_by=request.user,
             name=form.cleaned_data.get("name"),
-            description=form.cleaned_data.get("description", ""),
-            icon=form.cleaned_data.get("icon", "")
         )
+        if created:
+            print("New Accomplishment")
+            new_acc.description=form.cleaned_data.get("description", ""),
+            new_acc.icon=form.cleaned_data.get("icon", "")
+            new_acc.save()
         FamilyUserAccomplishment.objects.get_or_create(
             family_user_id=family_user,
             accomplishment_id=new_acc,
@@ -69,7 +97,9 @@ def submit_accomplishment(request):
             from_date=timezone.now(),
             to_date=timezone.now()
         )
-        return JsonResponse({})
+        return JsonResponseAlert(
+            request=request, message="Accomplishment successfully created!",
+            type="success")
     else:
         print(form.errors)
 
