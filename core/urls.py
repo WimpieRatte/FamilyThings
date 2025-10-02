@@ -12,10 +12,14 @@ core_urls = [
     path("", views.home, name="home"),
     path("login/", views.user_login, name="user_login"),  # Django's default
     path("logout/", views.user_logout, name="user_logout"),
+    path("registration/", views.register, name="registration"),
+    path("forgot_password/", views.forgot_password, name="forgot_password"),
+    path("password_reset_sent/<str:reset_id>/", views.password_reset_sent, name="password_reset_sent"),
+    path("reset_password/<str:reset_id>/", views.reset_password, name="reset_password"),
     path("profile/", views.user_profile, name="user_profile"),
     path("settings/", views.user_settings, name="user_settings"),
     path("accounts/profile/", views.home, name="home"),  # default landing page
-    path("registration/", views.register, name="registration"),
+   
 
     # AJAX Urls
     path("session/switchlanguage", change_language,

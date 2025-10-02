@@ -17,9 +17,10 @@
                 {% csrf_token %}
                 {% include 'site/form_field_small.html' with id="username" field=form.username %}
                 {% include 'site/form_field_small.html' with id="password" field=form.password %}
+                <a href="{% url 'core:forgot_password' %}" id="label-registration-hint" class="text-center d-block">Forgot password?</a>
                 <button id="button-log-in" class="btn btn-primary mt-4 m-auto text-center d-block" type="submit">Log In</button>
             </form>
-            <a href="{% url 'core:registration' %}" id="label-registration-hint" class="text-center d-block" href="">Not registered yet? Click here.</a>
+            <div class="d-flex justify-content-center">Not registered yet?&nbsp;<a href="{% url 'core:registration' %}" id="label-registration-hint" class="text-center d-block">Click here.</a></div>
         </div>
     </div>
 </div>
