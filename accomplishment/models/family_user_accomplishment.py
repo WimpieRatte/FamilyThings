@@ -40,6 +40,9 @@ class FamilyUserAccomplishment(models.Model):
         related_name="chore_completions"
     )
 
+    def get_accomplishment(self):
+        return self.accomplishment_id
+
     class Meta:
         verbose_name = " Family User Accomplishment"
         verbose_name_plural = " Family User Accomplishments"

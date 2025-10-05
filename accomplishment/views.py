@@ -18,13 +18,13 @@ def overview_page(request, lang_code: str = ""):
             text="For this action, you need to login first.")
         return redirect("core:user_login")
 
-    fam_user_acc_ids = FamilyUserAccomplishment.objects.filter(
-                    created_by=request.user.id).order_by('created').values().values_list("accomplishment_id")
+    recent_additions = Accomplishment.objects.filter(
+                    created_by=request.user.id).order_by('created').values()[:10]
 
     target: HttpResponse = render(
         request, "accomplishment/overview.html",
         {
-            'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=fam_user_acc_ids))),
+            'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=recent_additions))),
             'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan']
         })
 
@@ -33,7 +33,8 @@ def overview_page(request, lang_code: str = ""):
 
 def add_new_page(request, lang_code: str = "", ID: int = -1):
     """."""
-    update_session(request=request, lang_code=lang_code)
+    update_session(request=request, lang_code=lang_code,
+                   cache_last_visited_page=False)
     form: AccomplishmentForm = AccomplishmentForm()
 
     if ID is not -1:

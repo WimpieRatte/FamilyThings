@@ -1,4 +1,27 @@
-<div id="message-{{sender}}" class="container rounded w-100 bg-primary shadow flex-column p-2 my-3 fs-sm tooltip-source" data-tooltip-content="Sent Sep 22nd, 2025">
-    <p id="message-sender-{{sender}}" class="my-0 {% if sender != 'You' %}text-end{% endif %} fw-bold">{{sender}}</p>
-    <p id="message-content-{{sender}}" class="my-0 {% if sender != 'You' %}text-end{% endif %}">{{content}}</p>
+<div id="message-{{message.id}}" class="message d-flex gap-2 w-100 my-3 position-relative">
+    {% if can_delete %}
+        <div id="delete-message-{{message.id}}" value="{{message.id}}" class="tooltip-source badge rounded-circle border bg-danger border-dark fs-sm position-absolute top-0 start-100 translate-middle" data-tooltip-context="Delete Message" data-tooltip-content=""
+        style="display: none; width: 1.5em; height: 1.5em; z-index: 210;"><i class="bi bi-x h5 position-absolute top-50 start-50 translate-middle"></i></div>
+    {% endif %}
+    {% if 'text-end' in class %}
+        {% include 'home/message_item_text.html' with name='You' content=message.content color=sender.color class=class date=message.created_on %}
+        {% include 'home/message_item_icon.html' with icon=sender.icon color=sender.color %}
+    {% else %}
+        {% include 'home/message_item_icon.html' with icon=sender.icon color=sender.color %}
+        {% include 'home/message_item_text.html' with name=sender.full_name content=message.content color=sender.color class=class date=message.created_on %}
+    {% endif %}
 </div>
+<script>
+    var deleteURL = "{{HOST}}/message/delete/id="
+    /* Delete Messages */
+    $("#delete-message-{{message.id}}").click( function(event) {
+        let message_id = $(this).attr('value');
+        if (confirm(`Are you sure you want to delete this message?\n(This cannot be undone!)`)) {
+            $.get( `${deleteURL}${message_id}`, function() {})
+            .done(function(response) {
+                location.reload();
+            })
+            .fail(function(err) {console.log(err);})
+        }
+    })
+</script>

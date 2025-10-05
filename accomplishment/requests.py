@@ -1,14 +1,26 @@
+import json
 from django.http import JsonResponse, HttpResponseBadRequest, Http404
 from django.utils import timezone
+from django.core.serializers import serialize
 from .models.accomplishment import Accomplishment
 from .models.family_user_accomplishment import FamilyUserAccomplishment
 from .forms.accomplishment import AccomplishmentForm
 from core.models.family import Family
 from core.models.family_user import FamilyUser
 from core.models.custom_user import CustomUser
-from core.session import create_alert, get_locale_text, JsonResponseAlert
-from django.utils import timezone
-import uuid
+from core.session import get_locale_text, JsonResponseAlert
+
+
+def accomplishments_list_from_query(query):
+    """Return a list of Accomplishments based on a
+    FamilyUserAccomplishment QuerySet."""
+    result = []
+    for _ in query:
+        _ = Accomplishment.objects.filter(id__in=_).values()
+        result += _
+    result = list(result)
+
+    return (result)
 
 
 def get_obtained_today(request, amount: int = 4):
@@ -17,21 +29,15 @@ def get_obtained_today(request, amount: int = 4):
         return HttpResponseBadRequest()
     else:
         today: timezone.datetime = timezone.now()
-        fam_acc_ids = FamilyUserAccomplishment.objects.filter(
+        fam_user_accomplishments = FamilyUserAccomplishment.objects.filter(
                 created_by_id=request.user,
                 created__year=today.year,
                 created__month=today.month,
                 created__day=today.day
         ).order_by('created').reverse().values_list("accomplishment_id")[:amount]
 
-        _2 = []
-        for _ in fam_acc_ids:
-            _ = Accomplishment.objects.filter(id__in=_).values()
-            _2 += _
-        _2 = list(_2)
-
         return JsonResponse(data={
-            'result': _2
+            'result': accomplishments_list_from_query(fam_user_accomplishments)
         })
 
 
@@ -40,9 +46,45 @@ def get_recent(request, amount: int = 5):
     if not request.user.is_authenticated:
         return HttpResponseBadRequest()
     else:
+        yesterday: timezone.datetime = timezone.now() - timezone.timedelta(days=1)
+        fam_user_accomplishments = FamilyUserAccomplishment.objects.filter(
+                created_by_id=request.user,
+                created__lt=yesterday
+        ).order_by('created').reverse().values_list("accomplishment_id")[:amount]
+
         return JsonResponse(data={
-            'result': list(reversed(Accomplishment.objects.filter(
-                    created_by=request.user.id).order_by('created').values()[:amount]))
+            'result': accomplishments_list_from_query(fam_user_accomplishments)
+        })
+
+
+def get_entities(request, amount: int = 5, start: int = 0, key=""):
+    """."""
+    start = max(int(start)-1, 0)
+
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest()
+
+    total_accomplishments = FamilyUserAccomplishment.objects.filter(
+            created_by_id=request.user,
+            accomplishment_id__name__icontains=key)
+    output = FamilyUserAccomplishment.objects.filter(
+            created_by_id=request.user,
+            accomplishment_id__name__icontains=key).order_by(
+                'created').reverse()[start:start+int(amount)]
+
+    cache = output
+    output = json.loads(serialize("json", list(output)))
+
+    for i, entry in enumerate(cache):
+        output[i]["fields"]['accomplishment'] = entry.accomplishment_id.dict()
+
+    count = cache.count()
+
+    return JsonResponse(
+        data={
+            'result': output,
+            'range': {'start': start + 1, 'end': start + count},
+            'total': total_accomplishments.count()
         })
 
 
@@ -71,7 +113,7 @@ def submit_accomplishment(request):
                 request=request, ID="login-required",
                 text="For this action, you need to login first."))
 
-    family_user: FamilyUser = FamilyUser.objects.get(custom_user_id=request.user)
+    family_user: FamilyUser = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
     if family_user is None:
         return HttpResponseBadRequest(
             get_locale_text(

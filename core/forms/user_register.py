@@ -13,3 +13,7 @@ class UserRegisterForm(forms.Form):
         label="First Name", max_length=20, required=False)
     last_name = forms.CharField(
         label="Last Name", max_length=20, required=False)
+    invite_code = forms.CharField(
+        label="", max_length=50, required=False)
+
+    invite_code.widget.attrs.update({"style": "width: 20em;"})

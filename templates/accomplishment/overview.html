@@ -1,21 +1,166 @@
 {% extends "site/site_base.html" %}
-{% block title %}Accomplishments{% endblock %}
+{% block title %}Accomplishments -{% endblock %}
 {% block content %}
-<div id="todo-section" class="container-sm pb-4 w-100">
+<div id="accomplishments-overview" class="container-sm pb-4 w-100">
     {% include 'site/heading_section.html' with label="Accomplishments" id="accomplishments" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
         <div id="accomplishments-wrapper" class="container rounded py-2">
-            {% include 'site/heading_small.html' with label="Recent Additions" id="recent-additions" %}
-            <div class="w-75 d-flex flex-wrap gap-1">
-                {% for entry in recent_additions %}
-                    <a href="{% url 'accomplishment:add_new' entry.id %}" class="link-underline link-underline-opacity-0">
-                        {% with color=colors|random %}
-                        <div class="rounded-2 p-1" style="color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});">{{entry.name}}</div>
-                        {% endwith %}
-                    </a>
-                {% endfor %}
+            <div class="d-flex justify-content-between p-3">
+                <div style="width: 65%">
+                    <div class="d-flex justify-content-between pb-2">
+                        {% include 'site/heading_small.html' with label="All Activity" id="all-activity" %}
+                        <form id="filter-form">
+                            <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter" aria-label="Search">
+                            <button id="" type="submit" class="d-none"></button>
+                        </form>
+                    </div>
+                    <div class="pe-3 position-relative" style="height: 34em;">
+                        <table id="accomplishments-table" class="table table-striped bg-opacity-50">
+                            <thead class="fs-sm">
+                                <tr>
+                                    <th class="p-1" style="width: 1em;" scope="col">#</th>
+                                    <th class="p-1" style="width: 15em;" scope="col">Name</th>
+                                    <th class="p-1" style="width: 7em;" scope="col">Category</th>
+                                    <th class="p-1" style="width: 14em;"scope="col">Measurement</th>
+                                    <th class="p-1" scope="col">Created on</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accomplishments-table-body" class="fs-sm">
+                                
+                            </tbody>
+                        </table>
+                        <div id="table-buttons" class="w-100 pe-3 d-flex justify-content-between position-absolute bottom-0 start-50 translate-middle-x">
+                            <button id="previous-button" type="button" class="bi bi-caret-left-fill h4 d-block"></button>
+                            <div class="font-monospace">Showing Entries <span id="range-start"></span>-<span id="range-end"></span> (found <span id="range-total"></span> total)</div>
+                            <button id="next-button" type="button" class="bi bi-caret-right-fill h4 d-block"></button>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 35%">
+                    {% include 'site/heading_small.html' with title="Had any recent Accomplishments?" id="" class='text-center pt-1' %}
+                    <div id="new-accomplishment-wrapper" class="w-auto m-auto pb-4">
+                        <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
+                            <h4 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
+                            <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-1"></i></h4>
+                        </a>
+                    </div>
+                    {% include 'site/heading_small.html' with title="Recent Additions (Click to repeat)" id="recent-additions" class='text-center pt-1' %}
+                    <div class="d-flex justify-content-center flex-wrap gap-1" style="width: fit-content;">
+                        {% for entry in recent_additions %}
+                            <a href="{% url 'accomplishment:add_new' entry.id %}" class="link-underline link-underline-opacity-0 tooltip-source" data-tooltip-context="Repeat" data-tooltip-content='"{{entry.name}}"'>
+                                {% with color=colors|random %}
+                                <div class="rounded-2 p-1" style="color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});">{{entry.name}} <span class="bi bi-repeat"></span></div>
+                                {% endwith %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<style>
+    #next-button:disabled,
+    #previous-button:disabled {
+        filter: grayscale(.5);
+        color: var(--bs-gray-700);
+        border-color: var(--bs-gray-700) !important;
+    }
+</style>
+<script>
+    const todaysAccContainer = $("#accomplishments-table-body");
+    const searchBar = document.getElementById("search-filter");
+    const tablePreviousButton = document.getElementById("previous-button");
+    const tableNextButton = document.getElementById("next-button");
+
+    var currentIndex = 1;
+    var currentEnd = 0;
+    var totalEntries = 0;
+    var searchText = "";
+
+    /* Get Today's Accomplishments */
+    const queryURL = "{{HOST}}/accomplishments/get"
+    function createAccomplishmentsTable(length = 15, start = 1, search = ""){
+        tablePreviousButton.disabled = true;
+        tableNextButton.disabled = true;
+        currentIndex = start;
+
+        let queryURLFinal = `${queryURL}/amount=${length}/start=${start}`
+
+        if (search != ""){queryURLFinal+=`/key=${search}`}
+        $.get(queryURLFinal, function() {})
+        .done(function(response) {
+            var index = 0;
+            todaysAccContainer.empty();
+            Object.entries(response.result).forEach(function(entry) {
+                let data = entry[1];
+                createTableEntry(todaysAccContainer, data, start+index, searchText)
+                index++;
+            });
+            currentEnd = start + Object.entries(response.result).length;
+            totalEntries = response.total;
+            if (currentEnd-1 < totalEntries){tableNextButton.disabled = false;}
+            document.getElementById("range-start").textContent = start;
+            document.getElementById("range-end").textContent = start - 1 + Object.entries(response.result).length;
+            document.getElementById("range-total").textContent = response.total;
+            updateTooltips(); // Required to make the new Entries interactable
+        })
+        .fail(function(err) {console.log(err);})
+
+        if (currentIndex > 1){tablePreviousButton.disabled = false;}
+    }
+    createAccomplishmentsTable()
+
+    /* Dynamically create Accomplishment entries */
+    const tableEntryTemplate = `{% include "accomplishment/accomp_entry.html" %}`
+
+    function createTableEntry(target_container, data, index, highlight=""){
+        let language = languageCode;
+        if (language == ""){language="en";}
+        creation_date = new Date(data["fields"]["created"]).toLocaleTimeString(language, {
+            year: "numeric", month: "short", day: "numeric",
+            hour: '2-digit', minute:'2-digit'})
+
+        let accomplishment = data["fields"]["accomplishment"];
+        let templateDump = tableEntryTemplate;
+        let accomp_name = accomplishment["name"];
+
+        /* Highlight the name based on the search query */
+        if (highlight != "") {accomp_name = accomp_name.replace(highlight, `<strong>$1</strong>`)}
+
+        /* Turn the whole name + icon yellow */
+        if (accomplishment["is_achievement"]) { templateDump = templateDump.replace("%name_style%", 'style="color: #ddc67f !important;"')}
+            else { templateDump = templateDump.replace("%name_style%", '')}
+
+        /* Insert the rest */
+        templateDump = templateDump.replace("%index%", index)
+        .replace("%name%", accomp_name)
+        .replace("%date_created%", creation_date)
+        .replace("%icon%", accomplishment["icon"])
+        .replace("%category%", accomplishment["type"])
+        .replace("%description%", accomplishment["description"])
+        
+        target_container.append(templateDump);
+    }
+
+    $("#previous-button").click(function(event) {
+        createAccomplishmentsTable(15, currentIndex-15);
+    });
+
+    $("#next-button").click(function(event) {
+        createAccomplishmentsTable(15, currentIndex+15);
+    });
+
+    $("#filter-form").submit(function(event) {
+        event.preventDefault();
+        searchText = new RegExp(`(${searchBar.value})`,'gi');
+        console.log(searchText)
+        createAccomplishmentsTable(15, 1, searchBar.value)
+    });
+
+    // $("#search-filter").on('keyup', function (event) {
+    //     searchText = new RegExp(`(${event.target.value})`,'gi');
+    //     createAccomplishmentsTable(15, currentIndex, event.target.value)
+    // });
+</script>
 {% endblock %}

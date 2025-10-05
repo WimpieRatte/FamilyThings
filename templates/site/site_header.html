@@ -19,16 +19,27 @@
               {% include 'header/dropdown_item.html' with href='core:user_register' id="register" icon='pencil-square' label='Register' %}
               {% include 'header/dropdown_item.html' with href='core:user_login' id="log-in" icon='box-arrow-right' label='Log In' %}
             {% else %}
-            <small id="dropdown-item-role" class="dropdown-item">{% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.user.is_manager %}</small>
+              <small id="dropdown-item-role" class="dropdown-item">
+                {% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.user.is_manager %}<br>
+                {{ family.name }}
+              </small>
               <li><hr class="dropdown-divider"></li>
               {% include 'header/dropdown_item.html' with href='core:user_settings' id="user-settings" icon='gear' label='Settings' %}
               {% if request.user.is_superuser %}
                 {% include 'header/dropdown_item.html' with href='admin:index' id="admin:admin" icon='sliders' label='Admin Page' new_tab='True' %}
               {% endif %}
-              {% if request.user.is_manager %}
-                {% include 'header/dropdown_item.html' with href='#' id="family-settings" icon='person-arms-up' label='Manage Family' %}
+              {% if family.is_manager %}
+                {% include 'header/dropdown_item.html' with id="family-settings" icon='person-arms-up' label='Manage Family' %}
               {% endif %}
               {% include 'header/dropdown_item.html' with href='core:request_logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
+              {% if request.session.families|length > 1 %}
+                <li><hr class="dropdown-divider"></li>
+                {% for family in request.session.families %}
+                  {% if request.session.current_family != forloop.counter0 %}
+                  <a href="{% url 'core:session_switch_family' forloop.counter0 %}"><li class="dropdown-item link-underline-opacity-0 link-underline" style="overflow-x: hidden;"><small>Switch to {{family.0}}</small></li></a>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
             {% endif %}
           </div>
       </ul>

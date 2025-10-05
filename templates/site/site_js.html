@@ -17,9 +17,14 @@
     const imgCursorLink = '/static/icons/cursor/cursor-link.svg';
     const imgCursorText = '/static/icons/cursor/cursor-text.svg';
 
+    /* Wait for the user to have moved the mouse again before showing it, since it will be at x0,y0 when reloading. */
+    /* There doesn't seem to be a way to detect the real mouse position outside of an event. */
     cursor.style.display = "none";
+
+    /* Set the height of the entire overlay to the size of the document. This is needed for the cursor to be visible. */
     overlay.style.height = `${body.clientHeight + 70}px`;
 
+    /* Users can disable this custom cursor in their settings, so we need to wrap everything in this. */
     if ('{{request.session.use_custom_cursor}}' != 'False'){
         /* Reposition the cursor according to the mouse position */
         const updateCursorPosition = (e)=> {
@@ -42,24 +47,25 @@
             cursorImage.setAttribute('y', `${y}`);
         }
 
-        /* Change the appearance of the cursor depending on the element you're hovering at */
+        /* Change the appearance of the cursor depending on the element you're hovering at. */
+        /* Add here any more elements that require special cursors. */
         const link_selectors = 'a, button, select, option, input[type="checkbox"], .rd-day-body';
-        const text_selectors = 'textarea, input[type="text"], input[type="password"]';
+        const text_selectors = 'textarea, input[type="text"], input[type="password"], input[type="search"]';
         const special_selectors = link_selectors + ", " + text_selectors
 
-        /* Variant for links, buttons, etc. */
+        /* Behavior for links, buttons, etc. */
         $(link_selectors).on("mouseover", function() {change_cursor_appearance(imgCursorLink, 0, 0);});
         $(link_selectors).on("mouseup", function() {change_cursor_appearance(imgCursorLink, 0, 0);});
         $(link_selectors).on("mousedown", function() {change_cursor_appearance(imgCursorRegular, 0, 0);});
 
-        /* Variant for text areas */
+        /* Behavior for all text areas */
         $(text_selectors).on("mouseover", function() {change_cursor_appearance(imgCursorText, -20, -16);});
 
-        /* Default Cursor */
+        /* Default/Fallback cursor */
         $(special_selectors).on("mouseleave", function() {change_cursor_appearance(imgCursorRegular, 0, 0);});
     }
 
-    /* Tooltip */
+    /* Tooltip detection */
     function updateTooltips(){
         $(".tooltip-source").on("mouseover", function() {
             let text = $(this).attr('data-tooltip-context')
@@ -128,6 +134,7 @@
         });
     })
 
+    /* Load and apply localized text specific to the Tooltips. */
     $.getJSON('/static/localization/{{request.session.lang_code}}/tooltip.json', 
     function(json_data){})
     .done(function(json_data) {
@@ -151,39 +158,37 @@
             return default_text;
     }
 
-    /* Changing Language */
+    /* Chane Language Button behaviors */
     $(".language-btn").on( "click", function() {
         let lang_code = $(this).attr('value');
 
         $.ajax({ 
-            type: 'POST',
-            url: '{% url "core:session_change_language" %}',
-            data: {
-                action: 'post',
+            type: 'POST', url: '{% url "core:session_change_language" %}',
+            data: { action: 'post',
                 lang_code: lang_code,
                 csrfmiddlewaretoken: '{{ csrf_token }}'},
-            success: function(json) {
-                //console.log(json.result);
-                location.reload();
-            },
-            error: function(xhr, errmsg, err) {
-                console.log(errmsg);
-            }
+            success: function(json) { location.reload(); },
+            error: function(xhr, errmsg, err) { console.log(errmsg); }
         });
     });
 
-    /* Loading Animation */
-    function enable_loading_screen(){
+    /* Loading Screen */
+    function enableLoadingScreen() {
         loadingArrow.style = "opacity: 1";
         screenTransition.style.backgroundColor = "rgba(0, 0, 0, 1)";
     }
-    function disable_loading_screen(){
+    function disableLoadingScreen() {
         loadingArrow.style = "opacity: 0";
         screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
     }
-    setTimeout(function(){disable_loading_screen()}, 40 + (Math.random() * 100));
+    /* Since it is enabled on boot, disable it after a short time. */
+    $( document ).ready(function() {
+        setTimeout(function(){
+            disableLoadingScreen()}, 40 + (Math.random() * 100)
+        );
+    });
 
-    /* Alerts */
+    /* Close Alerts after five seconds */
     setTimeout(function() {
         let alerts = document.querySelectorAll('.alert');
 
@@ -192,4 +197,18 @@
             bsAlert.close(); // removes element from DOM
         });
     }, 5000);
+
+    /* Check current URL and disable all links to it */
+    /* This is primarily done to reduce requests when, for example, constantly heading to the profile page. */
+    let currentURL = window.location.href;
+    document.querySelectorAll("a").forEach(function(element) {
+        if (element.href == currentURL)
+        element.style = "pointer-events: none; color: gray;";
+    });
+
+    /* Prevent resubmissions */
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+
 </script>

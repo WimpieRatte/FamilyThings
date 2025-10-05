@@ -1,7 +1,7 @@
 {% load static %}
-<div id="accomplishment-item" class="container w-100 my-1 p-2 rounded bg-gradient shadow-sm tooltip-source" style="height: 2.5em; background-color: var(--bs-{{color}});" data-tooltip-content="Accomplished Sep 22nd, 2025">
+<div id="accomplishment-item" class="container w-100 my-1 p-2 rounded bg-gradient shadow-sm tooltip-source" style="height: 2.5em; color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});" data-tooltip-content="Accomplished Sep 22nd, 2025">
     <div class="d-flex align-items-start p-0 m-0 position-relative">
-        <img id="dropdown-user-icon" class="position-absolute top-50 start-0 translate-middle-y border border-0 ;" src={% static '/icons/task/'|add:icon|add:'.svg' %} height="30" width="30" alt="...">
+        <img id="dropdown-user-icon" class="position-absolute top-50 start-0 translate-middle-y border border-3;" style="border-color: var(--bs-{{color}}) !important;" src="{% get_media_prefix %}{{icon}}" height="30" width="30" alt="{% get_media_prefix %}{{icon}}">
         <div class="flex-column mx-5 p-0" style="line-height: 1.35em;">
             <span class="row fs-sm">{{title}}</span>
         </div>

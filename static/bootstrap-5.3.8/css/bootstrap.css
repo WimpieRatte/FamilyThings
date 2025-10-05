@@ -19,7 +19,7 @@
   --bs-pink: #d05f97;
   --bs-pink-font: #212529;
   --bs-red: #c84855;
-  --bs-red-font: #212529;
+  --bs-red-font: #dee2e6;
   --bs-orange: #df7823;
   --bs-orange-font: #212529;
   --bs-yellow: #d5af3c;
@@ -91,7 +91,7 @@
   --bs-white-rgb: 255, 255, 255;
   --bs-black-rgb: 0, 0, 0;
   --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --bs-font-monospace: "LXGW WenKai Mono TC", monospace; /*FamilyThings: Alternative font*/
   --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
   --bs-body-font-family: var(--bs-font-sans-serif);
   --bs-body-font-size: 1rem;
@@ -388,9 +388,15 @@ figure {
 img,
 svg {
   vertical-align: middle;
+  
+  /* FamilyThings: Alternative rendering setting (might not have any effect) */
+  image-rendering: smooth;
 }
 
 table {
+  /* FamilyThings: Alternative font + Monospace */
+  font-family: "LXGW WenKai Mono TC", monospace;
+
   caption-side: bottom;
   border-collapse: collapse;
 }
@@ -7186,7 +7192,7 @@ input:disabled {
 .text-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  /*white-space: nowrap;*/ /* FamilyThings: Remove white-space rule */
 }
 
 .vr {

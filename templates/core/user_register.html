@@ -3,11 +3,11 @@
 {% block content %}
 <div id="register-section" class="container">
     <div id="register" class="container rounded bg-dark p-2 pb-4 h-25 mh-25">
-        <div id="label-create-account" class="m-auto text-center" style="font-size: 4em;">Create account</div>
+        {% include 'site/heading_large.html' with id="create-account" label='Create account'%}
         <hr>
         <form method="post" class="m-auto" style="width: fit-content !important;">
             {% csrf_token %}
-            <div class="required-fields bg-body-tertiary rounded p-2 pb-3">
+            <div id="required-fields" class="bg-body-tertiary rounded p-2 pb-3">
                 <div class="d-flex justify-content-between px-3" style="gap: 20px;">
                     {% include 'site/form_field.html' with id="username" field=form.username %}
                     {% include 'site/form_field.html' with id="email" field=form.email %}
@@ -20,7 +20,15 @@
                     <span id="label-password-hint2">include one uppercase letter, and one special character.</span>
                 </div>
             </div>
-            <div class="optional-fields bg-body-tertiary rounded p-2 pb-3 mt-3">
+            <div id="family-invite" class="bg-body-tertiary rounded p-2 pb-3 mt-3">
+                <div id="family-invite-hint" class="w-100 m-auto pb-1 text-center fs-sm">
+                    <span id="label-invite-hint">Already got a Family Invite? Add the code here.</span><br>
+                </div>
+                <div class="d-block m-auto text-center" style="width: fit-content;">
+                    {% include 'site/form_field.html' with id="" field=form.invite_code %}
+                </div>
+            </div>
+            <div id="optional-fields" class="bg-body-tertiary rounded p-2 pb-3 mt-3">
                 <div class="d-flex justify-content-between px-3">
                     {% include 'site/form_field.html' with id="first-name" field=form.first_name optional=True %}
                     {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}

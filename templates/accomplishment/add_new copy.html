@@ -1,7 +1,3 @@
-{% extends "site/site_base.html" %}
-{% block title %}Accomplishments{% endblock %}
-{% block content %}
-{% load static %}
 <div id="todo-section" class="container-sm pb-4 w-100">
     {% include 'site/heading_section.html' with label="Add New Accomplishment" id="create_accomplishment" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25 position-relative">
@@ -13,7 +9,7 @@
             </div>
         </div>
         <div id="accomplishments-wrapper" class="d-flex py-5">
-            <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap" style="width: 65%;">
+            <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap">
                 {% csrf_token %}
                 <div class="ms-auto" style="width: 60%;">
                     <div id="" class="d-flex gap-2">
@@ -21,30 +17,12 @@
                         {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
                     </div>
                     {% include 'site/form_field.html' with id="description" field=form.description optional=True %}
-                    {# Hidden Fields #}
-                    {% include 'site/form_field.html' with id="icon" field=form.icon %}
-                    {% include 'site/form_field.html' with id="is_repeat" field=form.is_repeat %}
-                </div>
-                <div style="width: 40%;">
-                    {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement field_class="d-flex" %}
-                    <div id="form-label-measurement" class="pb-1">Measurement</div>
-                    <div id="measurement-section" class="d-flex gap-2">
-                        {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
-                        {% include 'site/form_field.html' with id="" field=form.measurement %}
-                    </div>
-                    <div id="form-label-time-range" class="pb-1">Time Range</div>
-                    <div id="timeframe-section" class="flex-column gap-2">
-                        {% include 'site/form_field.html' with id="" field=form.date_from field_class="d-flex" label_class="w-25" %}
-                        {% include 'site/form_field.html' with id="" field=form.date_to field_class="d-flex" label_class="w-25" %}
-                    </div>
-                </div>
-                <div class="w-100">
-                    <div class="m-auto" style="width: fit-content; gap:.125em">
-                        <div id="form-label-icon">Icon</div>
-                        <div class="d-flex flex-wrap">
+                    <div id="form-label-icon">Icon</div>
+                    <div class="d-flex flex-wrap" style="width: 27em; gap:.125em">
+                        <div class="d-flex flex-wrap w-100">
                         {% for icon in icons %}
                             {% if icon == "$BREAK$" %}
-                                </div><div class="d-flex flex-wrap">
+                                </div><div class="d-flex flex-wrap w-100">
                             {% elif icon == "$SPACE$" %}
                                 <div style="width: .5em;"></div>
                             {% else %}
@@ -55,9 +33,24 @@
                         {% endfor %}
                         </div>
                     </div>
-                <div>
+                    {# Hidden Fields #}
+                    {% include 'site/form_field.html' with id="icon" field=form.icon %}
+                    {% include 'site/form_field.html' with id="is_repeat" field=form.is_repeat %}
                 </div>
-                <button id="button-create" class="btn btn-primary border-primary mt-4 d-block m-auto" type="submit">Create</button>
+                <div style="width: 40%;">
+                    <div id="form-label-measurement">Measurement</div>
+                    <div id="measurement-section" class="d-flex gap-2">
+                        {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
+                        {% include 'site/form_field.html' with id="" field=form.measurement %}
+                    </div>
+                    <div id="timeframe-section" class="flex-column gap-2">
+                        {% include 'site/form_field.html' with id="" field=form.date_from %}
+                        {% include 'site/form_field.html' with id="" field=form.date_to %}
+                    </div>
+                    {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement %}
+                </div>
+                <div>
+                    <button id="button-create" class="btn btn-primary border-primary mt-4 d-block ms-auto" type="submit">Create</button>
                 </div>
             </form>
         </div>
@@ -67,24 +60,6 @@
     .active {
         color: rgb(41, 151, 219) !important;
         background-color: var(--bs-dark) !important;
-    }
-
-    .d-flex > p + input {
-        margin-left: 1em;
-    }
-
-    /* Achievement Button Styling */
-    #id_is_achievement {
-        --bs-form-check-bg-image: url({% static 'icons/task/award.svg' %});
-    }
-    #id_is_achievement:checked {
-        background-color: #e2cf20;
-        border-color: #e2cf20;
-        --bs-form-check-bg-image: url({% static 'icons/task/award-fill.svg' %});
-    }
-    #id_is_achievement:focus {
-        border-color: #e2cf20;
-        box-shadow: 0 0 0 0.25rem rgba(250, 228, 26, 0.25);
     }
 </style>
 <script>
@@ -130,21 +105,7 @@
             success: function(json) {
                 disableLoadingScreen();
                 createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-                setTimeout(function() {window.location.replace('{{request.session.last_visited_page}}');}, 2000);
-
-                setTimeout(function() {
-                    var count = 200;
-                    var defaults = {origin: { y: 0.65 }};
-
-                    function fire(particleRatio, opts) {
-                        confetti({...defaults, ...opts, particleCount: Math.floor(count * particleRatio)});
-                    }
-                    fire(0.25, { spread: 26, startVelocity: 55});
-                    fire(0.2, {spread: 60,});
-                    fire(0.35, {spread: 100, decay: 0.91, scalar: 0.8});
-                    fire(0.1, {spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2});
-                    fire(0.1, {spread: 120, startVelocity: 45});
-                }, 10);
+                setTimeout(function() {window.location.replace('{% url "core:user_profile" %}');}, 1000);
             },
             error: function(xhr, errmsg, err) {
                 event.target.disabled = false;
@@ -202,4 +163,3 @@
         duplicateAccomplishmentPrompt.style.display = "none";
     })
 </script>
-{% endblock %}

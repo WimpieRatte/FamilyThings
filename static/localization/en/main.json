@@ -1,5 +1,7 @@
 {
     "form-label-username": "User Name",
     "form-label-password": "Password",
-    "form-label-language": "Language"
+    "form-label-language": "Language",
+    "label-recent-additions": "Recent Additions (Click to repeat)",
+    "label-all-activity": "All Activity"
 }

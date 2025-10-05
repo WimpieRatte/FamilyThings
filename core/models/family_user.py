@@ -26,6 +26,10 @@ class FamilyUser(models.Model):
     )
     is_manager = models.BooleanField(default=False)
 
+    def json_data(self):
+        """."""
+        return {'name': self.family_id.name, 'is_manager': self.is_manager}
+
     class Meta:
         verbose_name = "Family User"
         verbose_name_plural = "Family Users"
