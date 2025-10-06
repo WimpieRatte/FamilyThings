@@ -14,24 +14,26 @@
   background-position-y: -3em;
 
 /* Modified colors and added font-colors to better match those alternative bg colors*/
-  --bs-blue-font: #dee2e6;
-  --bs-indigo-font: #dee2e6;
-  --bs-pink-font: #212529;
-  --bs-red-font: #212529;
-  --bs-orange-font: #212529;
-  --bs-yellow-font: #212529;
-  --bs-teal-font: #212529;
-  --bs-cyan-font: #212529;
   --bs-blue: #4b85d9;
+  --bs-blue-font: #dee2e6;
   --bs-pink: #d05f97;
+  --bs-pink-font: #212529;
   --bs-red: #c84855;
+  --bs-red-font: #212529;
   --bs-orange: #df7823;
+  --bs-orange-font: #212529;
   --bs-yellow: #d5af3c;
+  --bs-yellow-font: #212529;
   --bs-indigo: #8c4df2;
+  --bs-indigo-font: #dee2e6;
   --bs-purple: #6f42c1;
+  --bs-purple-font: #dee2e6;
   --bs-green: #198754;
+  --bs-green-font: #dee2e6;
   --bs-teal: #1cb789;
+  --bs-teal-font: #212529;
   --bs-cyan: #64cbdf;
+  --bs-cyan-font: #212529;
 
   --bs-black: #000;
   --bs-white: #fff;
@@ -3039,6 +3041,11 @@ textarea.form-control-lg {
 }
 
 /* Added styling for the disabled button */
+input:disabled {
+    color: var(--bs-gray-800);
+    background-color: var(--bs-gray-600);
+}
+
 .btn-primary:disabled {
     filter: grayscale(80%);
     color: #312e2e;

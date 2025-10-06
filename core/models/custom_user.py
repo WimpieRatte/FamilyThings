@@ -41,7 +41,6 @@ class CustomUser(AbstractUser):
     last_login = models.DateTimeField(default=timezone.now)
 
     # Used to define an User as Family Manager
-    is_manager = models.BooleanField(default=False)
 
     # Personalization-related fields
     first_name = models.CharField(max_length=20, default="")

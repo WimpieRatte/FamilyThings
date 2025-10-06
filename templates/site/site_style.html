@@ -104,6 +104,15 @@
         } 
     }
 
+    .pop {
+        transform: scale(1);
+    }
+    div:hover > div > .pop {
+        animation: pop 0.2s ease-in-out 1;
+    }
+    @keyframes pop{
+        33%  {transform: scale(1.2) rotate(15deg);}
+    }
 
     /* // Large devices (desktops, 992px and up) */
     @media (min-width: 992px) {}

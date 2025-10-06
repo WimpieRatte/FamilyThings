@@ -8,6 +8,7 @@ class Currency(models.Model):
         max_length=3
     )
     description = models.CharField(max_length=1000)
+    symbol = models.CharField(max_length=3, null=True)
 
     class Meta:
         verbose_name = "Currency"

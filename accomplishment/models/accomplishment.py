@@ -4,6 +4,7 @@ from django.utils import timezone
 from core.models.family_user import CustomUser
 from .accomplishment_type import AccomplishmentType
 from .measurement_type import MeasurementType
+from core.utils import get_first_custom_user
 
 
 class Accomplishment(models.Model):
@@ -17,25 +18,26 @@ class Accomplishment(models.Model):
     created_by = models.ForeignKey(
         CustomUser,
         on_delete=models.PROTECT,
-        # related_name="custom_user_id"  #TODO: Find a different name
-        blank=True  # TODO: strip out once debugging is finished
+        related_name="custom_user_created_accomplishments",
+        default=get_first_custom_user
     )
-    type = models.ForeignKey(
+    accomplishment_type_id = models.ForeignKey(
         AccomplishmentType,
         on_delete=models.PROTECT,
-        related_name="accomplishment_type",
+        related_name="accomplishments",
         default=None,
         blank=True,
-        null=True  # TODO: strip out once debugging is finished
+        null=True
     )
-    measurement = models.ForeignKey(
+    measurement_type_id = models.ForeignKey(
         MeasurementType,
         on_delete=models.PROTECT,
-        related_name="measurement_type",
+        related_name="measurements",
         default=None,
         blank=True,
-        null=True  # TODO: strip out once debugging is finished
+        null=True
     )
+    is_achievement = models.BooleanField(default=False)
 
     class Meta:
         # White space as workaround for the ordering.
