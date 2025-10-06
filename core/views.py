@@ -9,9 +9,6 @@ from django.contrib import messages
 from django.conf import settings
 from django.urls import reverse
 
-from core.models.custom_user import CustomUser
-from core.forms.user_settings import UserSettingsForm
-from django.contrib import messages
 from core.session import update_session
 from core.models.password_reset import PasswordReset
 from django.contrib.auth.models import AnonymousUser

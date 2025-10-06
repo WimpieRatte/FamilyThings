@@ -19,7 +19,7 @@ def get_obtained_today(request, amount: int = 4):
         today: timezone.datetime = timezone.now()
         return JsonResponse(data={
             'result': list(reversed(Accomplishment.objects.filter(
-                created_by_id=request.user,
+                created_by=request.user.id,
                 created__year=today.year,
                 created__month=today.month,
                 created__day=today.day).order_by('created').values()[:amount]))
