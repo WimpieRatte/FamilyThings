@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.BigAutoField(primary_key=True, serialize=False),
         ),
     ]
+    
