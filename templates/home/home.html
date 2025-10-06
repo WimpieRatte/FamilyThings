@@ -1,141 +1,139 @@
 {% load static %}
 <!doctype html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="dark" {% include 'site/site_bg_img.html' with image=request.user.background_image %}>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}FamilyThings{% endblock %}</title>
   {% include 'site/site_style_imports.html' %}
   {% include 'site/site_style.html' %}
+  <style>
+    {% include 'site/site_style_overrides.html' with cursor=True %}
+  </style>
 </head>
 {% include 'site/site_overlay.html' %}
 {% include 'site/site_js_preload.html' %}
-{% include 'site/site_header.html' %}
+{% include 'site/site_header.html' with show_time=False %}
 <body>
-<main role="main">
-      <div id="myCarousel" class="carousel slide" data-ride="carousel">
-        <ol class="carousel-indicators">
-          <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-          <li data-target="#myCarousel" data-slide-to="1" class=""></li>
-          <li data-target="#myCarousel" data-slide-to="2" class=""></li>
-        </ol>
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img class="first-slide" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="First slide">
-            <div class="container">
-              <div class="carousel-caption text-left">
-                <h1>Example headline.</h1>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>
-              </div>
-            </div>
+  <img class="position-absolute top-0 start-50 translate-middle-x" style="z-index: 1000;" 
+      src="{% static 'logo.png' %}" alt="FamilyThings logo" height="80">
+  <main id="main" role="main" style="font-size: 0.6em;">
+    <div class="bg-dark" style="padding-bottom: 20em;">
+      <div class="carousel home-section">
+        <div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true"
+              aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
           </div>
-          <div class="carousel-item">
-            <img class="second-slide" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Second slide">
-            <div class="container">
-              <div class="carousel-caption">
-                <h1>Another example headline.</h1>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
-              </div>
-            </div>
+          <div class="carousel-inner ft-sm">
+            {% include 'home/home_carousel_item.html' with header='One more for good measure.' paragraph='Some representative placeholder content for the third slide of this carousel.' link='Browse gallery' caption_class='text-start' active=True %}
+            {% include 'home/home_carousel_item.html' with header='One more for good measure.' paragraph='Some representative placeholder content for the third slide of this carousel.' link='Browse gallery' caption_class='text-center' %}
+            {% include 'home/home_carousel_item.html' with header='One more for good measure.' paragraph='Some representative placeholder content for the third slide of this carousel.' link='Browse gallery' caption_class='text-end' %}
           </div>
-          <div class="carousel-item">
-            <img class="third-slide" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Third slide">
-            <div class="container">
-              <div class="carousel-caption text-right">
-                <h1>One more for good measure.</h1>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                <p><a class="btn btn-lg btn-primary" href="#" role="button">Browse gallery</a></p>
-              </div>
-            </div>
-          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
         </div>
-        <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="sr-only">Next</span>
-        </a>
       </div>
-
-
-      <!-- Marketing messaging and featurettes
-      ================================================== -->
-      <!-- Wrap the rest of the page in another container to center all the content. -->
-
-      <div class="container marketing">
-
-        <!-- Three columns of text below the carousel -->
-        <div class="row">
-          <div class="col-lg-4">
-            <img class="rounded-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
-            <h2>Heading</h2>
-            <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
-          </div><!-- /.col-lg-4 -->
-          <div class="col-lg-4">
-            <img class="rounded-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
-            <h2>Heading</h2>
-            <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
-          </div><!-- /.col-lg-4 -->
-          <div class="col-lg-4">
-            <img class="rounded-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
-            <h2>Heading</h2>
-            <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
-          </div><!-- /.col-lg-4 -->
-        </div><!-- /.row -->
-
-
-        <!-- START THE FEATURETTES -->
-
-        <hr class="featurette-divider">
-
-        <div class="row featurette">
-          <div class="col-md-7">
-            <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It'll blow your mind.</span></h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-          </div>
-          <div class="col-md-5">
-            <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto" alt="500x500" style="width: 500px; height: 500px;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22500%22%20height%3D%22500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20500%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_19980424194%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_19980424194%22%3E%3Crect%20width%3D%22500%22%20height%3D%22500%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22185.13333129882812%22%20y%3D%22261.1%22%3E500x500%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true">
+      <hr>
+      <div class="d-flex featurette">
+        <div class="">
+          <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It'll blow your mind.</span></h2>
+          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+        </div>
+        <div>
+          <img class="featurette-image img-fluid mx-auto" data-src="holder.js/360×360/auto" alt="360x360" style="width: 360px; height: 360px;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22500%22%20height%3D%22500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20500%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1999fa6f39a%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1999fa6f39a%22%3E%3Crect%20width%3D%22500%22%20height%3D%22500%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22185.13333129882812%22%20y%3D%22261.1%22%3E360x360%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true">
+        </div>
+      </div>
+      <hr>
+      <div id="about-us" class="home-section">
+        <h3 class="text-center pt-5 pop" style="font-size: 4em; transform-origin: 50% 100%;">The Team Behind It</h3>
+        <div id="about-us-people" class="container-fluid my-5 w-75">
+          <div class="d-flex justify-content-evenly">
+            {% include 'home/home_aboutus_item.html' with name='Wilhelm Ratte' github='WimpieRatte' linkedin='wilhelm-josef-ratte-3a8a1a67' role='Creator, Team Leader<br>Backend Developer' photo='wilhelmratte.jpg' delay='0' %}
+            {% include 'home/home_aboutus_item.html' with name='Roman Heus' github='RomanH1999' linkedin='roman-heus' role='Fullstack Developer<br>User Interface<br>Chronic Jokester' delay='0.03' %}
+            {% include 'home/home_aboutus_item.html' with name='Padma Devi Talatam' role='Database' delay='0.06' %}
+            {% include 'home/home_aboutus_item.html' with name='Thomas Leis' role='Team Coordinator<br>Testing' delay='0.10' %}
+            {% include 'home/home_aboutus_item.html' with name='Shafi Muhammadi' role='%Placeholder%' delay='0.14' %}
           </div>
         </div>
-
-        <hr class="featurette-divider">
-
-        <div class="row featurette">
-          <div class="col-md-7 order-md-2">
-            <h2 class="featurette-heading">Oh yeah, it's that good. <span class="text-muted">See for yourself.</span></h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-          </div>
-          <div class="col-md-5 order-md-1">
-            <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto" alt="500x500" style="width: 500px; height: 500px;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22500%22%20height%3D%22500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20500%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_19980424194%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_19980424194%22%3E%3Crect%20width%3D%22500%22%20height%3D%22500%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22185.13333129882812%22%20y%3D%22261.1%22%3E500x500%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true">
-          </div>
-        </div>
-
-        <hr class="featurette-divider">
-
-        <div class="row featurette">
-          <div class="col-md-7">
-            <h2 class="featurette-heading">And lastly, this one. <span class="text-muted">Checkmate.</span></h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
-          </div>
-          <div class="col-md-5">
-            <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto" alt="500x500" style="width: 500px; height: 500px;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22500%22%20height%3D%22500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20500%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_19980424195%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A25pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_19980424195%22%3E%3Crect%20width%3D%22500%22%20height%3D%22500%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22185.13333129882812%22%20y%3D%22261.1%22%3E500x500%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true">
+      </div>
+      <hr>
+      <div id="powered-by" class="home-section pb-5">
+        <h3 class="text-center pt-5 pop" style="font-size: 4em; transform-origin: 50% 100%;">Powered By</h3>
+        <div id="powered-by" class="container-fluid my-5 w-50">
+          <div class="d-flex flex-column justify-content-evenly">
+            <div class="container d-flex justify-content-evenly pb-5">
+              <img class="rounded-circle border-primary fade-in w-25 object-fit-contain" 
+              src="{% static 'home/Python.svg' %}" alt="Python logo" height="100">
+              <img class="rounded-circle border-primary fade-in w-25 object-fit-contain" 
+              src="{% static 'home/Django.svg' %}" alt="Django logo" height="100">
+              <img class="rounded-circle border-primary fade-in w-25 object-fit-contain" 
+              src="{% static 'home/Bootstrap.svg' %}" alt="Bootstrap logo" height="100">
+            </div>
           </div>
         </div>
+      </div>
+      </div>
+  </main>
+  {% include 'site/site_footer.html' %}
+  {% include 'site/site_js.html' with lang_code=lang_code %}
+  <style>
+    .home-section {
+      transition-property: opacity;
+      transition-duration: .25s;
+      transition-timing-function: ease-out;
+    }
 
-        <hr class="featurette-divider">
+    .pop {transform: scale(1);}
+    .active .pop {
+        animation: pop 0.2s ease-in-out 1;
+    }
+    @keyframes pop{
+        33%  {transform: scale(1.1);}
+    }
+  </style>
+  <script>
+    /* Const 'main' is already defined as a const in 'site.js.html' */
 
-        <!-- /END THE FEATURETTES -->
+    const homeSections = new Object()
 
-      </div><!-- /.container -->
-    </main>
+    /* Retrieve all elements that are supposed to react to the scrolling 
+    /* and store them for the iteration below. */
+    let homeSectionsQuery = document.querySelectorAll(".home-section");
+    homeSectionsQuery.forEach(function(element, i) {
+      var center_y = 0
+      if (i > 0){ center_y = element.getBoundingClientRect().y - element.getBoundingClientRect().height * .5
+        element.style.opacity = .2;
+      }
+      element.classList.remove("active");
+
+      /*The object's structure => {key: [element, element_y]}*/
+      Object.defineProperty(homeSections, i, {value: [element, center_y]})
+    });
+
+    function updateFading(){
+      Object.getOwnPropertyNames(homeSections).forEach(function(key) {
+        var element = homeSections[key];
+        var opacity = Math.max(1 - (Math.abs(main.scrollTop - element[1])*.003), .2);
+
+        if (opacity > .4 && opacity < 1){ opacity = 1; element[0].classList.add("active");}
+        else if (opacity < 0.3) { element[0].classList.remove("active"); }
+        element[0].style.opacity = opacity;
+      });
+    }
+
+    main.addEventListener('scroll', function () {
+      updateFading();
+    });
+  </script>
 </body>
-{% include 'site/site_footer.html' %}
-{% include 'site/site_js.html' with lang_code=lang_code %}
 </html>

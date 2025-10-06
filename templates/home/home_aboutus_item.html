@@ -1,0 +1,20 @@
+{% load static %}
+<div class="col-lg-4 p-1 position-relative" style="width: 250px; line-height: .75em; animation-delay: {{delay}}s;">
+    <div class="position-absolute top-0 start-50 translate-middle-x">
+        <img class="rounded-circle border border-3 border-primary pop" 
+        src="{% if photo %}{% static 'home/'|add:photo %}{% else %}{% static 'default-user.png' %}{% endif %}"
+        alt="A photo of team member {{name}}" width="120" height="120">
+    </div>
+    <h3 class="bg-primary rounded-5 text-center pop" style="margin-top: 130px; animation-delay: {{delay}}s;">{{name}}</h3>
+    <h5 class="text-center ft-sm mb-2 pop" style="animation-delay: {{delay}}s;">{{role}}</h5>
+    <div class="d-flex d-flex justify-content-center p-0 m-0">
+        {% if github %}
+            <a id="link-github" class="" href="https://github.com/{{github}}/" aria-label="Bootstrap">
+            <h5 class="bi bi-github pe-2"></h5></a>
+        {% endif %}
+        {% if linkedin %}
+            <a id="link-linkedin" class="" href="https://www.linkedin.com/in/{{linkedin}}/" aria-label="Bootstrap">
+            <h5 class="bi bi-linkedin pe-2"></h5></a>
+        {% endif %}
+    </div>
+</div>

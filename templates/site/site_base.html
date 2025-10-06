@@ -1,19 +1,21 @@
 {% load static %}
 <!doctype html>
-<html lang="en" data-bs-theme="dark" {% include 'site/site_bg_img.html' %}>
+<html lang="en" data-bs-theme="dark" {% include 'site/site_bg_img.html' with image=request.user.background_image %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}FamilyThings{% endblock %}</title>
+  <title>{% block title %}{% endblock %} FamilyThings</title>
   {% include 'site/site_style_imports.html' %}
   {% include 'site/site_style.html' %}
+  <style>
+    {% include 'site/site_style_overrides.html' with color=request.user.color cursor=request.session.use_custom_cursor %}
+  </style>
 </head>
-{% include 'site/site_overlay.html' %}
 {% include 'site/site_js_preload.html' %}
-{% include 'site/site_header.html' %}
+{% include 'site/site_overlay.html' with messages=messages %}
+{% include 'site/site_header.html' with show_time=True %}
 <body>
-  {# Header #}
-  <main class="container-sm px-4 mt-3 m-auto">
+  <main class="container px-4 py-2 mt-3 m-auto">
     {% block content %}
     {# Content will be injected here #}
     {% endblock %}

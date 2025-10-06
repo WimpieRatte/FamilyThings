@@ -1,112 +1,179 @@
 {% extends "site/site_base.html" %}
-{% block title %}User Settings{% endblock %}
+{% block title %}User Settings - {% endblock %}
 {% block content %}
-<div class="p-2" style="max-height: 1800px">
-    <div id="todo-section" class="container-sm pb-4 w-100">
-        {% include 'site/heading_section.html' with id="user-settings" label="User Settings" %}
-        <div id="settings" class="container rounded bg-dark p-2 h-25 mh-25">
-            <div id="settings-wrapper" class="container d-flex flex-wrap rounded py-2">
-                <div id="details-section" class="p-3 w-50 mw-50">
-                    <p><span id="label-joined">Joined</span>: {{request.user.date_joined}}</p>
-                    <form method="post" class="mb-3 pe-5" style="width: fit-content !important;">
-                        {% csrf_token %}
-                        {% include 'site/form_field_small.html' with id="name" field=form.name %}
-                        {% include 'site/form_field_small.html' with id="language" field=form.language %}
-                        {% include 'site/form_field_small.html' with id="color" field=form.color hidden=True %}
-                        {% include 'site/form_field_small.html' with id="user_icon" field=form.user_icon hidden=True %}
-                        {% include 'site/form_field_small.html' with id="background_image" field=form.background_image hidden=True %}
-                        {% include 'site/form_field_small.html' with id="cursor" field=form.cursor %}
-                        <button id="button-apply" class="btn btn-primary mt-4 m-auto p-2" type="submit">Apply</button>
-                    </form>
-                </div>
-                <div id="image-section" class="d-flex p-3 w-50 mw-50">
-                    <div id="user-icon-setting" class="w-25">
-                        {% include 'site/heading_small.html' with id="icon" title='Icon' %}
-                        <img id="user-icon-preview" src="user_uploads/{{request.user.background_image}}" class="border border-5 border-primary mb-1" height="75" width="75" alt="...">
-                        <input id="user-icon" class="form-control fs-sm w-75" type="file">
+{% load static %}
+<div id="todo-section" class="container-sm pb-4 w-100">
+    {% include 'site/heading_section.html' with id="user-settings" label="User Settings" %}
+    <div id="settings" class="container rounded bg-dark p-2 h-25 mh-25">
+        <div id="settings-wrapper" class="container d-flex flex-wrap rounded py-2">
+            <div id="details-section" class="p-3 w-50 mw-50">
+                <div class="user-details" style="line-height: 1.25em">
+                    {% include 'site/heading_small.html' with id="user-details" title='User Details' %}
+                    <p class="m-0 mb-2">{{request.user.username}}<small> ({{request.user.email}})</small></p>
+                    <small class="m-0"><span id="label-joined">Joined</span>: {{request.user.date_joined}}</small><br>
+                    <small class="m-0"><span id="label-last-updated">Last Updated</span>: {{request.user.updated}}</small>
+                </div><br>
+                <form id="settings-form" class="mb-3 pe-5" enctype="multipart/form-data" method="post" style="width: fit-content !important;">
+                    {% csrf_token %}
+                    {% include 'site/form_field.html' with id="first-name" field=form.first_name optional=True %}
+                    {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}
+                    {% include 'site/form_field.html' with id="birthday" field=form.birthday optional=True %}
+                    <div class="d-flex" style="gap: 20px;">
+                        {% include 'site/form_field.html' with id="language" field=form.language %}
+                        {% include 'site/form_field.html' with id="cursor" field=form.cursor %}
                     </div>
-                    <div id="background-setting" class="w-50 ms-5">
-                        {% include 'site/heading_small.html' with id="background" title='Background' %}
-                        <img id="background-preview" src="user_uploads/{{request.user.background_image}}" class="img-thumbnail" alt="...">
-                        <input id="background-image" class="form-control fs-sm" type="file">
+                    {% include 'site/form_field.html' with id="color" field=form.color hidden='True' %}
+                    {% include 'site/form_field.html' with id="user-icon" field=form.user_icon optional=True hidden='True' %}
+                    {% include 'site/form_field.html' with id="background-image" field=form.background_image optional=True hidden='True' %}
+                    <div class="d-flex">
+                        {% include 'site/form_field.html' with id="remove-icon" field=form.remove_icon optional=True hidden='True'%}
+                        {% include 'site/form_field.html' with id="remove-background" field=form.remove_background optional=True hidden='True'%}
+                    </div>
+                    <br>
+                    <button id="button-apply" class="btn btn-primary border-primary" type="submit">Apply</button>
+                </form>
+            </div>
+            <div id="image-section" class="d-flex flex-wrap p-3 w-50 mw-50">
+                <div id="user-icon-setting" class="d-flex flex-column w-25">
+                    {% include 'site/heading_small.html' with id="icon" title='Icon' %}
+                    <div class="position-relative" style="height: 75px; width: 75px;">
+                        <img id="user-icon-preview" {% include 'header/icon.html' with icon=request.user.icon %} class="border border-5 border-primary mb-1 position-absolute" height="75" width="75" alt="...">
+                        <div id="label-change" class="pe-none position-absolute top-50 start-50 translate-middle" style="z-index: 90;">Change</div>
+                        <button id="btn-clear-icon" class="btn btn-primary border-primary fs-sm mt-1 position-absolute top-100 start-50 translate-middle-x" type="submit">
+                            <span id="button-clear">Clear</span>
+                        </button>
                     </div>
                 </div>
-                <div class="w-50"></div>
-                <div id="color-section" class="p-3">
+                <div id="background-setting" class="w-50 ms-5" style="height: 0px;">
+                    {% include 'site/heading_small.html' with id="background" title='Background' %}
+                        <div class="position-relative" style="width: 256px; height: 140px;">
+                        <img id="background-preview" {% include 'core/bg_preview.html' with image=request.user.background_image %} class="img-thumbnail position-relative start-50 translate-middle-x h-100" height="140" alt="...">
+                        <div id="label-change" class="pe-none position-absolute top-50 start-50 translate-middle" style="z-index: 90;">Change</div>
+                        <button id="btn-clear-background" class="btn btn-primary border-primary fs-sm mt-1 position-absolute top-100 start-50 translate-middle-x" type="submit">
+                            <span id="button-clear">Clear</span>
+                        </button>
+                    </div>
+                    {#<img id="background-preview" {% include 'core/bg_preview.html' with image=request.user.background_image %} class="img-thumbnail position-relative" alt="..."> #}
+                    {#<button id="btn-clear-background" class="btn btn-primary border-primary fs-sm mt-1" type="submit">Clear</button> #}
+                </div>
+                <div id="color-section" class="pt-3 w-100">
                     {% include 'site/heading_small.html' with id="color-scheme" title='Color Scheme' %}
-                    {% for color in colors.keys %}
-                        <button id="color-btn-{{color}}" onclick="change_color(this.value)", value="{{color}}" class="rounded"><i class="bi bi-square-fill h4 p-0 m-0" style="color: var(--bs-{{color}});"></i></button></i>
-                    {% endfor %}
-                    <div id="label-color-example" class="bg-primary rounded mt-2 p-2 w-100 fs-sm">Text will appear like this.</div>
+                    <div class="d-flex w-100">
+                        {% for color in colors.keys %}
+                            <button id="color-btn-{{color}}" onclick="change_color(this.value)", value="{{color}}" class="btn btn-dark border border-secondary p-1 m-0 color-btn rounded">
+                                <div class="bi bi-square-fill h4 p-0 m-0" style="color: var(--bs-{{color}});"></div>
+                            </button></i>
+                        {% endfor %}
+                    </div>
+                    <div id="label-color-example" class="rounded mt-2 p-2 w-75 fs-sm">Text will appear like this.</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-    const colorChoiceField = document.getElementById("id_color")
+    /* Make submitting any changes impossible until the User made any actual change */
+    const settingsForm = document.getElementById("settings-form");
+    const submitButton = document.getElementById("button-apply");
+    submitButton.disabled = true;
+
+    settingsForm.addEventListener("input", (e) => {enableSubmitButton();});
+
+    settingsForm.addEventListener("input", (e) => {
+        enableSubmitButton();
+    });
+
+    /* Autofill the birthday fields if the User already set up one*/
+    if ('{{request.user.birthday}}' != '') {
+        document.getElementById("id_birthday_day").value = '{{request.user.birthday.day}}'
+        document.getElementById("id_birthday_month").value = '{{request.user.birthday.month}}'
+        document.getElementById("id_birthday_year").value = '{{request.user.birthday.year}}'
+    }
+    document.getElementById("id_first_name").value = '{{request.user.first_name}}'
+    document.getElementById("id_last_name").value = '{{request.user.last_name}}'
+
+    const colorChoiceField = document.getElementById("id_color");
+    const colorChoiceExample = document.getElementById("label-color-example");
+
+    if ('{{request.user.color}}' != '') {
+        colorChoiceExample.style.backgroundColor = "var(--bs-{{request.user.color}})"
+        colorChoiceExample.style.color = "var(--bs-{{request.user.color}}-font)"
+    }
+    else{
+        colorChoiceExample.style.backgroundColor = "var(--bs-primary)"
+    }
 
     async function change_color(color){
-      const bgPrimary = document.getElementsByClassName("bg-primary");
-      for (let i = 0; i < bgPrimary.length; i++) {
-        bgPrimary.item(i).setAttribute( 'style', 'background-color: var(--bs-' + color + ') !important; color: var(--bs-' + color + '-font) !important;');
-      }
-
-      const borderPrimary = document.getElementsByClassName("border-primary");
-      for (let i = 0; i < borderPrimary.length; i++) {
-        borderPrimary.item(i).setAttribute( 'style', 'border-color: var(--bs-' + color + ') !important;');
-      }
-
-      colorChoiceField.value = color
-
-      /*update_user_settings({
-        color: color,
-        csrfmiddlewaretoken: '{{ csrf_token }}',
-        action: 'post'})*/
+        colorChoiceExample.style.backgroundColor = `var(--bs-${color})`
+        colorChoiceExample.style.color = `var(--bs-${color}-font)`
+        colorChoiceField.value = color
+        enableSubmitButton();
     }
 
     /* Background settings */
-    const backgroundSetting = document.getElementById("background-setting");
-    const backgroundPreview = document.getElementById("background-preview");
-    const backgroundForm = document.getElementById("background-image");
+    const defaultBackground = '{% static "default_background.jpg" %}'
+    const backgroundPreviewWindow = document.getElementById("background-preview");
+    const backgroundForm = document.getElementById("id_background_image");
+    const backgroundClearButton = document.getElementById("btn-clear-background"); // The "Clear" button underneath the preview
+    const backgroundClearToggle = document.getElementById("id_remove_background"); // The checkbox inside the real form
 
-    backgroundSetting.addEventListener("click", (e) => {if (backgroundForm) {backgroundForm.click();}});
-    backgroundSetting.onchange = evt => {
+    backgroundPreviewWindow.addEventListener("click", (e) => {if (backgroundForm) {backgroundForm.click();}});
+    backgroundForm.onchange = evt => {
+        backgroundPreviewWindow.src = URL.createObjectURL(backgroundForm.files[0]);
         document.documentElement.style.backgroundImage = "url(" + URL.createObjectURL(backgroundForm.files[0]) + ")";
+        backgroundClearToggle.checked = false
+        backgroundClearButton.style.display = "block"
+        enableSubmitButton(show_hint=true);
     }
+
+    /* Remove toggle */
+    backgroundClearButton.addEventListener("click", (e) => {
+        if (backgroundClearToggle){
+                backgroundClearToggle.checked = true;}
+        backgroundPreviewWindow.src = defaultBackground;
+        document.documentElement.style.backgroundImage = "url(" + defaultBackground + ")";
+        backgroundClearButton.style.display = "none"
+        enableSubmitButton(show_hint=true);
+    });
+
+    /* Automatically hide the Remove toggle if there's no already uploaded background*/
+    if ('{{request.user.background_image}}' == '') {backgroundClearButton.style.display = "none"}
 
     /* Icon settings */
-    const iconSetting = document.getElementById("user-icon-setting");
-    const iconPreview = document.getElementById("user-icon-preview");
-    const iconForm = document.getElementById("user-icon");
+    const defaultIcon = '{% static "default-user.png" %}'
+    const iconPreviewWindow = document.getElementById("user-icon-preview");
+    const iconForm = document.getElementById("id_user_icon");
+    const iconClearButton = document.getElementById("btn-clear-icon"); // The "Clear" button underneath the preview
+    const iconClearToggle = document.getElementById("id_remove_icon"); // The checkbox inside the real form
+    const headerIcon = document.getElementById("dropdown-user-icon"); // The actual user icon in the header to the top-right
 
-    iconSetting.addEventListener("click", (e) => {if (iconForm) {iconForm.click();}});
-    iconSetting.onchange = evt => {
-        if (iconForm.files[0]) {iconPreview.src = URL.createObjectURL(iconForm.files[0]);}
-        document.getElementById("dropdown-user-icon").src = URL.createObjectURL(iconForm.files[0]);
-
-        fetch("", {
-            method: "POST",
-            headers: { 
-                'Content-Type':'application/json',
-                "X-CSRF-Token": '{{ csrf_token }}',
-            },
-            body: JSON.stringify({ 'background-image': URL.createObjectURL(iconForm.files[0]) })
-            });
+    iconPreviewWindow.addEventListener("click", (e) => {if (iconForm) {iconForm.click();}});
+    iconForm.onchange = evt => {
+        iconPreviewWindow.src = URL.createObjectURL(iconForm.files[0]);
+        headerIcon.src = URL.createObjectURL(iconForm.files[0]);
+        iconClearToggle.checked = false;
+        iconClearButton.style.display = "block";
+        enableSubmitButton(show_hint=true);
     }
 
-    function update_user_settings(data) {
-        $.ajax({  // do a hidden postback to the url(view) below
-            type: 'POST',
-            url: '{% url 'core:update_user_settings' %}',
-            data: data,
-            success: function(json) {
-                console.log("Success.")
-            },
-            error: function(xhr, errmsg, err) {
-                console.log(errmsg);
-            }
-        });
+    /* Remove toggle */
+    iconClearButton.addEventListener("click", (e) => {
+        if (iconClearToggle){
+            iconClearToggle.checked = true;}
+        iconPreviewWindow.src = defaultIcon;
+        headerIcon.src = defaultIcon;
+        iconClearButton.style.display = "none";
+        enableSubmitButton(show_hint=true);
+    });
+
+    /* Automatically hide the Remove toggle if there's no already uploaded icon*/
+    if ('{{request.user.icon}}' == '') {iconClearButton.style.display = "none"}
+
+    function enableSubmitButton(show_hint = false) {
+        if (show_hint){
+            createAlert(text="This change will only be applied after saving.", key="hint-changes", type="warning");
+        }
+        submitButton.disabled = false;
     }
 </script>
 {% endblock %}

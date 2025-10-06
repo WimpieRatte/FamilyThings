@@ -31,7 +31,6 @@ class CustomUser(AbstractUser):
 
     # Overriding Django's built-in AbstractUser
     email = models.EmailField(unique=True)
-    last_name = models.CharField(max_length=20, null=True)  # Overwritten to be removed, as it's not required.
 
     # TODO: Check if 'created' is required
     # Django has 'date_joined' built-in, which has the same function
@@ -45,7 +44,8 @@ class CustomUser(AbstractUser):
     is_manager = models.BooleanField(default=False)
 
     # Personalization-related fields
-    first_name = models.CharField(max_length=20)
+    first_name = models.CharField(max_length=20, default="")
+    last_name = models.CharField(max_length=20, default="")
     birthday = models.DateField(blank=True, null=True)
     color = models.CharField(
         max_length=6,
@@ -53,7 +53,7 @@ class CustomUser(AbstractUser):
         default=BLUE)
     icon = models.ImageField(
         blank=True, null=True,
-        upload_to="icons")
+        upload_to="icons/")
     background_image = models.ImageField(
         blank=True, null=True,
         upload_to="backgrounds/")
@@ -70,6 +70,15 @@ class CustomUser(AbstractUser):
     def __str__(self):
         """Return the Username as the model's default string representation."""
         return self.username
+
+    def full_name(self):
+        """Return either the Username or, if defined, the First and Last Names."""
+        if self.first_name != "":
+            return f"{self.first_name} {self.last_name}".replace(" None", "")
+        return self.username
+
+    def is_family_member(self):
+        return True # TODO: Get this check implemented properly
 
     class Meta:
         # White space is used as a workaround

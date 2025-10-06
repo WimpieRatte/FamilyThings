@@ -1,0 +1,84 @@
+{% extends "site/site_base.html" %}
+{% block title %}Accomplishments{% endblock %}
+{% block content %}
+<div id="todo-section" class="container-sm pb-4 w-100">
+    {% include 'site/heading_section.html' with label="Add New Accomplishment" id="create_accomplishment" %}
+    <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
+        <div id="accomplishments-wrapper" class="container d-flex py-5">
+            <form id="accomplishment-form" method="post" class="m-auto d-flex flex-wrap">
+                {% csrf_token %}
+                <div class="w-50">
+                    {% include 'site/form_field.html' with id="name" field=form.name %}
+                    {% include 'site/form_field.html' with id="description" field=form.description optional=True %}
+                    {% include 'site/form_field.html' with id="measurement" field=form.measurement optional=True %}
+                    {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement optional=True %}
+                    {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
+                </div>
+                <div class="w-50">
+                    {% include 'site/form_field.html' with id="icon" field=form.icon optional=True %}
+                    <div class="d-flex flex-wrap" style="width: 27em; gap:.125em">
+                        <div class="d-flex flex-wrap w-100">
+                        {% for icon in icons %}
+                            {% if icon == "$BREAK$" %}
+                                </div><div class="d-flex flex-wrap w-100">
+                            {% elif icon == "$SPACE$" %}
+                                <div style="width: .5em;"></div>
+                            {% else %}
+                                <button id="icon-btn-{{icon}}" type="button" onclick="input_change_value(this, '#id_icon')", value="{{icon}}" class="icon-btn btn btn-dark border border-secondary p-1 m-0 rounded">
+                                    <div class="bi bi-{{icon}} h4 p-0 m-0"></div>
+                                </button></i>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button id="button-create" class="btn btn-primary border-primary mt-4 d-block" type="submit">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    .active {
+        color: rgb(41, 151, 219) !important;
+        background-color: var(--bs-dark) !important;
+    }
+</style>
+<script>
+    async function input_change_value(button, input){
+        document.querySelector(input).value = button.value;
+
+        document.querySelectorAll(".icon-btn").forEach(function(element, i) {
+            element.classList.remove("active");
+        })
+
+        button.classList.add("active");
+    }
+    input_change_value(document.querySelector(".icon-btn"), '#id_icon')
+
+    // AJAX Submission
+    $("#button-create").click(function(event) {
+        event.preventDefault(); // Prevents the button from creating the default HTTPRequest
+        event.target.disabled = true; //  Disables the log in button
+
+        enable_loading_screen();  // Function is defined in site_js
+
+        let form_data = $("#accomplishment-form")
+        $.ajax({ 
+            type: 'POST', url: '{% url "accomplishment:submit_new" %}',
+            data: form_data.serializeArray(),
+            success: function(json) {
+                disable_loading_screen();
+                createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
+                /*setTimeout(function() {window.location.replace("{% url "core:user_profile" %}");}, 1000);*/
+            },
+            error: function(xhr, errmsg, err) {
+                event.target.disabled = false;
+                disable_loading_screen();
+                createAlert(xhr.responseText, key="", type="danger");
+            }
+        });
+    });
+</script>
+{% endblock %}
