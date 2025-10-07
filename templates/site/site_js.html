@@ -106,33 +106,37 @@
 
     /* Only proceed if a translation JSON was loaded beforehand;*/
     /*'locale_json' has been defined in 'site_js_preload.html' already */
-    $.getJSON('/static/localization/{{request.session.lang_code}}/main.json', 
-    function(json_data){})
-    .done(function(json_data) {
-        Object.entries(json_data).forEach(function(entry) {
-            /* Each entry would normally be a Key/Value pair in JSON. */
-            let key = entry[0]; let text = entry[1];
-            let elements = document.querySelectorAll("#" + key);
+    function applyLocaleToPage(){
+        $.getJSON('/static/localization/{{request.session.lang_code}}/main.json', 
+        function(json_data){})
+        .done(function(json_data) {
+            Object.entries(json_data).forEach(function(entry) {
+                /* Each entry would normally be a Key/Value pair in JSON. */
+                let key = entry[0]; let text = entry[1];
+                let elements = document.querySelectorAll("#" + key);
 
-            /* Determine the HTML value based on the element type. */
-            elements.forEach(function(element) {
-                switch (element.localName) {
-                    case "textarea":
-                        /* 'placeholder' refers to the intangible text inside the textarea. */
-                        element.placeholder = text; break;
-                    case "select":
-                        /* Select elements require access to their 'option' children. */
-                        /* When translating them, make sure to place all options inside of a list.*/
-                        let children = element.children;
-                        for (let i = 0; i < children.length; i++) {
-                            children[i].textContent = text[i]}
-                        break;
-                    default:
-                        element.textContent = text; break;
-                }
+                /* Determine the HTML value based on the element type. */
+                elements.forEach(function(element) {
+                    switch (element.localName) {
+                        case "textarea":
+                        case "input":
+                            /* 'placeholder' refers to the intangible text inside the textarea/input field. */
+                            element.placeholder = text; break;
+                        case "select":
+                            /* Select elements require access to their 'option' children. */
+                            /* When translating them, make sure to place all options inside of a list.*/
+                            let children = element.children;
+                            for (let i = 0; i < children.length; i++) {
+                                children[i].textContent = text[i]}
+                            break;
+                        default:
+                            element.textContent = text; break;
+                    }
+                });
             });
-        });
-    })
+        })
+    }
+    applyLocaleToPage()
 
     /* Load and apply localized text specific to the Tooltips. */
     function applyLocaleToTooltips(){

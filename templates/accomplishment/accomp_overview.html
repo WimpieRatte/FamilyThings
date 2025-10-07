@@ -27,11 +27,11 @@
                             <thead class="w-100 fs-sm">
                                 <tr class="">
                                     <th class="p-1" style="width: 3%;" scope="col">#</th>
-                                    <th class="p-1" id="id_name" style="width: 26%;" scope="col">Name</th>
-                                    <th class="p-1" id="lb-measurement" style="width: 20%;" scope="col">Measurement</th>
+                                    <th class="p-1" id="id_name" style="width: 27%;" scope="col">Name</th>
+                                    <th class="p-1" id="lb-measurement" style="width: 18%;" scope="col">Measurement</th>
                                     <th class="p-1" id="lb-category" style="width: 20%;" scope="col">Category</th>
-                                    <th class="p-1" id="lb-created-on" style="width: 18%;" scope="col">Created on</th>
-                                    <th class="p-1" style="width: 10%;" scope="col"></th>
+                                    <th class="p-1" id="lb-created-on" style="width: 20%;" scope="col">Created on</th>
+                                    <th class="p-1" style="width: 12%;" scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody id="accomplishments-table-body" class="fs-sm">
@@ -40,13 +40,13 @@
                         </table>
                         <div id="table-buttons" class="w-100 pe-3 d-flex justify-content-between position-absolute bottom-0 start-50 translate-middle-x">
                             <button id="previous-button" type="button" class="bi bi-caret-left-fill h4 d-block"></button>
-                            <div class="font-monospace">Showing Entries <span id="range-start"></span>-<span id="range-end"></span> (found <span id="range-total"></span> total)</div>
+                            <div class="font-monospace"><span id="lb-entries">Showing Entries</span> <span id="range-start"></span>-<span id="range-end"></span> (<span id="lb-entries2">found</span> <span id="range-total"></span> <span id="lb-entries3">total</span>)</div>
                             <button id="next-button" type="button" class="bi bi-caret-right-fill h4 d-block"></button>
                         </div>
                     </div>
                 </div>
                 <div style="width: 35%">
-                    {% include 'site/heading_small.html' with title="Had any recent Accomplishments?" id="" class='text-center pt-1' %}
+                    {% include 'site/heading_small.html' with title="Had any recent Accomplishments?" id="any-recent-accomps" class='text-center pt-1' %}
                     <div id="new-accomplishment-wrapper" class="w-auto m-auto pb-4">
                         <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
                             <h4 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
@@ -115,6 +115,8 @@
             document.getElementById("range-start").textContent = start;
             document.getElementById("range-end").textContent = start - 1 + Object.entries(response.result).length;
             document.getElementById("range-total").textContent = response.total;
+
+            applyLocaleToPage() /* Refresh all language content */
             updateTooltips(); // Required to make the new Entries interactable
         })
         .fail(function(err) {console.log(err);})

@@ -3,7 +3,7 @@
 {% block content %}
 {% load static %}
 <div id="todo-section" class="container-sm pb-4 w-100">
-    {% include 'site/heading_section.html' with label="Add New Accomplishment" id="create_accomp" %}
+    {% include 'site/heading_section.html' with label="Add New Accomplishment" id="create-accomp" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25 position-relative">
         <div id="duplicate-accomplishment-prompt" class="position-relative" style="display: none;">
             <div id="duplicate-accomplishment-label" class="w-50 p-2 m-auto border border-2 border-dark text-bg-warning rounded-3 text-center">There already exists an Accomplishment with that name.<br>Did you intend on repeating it?</div>
@@ -21,8 +21,6 @@
                         {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
                     </div>
                     {% include 'site/form_field.html' with id="description" field=form.description optional=True %}
-                    {# Hidden Fields #}
-                    {% include 'site/form_field.html' with id="icon" field=form.icon %}
                     {% include 'site/form_field.html' with id="is_repeat" field=form.is_repeat %}
                 </div>
                 <div style="width: 40%;">
@@ -34,15 +32,15 @@
                     </div>
                     <div id="lb-time-range" class="pb-1">Time Range</div>
                     <div id="timeframe-section" class="flex-column gap-2">
-                        {% include 'site/form_field.html' with id="" field=form.date_from field_class="d-flex" label_class="w-25" %}
-                        {% include 'site/form_field.html' with id="" field=form.date_to field_class="d-flex" label_class="w-25" %}
+                        {% include 'site/form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="w-25" %}
+                        {% include 'site/form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
                     </div>
                 </div>
                 {% include 'accomplishment/temp_accomp_icon_selection.html' with icons=icons initial=initial %}
                 </div>
                 <div class="d-flex gap-2 mt-4 pb-4 m-auto" style="width: fit-content;">
-                    <button id="button-create" class="btn btn-primary border-primary d-block m-auto" type="submit">Create</button>
-                    <a href="{% url 'accomplishment:overview' %}"><button id="button-abort" class="btn btn-danger" type="button">Abort</button></a>
+                    <button id="btn-create" class="btn btn-primary border-primary d-block m-auto" type="submit">Create</button>
+                    <a href="{% url 'accomplishment:overview' %}"><button id="btn-abort" class="btn btn-danger" type="button">Abort</button></a>
                 </div>
                 </div>
             </form>
@@ -78,10 +76,10 @@
     var duplicateAccomplishment = new Object()
     const nameField = document.getElementById("id_name");
     const descriptionField = document.getElementById("id_description");
-    const submitButton = document.getElementById("button-create");
+    const submitButton = document.getElementById("btn-create");
 
     // AJAX Submission
-    $("#button-create").click(function(event) {
+    $("#btn-create").click(function(event) {
         event.preventDefault(); // Prevents the button from creating the default HTTPRequest
         submitButton.disabled = true; //  Disables the log in button
 

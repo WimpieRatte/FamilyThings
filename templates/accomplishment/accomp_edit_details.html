@@ -15,12 +15,11 @@
                     </div>
                     {% include 'site/form_field.html' with id="description" field=form.description optional=True %}
                     {# Hidden Fields #}
-                    {% include 'site/form_field.html' with id="icon" field=form.icon %}
                 </div>
                 {% include 'accomplishment/temp_accomp_icon_selection.html' with icons=icons initial=initial %}
                 <div class="d-flex gap-2 py-4 m-auto" style="width: fit-content;">
-                    <button id="button-submit" class="btn btn-primary border-primary" type="submit">Submit Change</button>
-                    <a href="{% url 'accomplishment:overview' %}"><button id="button-abort" class="btn btn-danger" type="button">Abort</button></a>
+                    <button id="btn-apply-changes" class="btn btn-primary border-primary" type="submit">Submit Change</button>
+                    <a href="{% url 'accomplishment:overview' %}"><button id="btn-abort" class="btn btn-danger" type="button">Abort</button></a>
                 </div>
             </form>
         </div>
