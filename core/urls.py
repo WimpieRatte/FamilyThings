@@ -15,6 +15,9 @@ core_urls = [
     path("register/", views.user_register, name="user_register"),
     path("profile/", views.user_profile_page, name="user_profile"),
     path("settings/", views.user_settings_page, name="user_settings"),
+    path("forgot_password/", views.forgot_password, name="forgot_password"),
+    path("password_reset_sent/<str:reset_id>/", views.password_reset_sent, name="password_reset_sent"),
+    path("reset_password/<str:reset_id>/", views.reset_password, name="reset_password"),
 
     # Authentication and session (AJAX)
     path("auth?log_in", user_auth.process_login, name="request_login"),
