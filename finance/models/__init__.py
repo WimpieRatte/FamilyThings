@@ -2,3 +2,8 @@ from .business_entity import BusinessEntity
 from .currency import Currency
 from .exchange_rate import ExchangeRate
 from .transaction import Transaction
+from .import_profile import ImportProfile
+from .import_profile_mapping import ImportProfileMapping
+from .import_history import ImportHistory
+from .transaction_category import TransactionCategory
+from .transaction_pattern import TransactionPattern
