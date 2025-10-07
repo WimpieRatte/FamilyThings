@@ -16,10 +16,10 @@
 /* Modified colors and added font-colors to better match those alternative bg colors*/
   --bs-blue: #4b85d9;
   --bs-blue-font: #dee2e6;
-  --bs-pink: #d05f97;
+  --bs-pink: #fd77ba;
   --bs-pink-font: #212529;
   --bs-red: #c84855;
-  --bs-red-font: #dee2e6;
+  --bs-red-font: #212529;
   --bs-orange: #df7823;
   --bs-orange-font: #212529;
   --bs-yellow: #d5af3c;
@@ -388,15 +388,9 @@ figure {
 img,
 svg {
   vertical-align: middle;
-  
-  /* FamilyThings: Alternative rendering setting (might not have any effect) */
-  image-rendering: smooth;
 }
 
 table {
-  /* FamilyThings: Alternative font + Monospace */
-  font-family: "LXGW WenKai Mono TC", monospace;
-
   caption-side: bottom;
   border-collapse: collapse;
 }
@@ -2954,7 +2948,7 @@ textarea.form-control-lg {
   --bs-btn-font-family: ;
   --bs-btn-font-size: 1rem;
   --bs-btn-font-weight: 400;
-  --bs-btn-line-height: 1.5;
+  --bs-btn-line-height: 1.25; /* From 1.5 to 1.2 */
   --bs-btn-color: var(--bs-body-color);
   --bs-btn-bg: transparent;
   --bs-btn-border-width: var(--bs-border-width);

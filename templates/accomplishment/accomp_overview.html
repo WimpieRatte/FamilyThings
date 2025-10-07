@@ -5,24 +5,25 @@
     {% include 'site/heading_section.html' with label="Accomplishments" id="accomplishments" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
         <div id="accomplishments-wrapper" class="container rounded py-2">
-            <div class="d-flex justify-content-between p-3">
+            <div class="d-flex justify-content-between flex-wrap p-3">
                 <div style="width: 65%">
-                    <div class="d-flex justify-content-between pb-2">
+                    <div class="d-flex flex-wrap justify-content-between pb-2">
                         {% include 'site/heading_small.html' with label="All Activity" id="all-activity" %}
                         <form id="filter-form">
                             <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter" aria-label="Search">
                             <button id="" type="submit" class="d-none"></button>
                         </form>
                     </div>
-                    <div class="pe-3 position-relative" style="height: 34em;">
-                        <table id="accomplishments-table" class="table table-striped bg-opacity-50">
-                            <thead class="fs-sm">
-                                <tr>
-                                    <th class="p-1" style="width: 1em;" scope="col">#</th>
-                                    <th class="p-1" style="width: 15em;" scope="col">Name</th>
-                                    <th class="p-1" style="width: 7em;" scope="col">Category</th>
-                                    <th class="p-1" style="width: 14em;"scope="col">Measurement</th>
-                                    <th class="p-1" scope="col">Created on</th>
+                    <div class="position-relative pe-3" style="height: 34em;">
+                        <table id="accomplishments-table" class="table table-striped bg-opacity-50" style="table-layout: fixed;">
+                            <thead class="w-100 fs-sm">
+                                <tr class="">
+                                    <th class="p-1" style="width: 3%;" scope="col">#</th>
+                                    <th class="p-1" style="width: 26%;" scope="col">Name</th>
+                                    <th class="p-1" style="width: 20%;" scope="col">Measurement</th>
+                                    <th class="p-1" style="width: 20%;" scope="col">Category</th>
+                                    <th class="p-1" style="width: 18%;" scope="col">Created on</th>
+                                    <th class="p-1" style="width: 6%;" scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody id="accomplishments-table-body" class="fs-sm">
@@ -97,6 +98,7 @@
                 createTableEntry(todaysAccContainer, data, start+index, searchText)
                 index++;
             });
+
             currentEnd = start + Object.entries(response.result).length;
             totalEntries = response.total;
             if (currentEnd-1 < totalEntries){tableNextButton.disabled = false;}
@@ -108,11 +110,13 @@
         .fail(function(err) {console.log(err);})
 
         if (currentIndex > 1){tablePreviousButton.disabled = false;}
+
+        var deleteURL = "{{HOST}}/message/delete/id="
     }
     createAccomplishmentsTable()
 
     /* Dynamically create Accomplishment entries */
-    const tableEntryTemplate = `{% include "accomplishment/accomp_entry.html" %}`
+    const tableEntryTemplate = `{% include "accomplishment/temp_accomp_entry.html" %}`
 
     function createTableEntry(target_container, data, index, highlight=""){
         let language = languageCode;
@@ -131,16 +135,34 @@
         /* Turn the whole name + icon yellow */
         if (accomplishment["is_achievement"]) { templateDump = templateDump.replace("%name_style%", 'style="color: #ddc67f !important;"')}
             else { templateDump = templateDump.replace("%name_style%", '')}
-
+        
         /* Insert the rest */
         templateDump = templateDump.replace("%index%", index)
-        .replace("%name%", accomp_name)
+        .replaceAll("%name%", accomp_name)
         .replace("%date_created%", creation_date)
         .replace("%icon%", accomplishment["icon"])
-        .replace("%category%", accomplishment["type"])
+        .replace("%category%", accomplishment["type"].replace("-", "N/A"))
         .replace("%description%", accomplishment["description"])
+        .replace("%measurement%", `${data["fields"]["measurement_quantity"]} ${accomplishment["measurement"]}`.replace("null", "x"))
+        .replaceAll("%ID%", data["pk"])
         
         target_container.append(templateDump);
+
+        /* Delete Messages */
+        var deleteURL = "{{HOST}}/accomplishments/delete/id="
+        document.getElementById(`delete-accomplishment-btn-${data["pk"]}`).addEventListener(
+            "click", (event) => {
+                let accomp_id = event.currentTarget.getAttribute("data-accomp-id");
+                if (confirm(`Are you sure you want to delete this entry?\n(This cannot be undone!)`)) {
+                    $.get( `${deleteURL}${accomp_id}`, function() {})
+                    .done(function(response) {
+                        createAccomplishmentsTable(15, currentIndex);
+                    })
+                    .fail(function(err) {
+                        createAlert(xhr.responseText, key="", type="danger");
+                    })
+                }
+            });
     }
 
     $("#previous-button").click(function(event) {
@@ -154,10 +176,10 @@
     $("#filter-form").submit(function(event) {
         event.preventDefault();
         searchText = new RegExp(`(${searchBar.value})`,'gi');
-        console.log(searchText)
         createAccomplishmentsTable(15, 1, searchBar.value)
     });
 
+    /* Unused as it results in too many requests. */
     // $("#search-filter").on('keyup', function (event) {
     //     searchText = new RegExp(`(${event.target.value})`,'gi');
     //     createAccomplishmentsTable(15, currentIndex, event.target.value)

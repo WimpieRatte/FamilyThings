@@ -41,6 +41,7 @@ class Accomplishment(models.Model):
 
     def dict(self):
         return {
+            'ID': self.id,
             'name': self.name, 'description': self.description,
             'icon': self.icon, 'is_achievement': self.is_achievement,
             'type': str(self.accomplishment_type_id).replace("None", "-"),

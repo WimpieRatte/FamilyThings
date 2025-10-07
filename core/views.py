@@ -149,14 +149,20 @@ def user_profile_page(request, lang_code: str = ""):
             try:
                 user_accomp = FamilyUserAccomplishment.objects.filter(
                     family_user_id=user
-                ).order_by("created").reverse()[0].accomplishment_id.dict()
+                ).order_by("created").reverse()[0]
+
+                # Get the creared/created date before proceeding with
+                # the Accomplishment details.
+                create_date = user_accomp.created
+
+                user_accomp = user_accomp.accomplishment_id.dict()
                 user_accomp["cleared_by"] = user.custom_user_id.full_name()
                 user_accomp["color"] = user.custom_user_id.color
                 user_accomp["icon"] = user.custom_user_id.icon
+                user_accomp["date"] = create_date
                 accomplishments += [user_accomp]
             except (IndexError):
                 pass
-        print(accomplishments)
 
         return render(request, "core/user_profile.html", {
             'family': fam_user.json_data(),

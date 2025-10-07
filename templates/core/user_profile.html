@@ -31,7 +31,7 @@
         {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
         <div id="messager-section" class="pb-3 w-100" style="height: 24em;">
             <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 mb-2 h-100 fs-sm overflow-y-scroll" style="overflow-x: visible !important;">
-                <div id="message-wall" class="container rounded bg-light-subtle h-100">
+                <div id="message-wall" class="container rounded bg-light-subtle" style="min-height: 100%;">
                     <div id="message-list" class="p-1">
                     {% for message in chat %}
                         {% if not message.deleted %}
@@ -54,7 +54,7 @@
                     <textarea id="textarea-message-wall" name="text" class="form-control" rows="3" maxlength="150" placeholder="Write message..."></textarea>
                     <div id="textarea-message-wall-count" class="position-absolute bottom-0 end-0 fs-sm pe-1 text-end" style="pointer-events: none;">0/150</div>
                 </div>
-                <button id="button-message-wall" class="btn btn-primary mt-2 px-3" value="OK" type="submit">Post</button>
+                <button id="button-message-wall" class="btn btn-primary mt-1 px-3" value="OK" type="submit">Post</button>
             </form>
         </div>
     </div>
@@ -63,7 +63,7 @@
             {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
             <div class="flex-column bg-dark rounded p-1 mh-25">
                 {% for entry in family_activity %}
-                    {% include 'home/family_accomplishment_item.html' with title=entry.name icon=entry.icon color=entry.color %}
+                    {% include 'home/family_accomplishment_item.html' with title=entry.name icon=entry.icon color=entry.color date=entry.date%}
                 {% endfor %}
                 <!-- {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
                 {% include 'home/family_accomplishment_item.html' with title='Did the Dishes' icon='android' color='purple'%}

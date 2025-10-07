@@ -1,0 +1,46 @@
+{% extends "site/site_base.html" %}
+{% block title %}Accomplishments{% endblock %}
+{% block content %}
+{% load static %}
+<div id="todo-section" class="container-sm pb-4 w-100">
+    {% include 'site/heading_section.html' with label="Edit User Accomplishment" id="edit-user-accomplishment" %}
+    <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25 position-relative">
+        <div id="accomplishments-wrapper" class="d-flex py-5">
+            <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5" style="width: 65%;">
+                {% csrf_token %}
+                <div style="">
+                    <div id="form-label-measurement" class="pb-1">Measurement</div>
+                    <div id="measurement-section" class="d-flex gap-2">
+                        {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
+                        {% include 'site/form_field.html' with id="" field=form.measurement %}
+                    </div>
+                </div>
+                <div style="">
+                    <div id="form-label-time-range" class="pb-1">Time Range</div>
+                    <div id="timeframe-section" class="flex-column gap-2">
+                        {% include 'site/form_field.html' with id="" field=form.date_from field_class="d-flex" label_class="pe-3" %}
+                        {% include 'site/form_field.html' with id="" field=form.date_to field_class="d-flex" label_class="w-25" %}
+                    </div>
+                </div>
+                </div>
+                <div class="d-flex gap-2 pb-4 m-auto" style="width: fit-content;">
+                    <button id="button-submit" class="btn btn-primary border-primary" type="submit">Submit Change</button>
+                    <a href="{% url 'accomplishment:overview' %}"><button id="button-abort" class="btn btn-danger" type="button">Abort</button></a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    .active {
+        color: rgb(41, 151, 219) !important;
+        background-color: var(--bs-dark) !important;
+    }
+
+    .d-flex > p + input {
+        margin-left: 1em;
+    }
+</style>
+<script>
+</script>
+{% endblock %}

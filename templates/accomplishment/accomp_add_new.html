@@ -38,24 +38,7 @@
                         {% include 'site/form_field.html' with id="" field=form.date_to field_class="d-flex" label_class="w-25" %}
                     </div>
                 </div>
-                <div class="w-100">
-                    <div class="m-auto" style="width: fit-content; gap:.125em">
-                        <div id="form-label-icon">Icon</div>
-                        <div class="d-flex flex-wrap">
-                        {% for icon in icons %}
-                            {% if icon == "$BREAK$" %}
-                                </div><div class="d-flex flex-wrap">
-                            {% elif icon == "$SPACE$" %}
-                                <div style="width: .5em;"></div>
-                            {% else %}
-                                <button id="icon-btn-{{icon}}" type="button" onclick="input_change_value(this, '#id_icon')", value="{{icon}}" class="icon-btn btn btn-dark border border-secondary p-1 m-0 rounded">
-                                    <div class="bi bi-{{icon}} h4 p-0 m-0"></div>
-                                </button></i>
-                            {% endif %}
-                        {% endfor %}
-                        </div>
-                    </div>
-                <div>
+                {% include 'accomplishment/temp_accomp_icon_selection.html' with icons=icons %}
                 </div>
                 <button id="button-create" class="btn btn-primary border-primary mt-4 d-block m-auto" type="submit">Create</button>
                 </div>
@@ -91,27 +74,8 @@
     const duplicateAccomplishmentPrompt = document.getElementById("duplicate-accomplishment-prompt");
     var duplicateAccomplishment = new Object()
     const nameField = document.getElementById("id_name");
-    const iconField = document.getElementById("id_icon");
     const descriptionField = document.getElementById("id_description");
     const submitButton = document.getElementById("button-create");
-
-    function unfocus_all(elements){
-        elements.forEach(function(element, i) {
-            element.classList.remove("active");
-        })
-    }
-
-    async function input_change_value(button, input){
-        if (document.querySelector(input).disabled){
-            return; /* Only accept changes if the input field is active */
-        }
-
-        document.querySelector(input).value = button.value;
-        unfocus_all(document.querySelectorAll(".icon-btn"));
-
-        button.classList.add("active");
-    }
-    input_change_value(document.querySelector(".icon-btn"), '#id_icon')
 
     // AJAX Submission
     $("#button-create").click(function(event) {
@@ -123,7 +87,7 @@
         let form_data = $("#accomplishment-form")
         nameField.disabled = false;
         descriptionField.disabled = false;
-        iconField.disabled = false;
+
         $.ajax({ 
             type: 'POST', url: '{% url "accomplishment:submit_new" %}',
             data: form_data.serializeArray(),

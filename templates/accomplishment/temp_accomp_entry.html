@@ -1,0 +1,19 @@
+<tr class="">
+    <td class="p-1 fs-sm" style="width: 5%;">%index%</td>
+    <td class="p-1 overflow-hidden text-truncate text-nowrap tooltip-source" style="max-width: 10%;"
+    data-tooltip-context="%name%" data-tooltip-content="%description%">
+        <span class="bi bi-%icon% p-0 m-0" %name_style%> %name%</span>
+    </td>
+    <td class="p-1">%measurement%</td>
+    <td class="p-1"><span class="badge text-bg-primary p-1 m-0 fs-sm fw-normal">%category%</span></td>
+    <td class="p-1 overflow-hidden text-truncate text-nowrap">%date_created%</td>
+    <div class="dropdown">
+        <td class="p-0"><button id="edit-button-%ID%" value="%ID%" type="button" data-bs-toggle="dropdown" class="dropdown-toggle btn btn-primary d-block m-auto mt-auto p-1 fs-sm" style="margin-top: 0.1em !important;">Edit</button>
+        <ul class="dropdown-menu dropdown-menu-lg-start fs-sm">
+            <li><a class="dropdown-item" href="edit/%ID%"><span id="dropdown-item-icon" class="bi bi-journal-check pe-2"> Time Range/Measurement</span></a></li>
+            <li><a class="dropdown-item" href="edit/%ID%/details"><span id="dropdown-item-icon" class="bi bi-list-ul pe-2"> Accomplishment Details</span></a></li>
+            <li id="delete-accomplishment-btn-%ID%" data-accomp-id="%ID%"><a class="dropdown-item text-danger"><span id="dropdown-item-icon" class="bi bi-x-circle pe-2"> Delete</span></a></li>
+        </ul>
+        </td>
+    </div>
+</tr>
