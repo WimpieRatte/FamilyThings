@@ -18,7 +18,7 @@ def get_obtained_today(request, amount: int = 4):
     else:
         today: timezone.datetime = timezone.now()
         fam_acc_ids = FamilyUserAccomplishment.objects.filter(
-                created_by=request.user.id,
+                created_by_id=request.user.id,
                 created__year=today.year,
                 created__month=today.month,
                 created__day=today.day

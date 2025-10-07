@@ -215,15 +215,15 @@ def user_login_page(request, lang_code: str = ""):
 def forgot_password(request):
     if request.method == "POST":
         email = request.POST.get('email')
-        
+
         try:
             user = CustomUser.objects.get(email=email)
-            new_password_reset = PasswordReset(user=user)
+            new_password_reset = PasswordReset.objects.get(custom_user_id=user.id)
             new_password_reset.save()
             password_reset_url = reverse('core:reset_password', kwargs={'reset_id': new_password_reset.reset_id})
             full_password_reset_url = f'{request.scheme}://{request.get_host()}{password_reset_url}'
             email_body = f'Reset your password using the link below:\n\n\n{full_password_reset_url}'
-            
+
             email_message = EmailMessage(
 				'Reset your password', # email subject
 				email_body,
