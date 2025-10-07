@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-lg d-md-flex justify-content-evenly" style="max-height: 1800px">
     <div id="accomplishments-section" class="section container pb-4" style="width: 340px;">
-        {% include 'site/heading_section.html' with id="todays-accomplishments" label="Today's Accomplishments" value=todays_accomplishments.length %}
+        {% include 'site/heading_section.html' with id="todays-accomps" label="Today's Accomplishments" value=todays_accomplishments.length %}
         <div style="height: 16em;">
             <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2">
                 <!-- {% for entry in todays_accomplishments %}
@@ -51,10 +51,10 @@
             <form id="message-form" method="post">
                 {% csrf_token %}
                 <div class="position-relative">
-                    <textarea id="textarea-message-wall" name="text" class="form-control" rows="3" maxlength="150" placeholder="Write message..."></textarea>
-                    <div id="textarea-message-wall-count" class="position-absolute bottom-0 end-0 fs-sm pe-1 text-end" style="pointer-events: none;">0/150</div>
+                    <textarea id="txtarea-message-wall" name="text" class="form-control" rows="3" maxlength="150" placeholder="Write message..."></textarea>
+                    <div id="txtarea-message-wall-count" class="position-absolute bottom-0 end-0 fs-sm pe-1 text-end no-ptr-evt">0/150</div>
                 </div>
-                <button id="button-message-wall" class="btn btn-primary mt-1 px-3" value="OK" type="submit">Post</button>
+                <button id="btn-message-post" class="btn btn-primary mt-1 px-3" value="OK" type="submit">Post</button>
             </form>
         </div>
     </div>
@@ -164,9 +164,9 @@
 
 
     /* Message Box */
-    const messageBoxSymbolCounter = document.getElementById("textarea-message-wall-count");
+    const messageBoxSymbolCounter = document.getElementById("txtarea-message-wall-count");
     const messageBoxMaxLength = 150;
-    const messageBoxButton = document.getElementById("button-message-wall");
+    const messageBoxButton = document.getElementById("btn-message-post");
     messageBoxButton.disabled = true;
 
     updateTextLength = (value)=> {
@@ -179,8 +179,8 @@
         else {messageBoxButton.disabled = true;}
     }
 
-    $("#textarea-message-wall").on('keydown', function (event) {updateTextLength(event.target.value.length);});
-    $("#textarea-message-wall").on('keyup', function (event) {updateTextLength(event.target.value.length);});
+    $("#txtarea-message-wall").on('keydown', function (event) {updateTextLength(event.target.value.length);});
+    $("#txtarea-message-wall").on('keyup', function (event) {updateTextLength(event.target.value.length);});
 
     document.querySelectorAll(".message-content").forEach(function(element) {
         element.outerHTML = element.outerHTML.replace(/(\*{2}(.*?)\*{2})/g, "<strong>$2</strong>").replace(/(\*(.*?)\*)/g, "<i>$2</i>")

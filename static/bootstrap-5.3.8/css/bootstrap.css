@@ -7371,6 +7371,11 @@ input:disabled {
   display: none !important;
 }
 
+/* FamilyThings: added no-ptr */
+.no-ptr-evt {
+  pointer-events: none;
+}
+
 .shadow {
   box-shadow: var(--bs-box-shadow) !important;
 }

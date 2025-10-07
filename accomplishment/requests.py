@@ -2,8 +2,7 @@ import json
 from django.http import JsonResponse, HttpResponseBadRequest, Http404
 from django.utils import timezone
 from django.core.serializers import serialize
-from .models.accomplishment import Accomplishment
-from .models.family_user_accomplishment import FamilyUserAccomplishment
+from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType
 from .forms.accomplishment import AccomplishmentForm
 from core.models.family import Family
 from core.models.family_user import FamilyUser
@@ -57,28 +56,48 @@ def get_recent(request, amount: int = 5):
         })
 
 
-def get_entities(request, amount: int = 5, start: int = 0, key=""):
-    """."""
+def get_entries(request, amount: int = 5, start: int = 0, selector: str = "name", key: str = ""):
+    """
+    Get a list of FamilyUserAccomplishment entries using some filters.
+
+    :param request: The request.
+    :param amount: The amount of entries you want to return.
+    :param start: The starting offset.
+    :param key: Used to filter using this string. Checks if the string is
+    contained inside the name of the underlying Accomplishment.
+    """
     start = max(int(start)-1, 0)
 
     if not request.user.is_authenticated:
         return HttpResponseBadRequest()
 
     total_accomplishments = FamilyUserAccomplishment.objects.filter(
-            created_by_id=request.user,
-            accomplishment_id__name__icontains=key)
-    output = FamilyUserAccomplishment.objects.filter(
-            created_by_id=request.user,
-            accomplishment_id__name__icontains=key).order_by(
-                'created').reverse()[start:start+int(amount)]
+            created_by_id=request.user)
 
+    match selector:
+        case "category":
+            total_accomplishments = total_accomplishments.filter(
+                accomplishment_id__accomplishment_type_id__name__icontains=key)
+        case "uncategorized":
+            total_accomplishments = total_accomplishments.filter(
+                accomplishment_id__name__icontains=key,
+                accomplishment_id__accomplishment_type_id__name=None)
+        case "achievement":
+            total_accomplishments = total_accomplishments.filter(
+                accomplishment_id__name__icontains=key,
+                accomplishment_id__is_achievement=True)
+        case "name":
+            total_accomplishments = total_accomplishments.filter(
+                accomplishment_id__name__icontains=key)
+
+    count = total_accomplishments.count()
+    output = total_accomplishments.order_by(
+                'created').reverse()[start:start+int(amount)]
     cache = output
     output = json.loads(serialize("json", list(output)))
 
     for i, entry in enumerate(cache):
         output[i]["fields"]['accomplishment'] = entry.accomplishment_id.dict()
-
-    count = cache.count()
 
     return JsonResponse(
         data={
@@ -122,15 +141,28 @@ def submit_accomplishment(request):
 
     form = AccomplishmentForm(data=request.POST)
     if form.is_valid():
+
+        # We want to be strict with the name matching, so we only
+        # search an Accomplishment with the same name and user,
+        # and otherwise create a new one.
         new_acc, created = Accomplishment.objects.get_or_create(
             created_by=request.user,
             name=form.cleaned_data.get("name"),
         )
+
+        # If it was new, now apply the rest of the new information.
         if created:
-            print("New Accomplishment")
-            new_acc.description=form.cleaned_data.get("description", ""),
+            if form.cleaned_data.get("accomplishment_type", "") != "":
+                accomp_type = AccomplishmentType.objects.get_or_create(
+                    name=form.cleaned_data.get("accomplishment_type", ""),
+                    description=""
+                )[0]
+                new_acc.accomplishment_type_id = accomp_type
+                print(new_acc.accomplishment_type_id.name)
+            new_acc.description=form.cleaned_data.get("description", " "),
             new_acc.icon=form.cleaned_data.get("icon", "")
             new_acc.save()
+
         FamilyUserAccomplishment.objects.get_or_create(
             family_user_id=family_user,
             accomplishment_id=new_acc,
@@ -149,3 +181,20 @@ def submit_accomplishment(request):
         get_locale_text(
             request=request, ID="accomplishment-create-failed",
             default_text="Accomplishment couldn't be submitted."))
+
+
+def delete_accomplishment(request, ID):
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest(get_locale_text(
+            request=request, ID="missing-permissions",
+            default_text="You don't have permission to perform this operation."))
+
+    try:
+        message: FamilyUserAccomplishment = \
+            FamilyUserAccomplishment.objects.get(
+                id=ID, created_by=request.user)
+        message.delete()
+        return JsonResponse(
+            data={'alert-message': "", 'alert-type': 'success'})
+    except (FamilyUserAccomplishment.DoesNotExist):
+        return HttpResponseBadRequest()

@@ -40,13 +40,16 @@ class Accomplishment(models.Model):
     is_achievement = models.BooleanField(default=False)
 
     def dict(self):
-        return {
+        output: dict = {
             'ID': self.id,
             'name': self.name, 'description': self.description,
             'icon': self.icon, 'is_achievement': self.is_achievement,
-            'type': str(self.accomplishment_type_id).replace("None", "-"),
             'measurement': self.measurement_type_id,
         }
+
+        if self.accomplishment_type_id:
+            output['type'] = str(self.accomplishment_type_id.name).replace("None", "-"),
+        return output
 
     class Meta:
         # White space as workaround for the ordering.

@@ -1,14 +1,13 @@
+import zoneinfo
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
-import zoneinfo
+from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType
+from .forms.accomplishment import AccomplishmentForm
+from . import constants
 from core.views import render_if_logged_in
 from core.session import update_session, create_alert, get_locale_text
 from core.models.custom_user import CustomUser
-from .forms.accomplishment import AccomplishmentForm
-from .models.accomplishment import Accomplishment
-from .models.family_user_accomplishment import FamilyUserAccomplishment
-from . import constants
 
 
 def page_overview(request, lang_code: str = ""):
@@ -46,14 +45,15 @@ def page_new_accomplishment(request, lang_code: str = "", ID: int = -1):
             'name': accom.name,
             'description': accom.description,
             'icon': accom.icon,
-            'measurement_quantity': 1
+            'is_achievement': accom.is_achievement
         })
 
     return render(
         request, "accomplishment/accomp_add_new.html",
         {
             "form": form,
-            "icons": constants.ICONS
+            "icons": constants.ICONS,
+            "initial": form.initial
         })
 
 
@@ -117,15 +117,24 @@ def page_edit_accomplishment_details(request, lang_code: str = "", ID: int = -1)
             accom_details.name = request.POST["name"]
             accom_details.description = request.POST["description"]
             accom_details.icon = request.POST["icon"]
+            if request.POST.get("accomplishment_type", "") != "":
+                accom_details.accomplishment_type_id = AccomplishmentType.objects.get_or_create(
+                        name=request.POST["accomplishment_type"])[0]
             accom_details.save()
             return redirect("accomplishment:overview")
 
-        form = AccomplishmentForm(data={
+        accomp_data: dict = {
             'name': accom_details.name, 'description': accom_details.description,
-            'category': accom_details.accomplishment_type_id,
             'icon': accom_details.icon
-        })
+        }
+
+        # Apply the name of the AccomplishmentType if it was defined
+        if accom_details.accomplishment_type_id:
+            accomp_data["accomplishment_type"] = accom_details.accomplishment_type_id.name
+
+        form = AccomplishmentForm(data=accomp_data)
 
         return render(
             request, "accomplishment/accomp_edit_details.html", {
-                "form": form, "icons": constants.ICONS})
+                "form": form, "icons": constants.ICONS,
+                "initial": accomp_data})

@@ -10,7 +10,15 @@
                     <div class="d-flex flex-wrap justify-content-between pb-2">
                         {% include 'site/heading_small.html' with label="All Activity" id="all-activity" %}
                         <form id="filter-form">
-                            <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter" aria-label="Search">
+                            <div class="d-flex pe-3">
+                                <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter Milestones..." aria-label="Search">
+                                <select id="filter-selector" class="form-select fs-sm">
+                                    <option selected value="name">Name</option>
+                                    <option value="uncategorized">Name (w/o Category)</option>
+                                    <option value="achievement">Name (Sp. Achievement)</option>
+                                    <option value="category">Category</option>
+                                </select>
+                            </div>
                             <button id="" type="submit" class="d-none"></button>
                         </form>
                     </div>
@@ -19,11 +27,11 @@
                             <thead class="w-100 fs-sm">
                                 <tr class="">
                                     <th class="p-1" style="width: 3%;" scope="col">#</th>
-                                    <th class="p-1" style="width: 26%;" scope="col">Name</th>
-                                    <th class="p-1" style="width: 20%;" scope="col">Measurement</th>
-                                    <th class="p-1" style="width: 20%;" scope="col">Category</th>
-                                    <th class="p-1" style="width: 18%;" scope="col">Created on</th>
-                                    <th class="p-1" style="width: 6%;" scope="col"></th>
+                                    <th class="p-1" id="id_name" style="width: 26%;" scope="col">Name</th>
+                                    <th class="p-1" id="lb-measurement" style="width: 20%;" scope="col">Measurement</th>
+                                    <th class="p-1" id="lb-category" style="width: 20%;" scope="col">Category</th>
+                                    <th class="p-1" id="lb-created-on" style="width: 18%;" scope="col">Created on</th>
+                                    <th class="p-1" style="width: 10%;" scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody id="accomplishments-table-body" class="fs-sm">
@@ -77,25 +85,27 @@
     var currentIndex = 1;
     var currentEnd = 0;
     var totalEntries = 0;
+
     var searchText = "";
+    var searchSelector = "name";
 
     /* Get Today's Accomplishments */
     const queryURL = "{{HOST}}/accomplishments/get"
-    function createAccomplishmentsTable(length = 15, start = 1, search = ""){
+    function createAccomplishmentsTable(length = 15, start = 1, search = "", selector = "name"){
         tablePreviousButton.disabled = true;
         tableNextButton.disabled = true;
         currentIndex = start;
 
-        let queryURLFinal = `${queryURL}/amount=${length}/start=${start}`
+        let queryURLFinal = `${queryURL}/amount=${length}/start=${start}/selector='${selector}'`
 
-        if (search != ""){queryURLFinal+=`/key=${search}`}
+        if (search != ""){queryURLFinal+=`/key='${search}'`}
         $.get(queryURLFinal, function() {})
         .done(function(response) {
             var index = 0;
             todaysAccContainer.empty();
             Object.entries(response.result).forEach(function(entry) {
                 let data = entry[1];
-                createTableEntry(todaysAccContainer, data, start+index, searchText)
+                createTableEntry(todaysAccContainer, data, start+index, searchText, selector)
                 index++;
             });
 
@@ -110,15 +120,13 @@
         .fail(function(err) {console.log(err);})
 
         if (currentIndex > 1){tablePreviousButton.disabled = false;}
-
-        var deleteURL = "{{HOST}}/message/delete/id="
     }
     createAccomplishmentsTable()
 
     /* Dynamically create Accomplishment entries */
     const tableEntryTemplate = `{% include "accomplishment/temp_accomp_entry.html" %}`
 
-    function createTableEntry(target_container, data, index, highlight=""){
+    function createTableEntry(target_container, data, index, highlight = "", selector = "name"){
         let language = languageCode;
         if (language == ""){language="en";}
         creation_date = new Date(data["fields"]["created"]).toLocaleTimeString(language, {
@@ -130,7 +138,7 @@
         let accomp_name = accomplishment["name"];
 
         /* Highlight the name based on the search query */
-        if (highlight != "") {accomp_name = accomp_name.replace(highlight, `<strong>$1</strong>`)}
+        if (highlight != "" && selector == 'name') {accomp_name = accomp_name.replace(highlight, `<strong>$1</strong>`)}
 
         /* Turn the whole name + icon yellow */
         if (accomplishment["is_achievement"]) { templateDump = templateDump.replace("%name_style%", 'style="color: #ddc67f !important;"')}
@@ -141,10 +149,12 @@
         .replaceAll("%name%", accomp_name)
         .replace("%date_created%", creation_date)
         .replace("%icon%", accomplishment["icon"])
-        .replace("%category%", accomplishment["type"].replace("-", "N/A"))
+        .replace("%category%", accomplishment["type"])
         .replace("%description%", accomplishment["description"])
         .replace("%measurement%", `${data["fields"]["measurement_quantity"]} ${accomplishment["measurement"]}`.replace("null", "x"))
         .replaceAll("%ID%", data["pk"])
+        .replace("%repeatURL%", `"add%3Frepeat=${accomplishment["ID"]}""`)
+        .replace("undefined", "N/A")
         
         target_container.append(templateDump);
 
@@ -156,7 +166,8 @@
                 if (confirm(`Are you sure you want to delete this entry?\n(This cannot be undone!)`)) {
                     $.get( `${deleteURL}${accomp_id}`, function() {})
                     .done(function(response) {
-                        createAccomplishmentsTable(15, currentIndex);
+                        createAlert("Accomplishment has been removed.", key="", type="warning");
+                        createAccomplishmentsTable(length=15, start=currentIndex, search=searchBar.value);
                     })
                     .fail(function(err) {
                         createAlert(xhr.responseText, key="", type="danger");
@@ -166,17 +177,22 @@
     }
 
     $("#previous-button").click(function(event) {
-        createAccomplishmentsTable(15, currentIndex-15);
+        createAccomplishmentsTable(15, currentIndex-15, searchBar.value, searchSelector);
     });
 
     $("#next-button").click(function(event) {
-        createAccomplishmentsTable(15, currentIndex+15);
+        createAccomplishmentsTable(15, currentIndex+15, searchBar.value, searchSelector);
     });
 
     $("#filter-form").submit(function(event) {
         event.preventDefault();
         searchText = new RegExp(`(${searchBar.value})`,'gi');
-        createAccomplishmentsTable(15, 1, searchBar.value)
+        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector)
+    });
+
+    $("#filter-selector").change(function(event) {
+        searchSelector = document.getElementById("filter-selector").value;
+        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector)
     });
 
     /* Unused as it results in too many requests. */
@@ -185,4 +201,15 @@
     //     createAccomplishmentsTable(15, currentIndex, event.target.value)
     // });
 </script>
+<style>
+    #btn-actions {
+        filter: grayscale(1);
+        transition-property: filter;
+        transition-duration: .25s;
+    }
+
+    #btn-actions:hover, #btn-actions.show {
+        filter: grayscale(0);
+    }
+</style>
 {% endblock %}

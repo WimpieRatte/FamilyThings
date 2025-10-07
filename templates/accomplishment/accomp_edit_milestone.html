@@ -9,14 +9,14 @@
             <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5" style="width: 65%;">
                 {% csrf_token %}
                 <div style="">
-                    <div id="form-label-measurement" class="pb-1">Measurement</div>
+                    <div id="lb-measurement" class="pb-1">Measurement</div>
                     <div id="measurement-section" class="d-flex gap-2">
                         {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
                         {% include 'site/form_field.html' with id="" field=form.measurement %}
                     </div>
                 </div>
                 <div style="">
-                    <div id="form-label-time-range" class="pb-1">Time Range</div>
+                    <div id="lb-time-range" class="pb-1">Time Range</div>
                     <div id="timeframe-section" class="flex-column gap-2">
                         {% include 'site/form_field.html' with id="" field=form.date_from field_class="d-flex" label_class="pe-3" %}
                         {% include 'site/form_field.html' with id="" field=form.date_to field_class="d-flex" label_class="w-25" %}

@@ -143,7 +143,9 @@ def user_profile_page(request, lang_code: str = ""):
 
         messages = []
         if len(chat) > 0:
-            messages = Message.objects.filter(family_chat_id=chat[0]).order_by(
+            messages = Message.objects.filter(
+                family_chat_id=chat[0],
+                deleted=False).order_by(
                 "created_on").reverse()[:10]
 
         #  Family Activities

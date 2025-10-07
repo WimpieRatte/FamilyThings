@@ -1,6 +1,6 @@
 <div class="w-100">
     <div class="m-auto" style="width: fit-content; gap:.125em">
-        <div id="form-label-icon">Icon</div>
+        <div id="lb-icon">Icon</div>
         <div class="d-flex flex-wrap">
         {% for icon in icons %}
             {% if icon == "$BREAK$" %}
@@ -36,5 +36,8 @@
 
         button.classList.add("active");
     }
-    input_change_value(document.querySelector(".icon-btn"), '#id_icon')
+
+    /* Check if an icon (when repeating an Accomplishment) is defined, if not use the default icon. */
+    if ('{{initial.icon}}' != ''){ input_change_value(document.querySelector("#icon-btn-{{initial.icon}}"), '#id_icon'); }
+        else{ input_change_value(document.querySelector(".icon-btn"), '#id_icon'); }
 </script>

@@ -3,7 +3,7 @@
 {% block content %}
 {% load static %}
 <div id="todo-section" class="container-sm pb-4 w-100">
-    {% include 'site/heading_section.html' with label="Add New Accomplishment" id="create_accomplishment" %}
+    {% include 'site/heading_section.html' with label="Add New Accomplishment" id="create_accomp" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25 position-relative">
         <div id="duplicate-accomplishment-prompt" class="position-relative" style="display: none;">
             <div id="duplicate-accomplishment-label" class="w-50 p-2 m-auto border border-2 border-dark text-bg-warning rounded-3 text-center">There already exists an Accomplishment with that name.<br>Did you intend on repeating it?</div>
@@ -27,20 +27,23 @@
                 </div>
                 <div style="width: 40%;">
                     {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement field_class="d-flex" %}
-                    <div id="form-label-measurement" class="pb-1">Measurement</div>
+                    <div id="lb-measurement" class="pb-1">Measurement</div>
                     <div id="measurement-section" class="d-flex gap-2">
                         {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
                         {% include 'site/form_field.html' with id="" field=form.measurement %}
                     </div>
-                    <div id="form-label-time-range" class="pb-1">Time Range</div>
+                    <div id="lb-time-range" class="pb-1">Time Range</div>
                     <div id="timeframe-section" class="flex-column gap-2">
                         {% include 'site/form_field.html' with id="" field=form.date_from field_class="d-flex" label_class="w-25" %}
                         {% include 'site/form_field.html' with id="" field=form.date_to field_class="d-flex" label_class="w-25" %}
                     </div>
                 </div>
-                {% include 'accomplishment/temp_accomp_icon_selection.html' with icons=icons %}
+                {% include 'accomplishment/temp_accomp_icon_selection.html' with icons=icons initial=initial %}
                 </div>
-                <button id="button-create" class="btn btn-primary border-primary mt-4 d-block m-auto" type="submit">Create</button>
+                <div class="d-flex gap-2 mt-4 pb-4 m-auto" style="width: fit-content;">
+                    <button id="button-create" class="btn btn-primary border-primary d-block m-auto" type="submit">Create</button>
+                    <a href="{% url 'accomplishment:overview' %}"><button id="button-abort" class="btn btn-danger" type="button">Abort</button></a>
+                </div>
                 </div>
             </form>
         </div>

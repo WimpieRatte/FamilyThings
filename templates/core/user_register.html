@@ -16,13 +16,13 @@
                     {% include 'site/form_field.html' with id="password" field=form.password %}
                 </div>
                 <div id="password-hint" class="w-100 m-auto text-center fs-sm">
-                    <span id="label-password-hint">Password must be at least 8 characters long,</span><br>
-                    <span id="label-password-hint2">include one uppercase letter, and one special character.</span>
+                    <span id="lb-password-hint">Password must be at least 8 characters long,</span><br>
+                    <span id="lb-password-hint2">include one uppercase letter, and one special character.</span>
                 </div>
             </div>
             <div id="family-invite" class="bg-body-tertiary rounded p-2 pb-3 mt-3">
                 <div id="family-invite-hint" class="w-100 m-auto pb-1 text-center fs-sm">
-                    <span id="label-invite-hint">Already got a Family Invite? Add the code here.</span><br>
+                    <span id="lb-invite-hint">Already got a Family Invite? Add the code here.</span><br>
                 </div>
                 <div class="d-block m-auto text-center" style="width: fit-content;">
                     {% include 'site/form_field.html' with id="" field=form.invite_code %}
@@ -34,16 +34,16 @@
                     {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}
                 </div>
                 <div id="name-hint" class="w-100 m-auto text-center fs-sm">
-                    <span id="label-name-hint">You can always set up your full, or just first, name in the Settings.</span><br>
-                    <span id="label-name-hint-2">(Only you, as well as your Family, can see it.)</span>
+                    <span id="lb-name-hint">You can always set up your full, or just first, name in the Settings.</span><br>
+                    <span id="lb-name-hint-2">(Only you, as well as your Family, can see it.)</span>
                 </div>
             </div>
-            <button id="button-register" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="submit">Register</button>
+            <button id="btn-register" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="submit">Register</button>
         </form>
         <br>
         <div class="text-center d-block">
-            <span id="label-login-hint">Already have an account?</span> 
-            <a id="label-login-hint-2" href="{% url 'core:user_login' %}">Login</a>
+            <span id="lb-login-hint">Already have an account?</span> 
+            <a id="lb-login-hint-2" href="{% url 'core:user_login' %}">Login</a>
         </div>
     </div>
 </div>
