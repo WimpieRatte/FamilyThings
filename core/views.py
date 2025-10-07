@@ -218,7 +218,7 @@ def forgot_password(request):
 
         try:
             user = CustomUser.objects.get(email=email)
-            new_password_reset = PasswordReset.objects.get(custom_user_id=user.id)
+            new_password_reset = PasswordReset(custom_user_id=user)
             new_password_reset.save()
             password_reset_url = reverse('core:reset_password', kwargs={'reset_id': new_password_reset.reset_id})
             full_password_reset_url = f'{request.scheme}://{request.get_host()}{password_reset_url}'
@@ -268,7 +268,7 @@ def reset_password(request, reset_id):
                 messages.error(request, 'Password must be at least 8 characters long')
 
             # Verify that the reset link hasn't expired
-            expiration_time = password_reset_id.created_at + timezone.timedelta(minutes=10)
+            expiration_time = password_reset_id.created + timezone.timedelta(minutes=10)
             if timezone.now() > expiration_time:
                 passwords_have_error = True
                 messages.error(request, 'Reset link has expired')
@@ -276,7 +276,7 @@ def reset_password(request, reset_id):
 
             if not passwords_have_error:
                 # Set password for user and delete password reset object
-                user = password_reset_id.user
+                user = CustomUser.objects.get(id=password_reset_id.custom_user_id.id)
                 user.set_password(password)
                 user.save()
                 password_reset_id.delete()
