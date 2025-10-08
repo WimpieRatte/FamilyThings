@@ -97,16 +97,16 @@ def create_alert(request: dict, type: str = "", ID: str = "",
 
 
 def get_locale_text(request: dict, ID: str = "",
-                    default_text: str = "", insert: str = " "):
+                    default_text: str = " ", insert: str = " ") -> str:
     # Try to load one of localization files.
     try:
         file: str = f"./static/localization/{request.session['lang_code']}/alerts.json"
         raw_json: str = open(file, encoding='utf-8').read()
         parsed_json = json.loads(raw_json)
-        return parsed_json[ID].replace("%PLACEHOLDER%", insert),
+        return parsed_json[ID].replace("%PLACEHOLDER%", insert)
     # Otherwise, proceed with the default text.
     except (Exception):
-        return default_text.replace("%PLACEHOLDER%", insert),
+        return default_text.replace("%PLACEHOLDER%", insert)
 
 
 class JsonResponseAlert(JsonResponse):

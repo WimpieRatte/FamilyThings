@@ -11,5 +11,6 @@
     "login-success": "Willkommen zurück, %PLACEHOLDER%!",
     "login-failed": "Nutzername und Passwort stimmen nicht überein.",
     "logout-success": "Du wurdest erfolgreich ausgeloggt.",
-    "hint-changes": "Die Änderungen werden erst nach dem Speichern übernommen."
+    "hint-changes": "Die Änderungen werden erst nach dem Speichern übernommen.",
+    "changes-applied": "Alle Änderungen wurden erfolgreich übernommen."
 }

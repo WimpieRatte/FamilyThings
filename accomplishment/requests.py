@@ -157,7 +157,7 @@ def edit_milestone(request, ID):
 
         form = AccomplishmentForm(data=request.POST)
 
-        if (request.POST["measurement_quantity"] == ""):
+        if (request.POST.get("measurement_quantity", "") == ""):
             accom.measurement_quantity = 0
         else:
             accom.measurement_quantity = int(request.POST.get("measurement_quantity", 0))
@@ -165,8 +165,11 @@ def edit_milestone(request, ID):
         accom.from_date = datetime_from_field(form=form, field="date_from")
         accom.to_date = datetime_from_field(form=form, field="date_to")
         accom.save()
-        return JsonResponse(data={'milestone': ID})
-    except (Exception):
+        return JsonResponseAlert(
+            request=request, type="success", message=get_locale_text(
+                request=request, ID="changes-applied",
+                default_text="All changes have been successfully applied."))
+    except (FamilyUserAccomplishment.DoesNotExist):
         return HttpResponseBadRequest()
 
 
@@ -205,7 +208,7 @@ def submit_accomplishment(request):
                 )[0]
                 new_acc.accomplishment_type_id = accomp_type
                 print(new_acc.accomplishment_type_id.name)
-            new_acc.description=form.cleaned_data.get("description", " "),
+            new_acc.description=form.cleaned_data.get("description", ""),
             new_acc.icon=form.cleaned_data.get("icon", "")
             new_acc.is_achievement=form.cleaned_data.get("is_achievement", False)
             new_acc.save()

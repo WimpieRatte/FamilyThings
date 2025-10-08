@@ -77,10 +77,11 @@
     }
 </style>
 <script>
-    const todaysAccContainer = $("#accomplishments-table-body");
-    const searchBar = document.getElementById("search-filter");
-    const tablePreviousButton = document.getElementById("previous-button");
-    const tableNextButton = document.getElementById("next-button");
+    var todaysAccContainer = $("#accomplishments-table-body");
+    var searchBar = document.getElementById("search-filter");
+    var tablePreviousButton = document.getElementById("previous-button");
+    var tableNextButton = document.getElementById("next-button");
+    var accomTableBody = document.getElementById("accomplishments-table-body")
 
     var currentIndex = 1;
     var currentEnd = 0;
@@ -90,6 +91,7 @@
     var searchSelector = "name";
 
     var selectedMilestone = "" //Stores the UUID of the Accomplishment/Milestone that is being edited.
+
 
     /* Get Today's Accomplishments */
     const queryURL = "{{HOST}}/accomplishments/get"
@@ -188,11 +190,6 @@
             });
 
         $(`#edit-milestone-${data["pk"]}`).click(function(event) {
-            screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
-            screenTransition.style.transitionDuration = "0s";
-            main.style.pointerEvents = "none";
-            header.style.pointerEvents = "none";
-
             selectedMilestone = $(this).val();
 
             $.ajax({ 
@@ -210,16 +207,14 @@
                     });
 
                     $(`#id_measurement`).prop( "disabled", true )
+                    // If the user has not Measurement type but a quantity specified, use x (amount of times)
                     if (milestone_data['measurement'] == null) {
-                        console.log("nothing x.x")
                         $(`#id_measurement`).val("x");
                     }
                 },
                 error: function(xhr, errmsg, err) {
                     console.log(xhr)
-                    screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
-                    main.style.pointerEvents = "initial";
-                    header.style.pointerEvents = "initial";
+                    closePopup();
                 }
             });
         });
@@ -245,36 +240,45 @@
     });
 
     function openPopup(){
+
+        // Defined in site/site_js.html
+        screenTransition.style.transitionDuration = "0s";
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
+
         popupWindow.style.display = "block";
+        main.style.pointerEvents = "none";
+        header.style.pointerEvents = "none";
+    }
+
+    function closePopup(){
+
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
+
+        popupWindow.style.display = "none";
+        main.style.pointerEvents = "initial";
+        header.style.pointerEvents = "initial";
     }
 
     $("#btn-abort").click(function(event) {
-        popupWindow.style.display = "none";
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
-        main.style.pointerEvents = "initial";
-        header.style.pointerEvents = "initial";
+        closePopup();
     });
 
     $("#btn-apply-changes").click(function(event) {
-        console.log(selectedMilestone);
+        let form_data = $("#edit-milestone-form");
 
-        let form_data = $("#edit-milestone-form")
-            
         $.ajax({ 
             type: 'POST', url: `{{HOST}}/accomplishments/milestone/edit/id=${selectedMilestone}`, 
             data: form_data.serializeArray(),
-            success: function(milestone_data) {
-                console.log("success!")
+            success: function(json) {
                 createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
+                createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
             },
             error: function(xhr, errmsg, err) {
                 console.log(xhr)
+                createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
             }
         });
-        popupWindow.style.display = "none";
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
-        main.style.pointerEvents = "initial";
-        header.style.pointerEvents = "initial";
+        closePopup();
     });
 
     /* Unused as it results in too many requests. */
