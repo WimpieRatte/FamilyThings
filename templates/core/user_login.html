@@ -11,46 +11,41 @@
             style="line-height: 1em;"> <!-- -webkit-text-stroke-color: #FFFFFF; -webkit-text-stroke-width: 3px;">-->
                 It's not always about what you <i>need</i> to do.<br>But about what you've <i><strong>accomplished</strong></i>!
             </div>
-            <!-- <div id="logo-description" class="m-auto text-center text-capitalize position-absolute start-50 top-100 translate-middle" 
-            style="line-height: 1em; color: #2B578C; -webkit-text-stroke-width: 1px;">
-                It's not always about what you <i>need</i> to do.<br>But about what you've <i><strong>accomplished</strong></i>!
-            </div> -->
         </div>
         <hr class="mt-4">
         <form id="login-form" enctype="multipart/form-data" method="post" class="m-auto" style="width: fit-content !important;">
             {% csrf_token %}
             {% include 'site/form_field.html' with id="username" field=form.username %}
             {% include 'site/form_field.html' with id="password" field=form.password %}
-            <a href="{% url 'core:forgot_password' %}" id="label-registration-hint" class="text-center d-block">Forgot password?</a>
-            <button id="button-log-in" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="submit">Log In</button>
+            <a href="{% url 'core:forgot_password' %}" id="lb-registration-hint" class="text-center d-block">Forgot password?</a>
+            <button id="btn-login" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="submit">Log In</button>
         </form>
         <br>
         <div class="text-center d-block">
-            <span id="label-registration-hint">Not registered yet?</span> 
-            <a id="label-registration-hint-2" href="{% url 'core:user_register' %}">Click here.</a>
+            <span id="lb-registration-hint">Not registered yet?</span> 
+            <a id="lb-registration-hint-2" href="{% url 'core:user_register' %}">Click here.</a>
         </div>
     </div>
 </div>
 <script>
     // AJAX-based Log In
-    $("#button-log-in").click(function(event) {
+    $("#btn-login").click(function(event) {
         event.preventDefault(); // Prevents the button from creating the default HTTPRequest
         event.target.disabled = true; //  Disables the log in button
 
-        enable_loading_screen();  // Function is defined in site_js
-
+        enableLoadingScreen();  // Function is defined in site_js
         let form_data = $("#login-form")
         $.ajax({ 
             type: 'POST', url: '{% url "core:request_login" %}',
             data: form_data.serializeArray(),
             success: function(json) {
-                disable_loading_screen();
+                disableLoadingScreen();
                 createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
                 setTimeout(function() {window.location.replace("{% url "core:user_profile" %}");}, 1000);
             },
             error: function(xhr, errmsg, err) {
                 event.target.disabled = false;
-                disable_loading_screen();
+                disableLoadingScreen();
                 createAlert(xhr.responseText, key="", type="danger");
             }
         });

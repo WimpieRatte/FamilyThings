@@ -1,8 +1,4 @@
 import re
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
-from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMessage
 from django.contrib import messages
@@ -12,22 +8,32 @@ from django.urls import reverse
 from core.session import update_session
 from core.models.password_reset import PasswordReset
 from django.contrib.auth.models import AnonymousUser
-from core.models.custom_user import CustomUser
-from core.models.family_user import FamilyUser
-from core.forms import UserSettingsForm, UserRegisterForm
+from django.http import HttpResponse
+from django.utils import timezone
+from django.shortcuts import render, redirect
+from core.models import CustomUser, FamilyUser
+from core.forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
 
 from core.session import update_session, create_alert, get_locale_text
-from accomplishment.models.accomplishment import Accomplishment
+from accomplishment.models import Accomplishment, FamilyUserAccomplishment
+from messenger.models import FamilyChat, Message
 
 
 def render_if_logged_in(request, target: HttpResponse):
     """Check if the User is logged in. Then, either proceed to the target page,
-    or redirect them to the Login page."""
+    or redirect them to the Login/Final Step page."""
+
     if not request.user.is_authenticated:
         create_alert(request=request, ID="login-required", type="warning",
             text="For this action, you need to login first.")
         return redirect("core:user_login")
-    return target
+
+    try:
+        fam_user = FamilyUser.objects.filter(
+            custom_user_id=request.user)[request.session["current_family"]]
+        return target
+    except (FamilyUser.DoesNotExist):
+        return redirect("core:user_final_step")
 
 
 def home(request, lang_code: str = ""):
@@ -78,22 +84,35 @@ def user_register(request):
                 username=username,
                 password=password,
             )
-            create_alert(request=request, ID="account-created", type="success",
-                    text="Account has been successfully created. You may login now.")
 
-            Accomplishment.objects.create(
-                created_by=new_user,
+            new_accomp, created= Accomplishment.objects.get_or_create(
                 name="First Step",
                 description="Create an Account",
                 icon="person-arms-up",
-                type=None,
-                measurement=None
+                accomplishment_type_id=None,
+                measurement_type_id=None
             )
+            FamilyUserAccomplishment.objects.create(
+                created_by=new_user,
+                accomplishment_id=new_accomp,
+                measurement_quantity=1
+            )
+
+            create_alert(request=request, ID="account-created", type="success",
+                    text="Account has been successfully created. You may login now.")
             return redirect("core:user_login")
     else:
         return render(
             request, "core/user_register.html",
             {'form': form})
+
+
+def user_final_step(request, lang_code: str = ""):
+    """."""
+    update_session(request=request, lang_code=lang_code)
+    form: UserFinalizeForm = UserFinalizeForm(
+        initial={'family_name': f"{request.user.full_name()}'s Family"})
+    return render(request, "core/user_final_step.html", {'form': form})
 
 
 def user_profile_page(request, lang_code: str = ""):
@@ -104,13 +123,64 @@ def user_profile_page(request, lang_code: str = ""):
         create_alert(request=request, ID="login-required", type="warning",
             text="For this action, you need to login first.")
         return redirect("core:user_login")
+    try:
+        fam_user = FamilyUser.objects.filter(
+            custom_user_id=request.user)[request.session["current_family"]]
+        chat = FamilyChat.objects.filter(family_id=fam_user.family_id)
 
-    target: HttpResponse = render(request, "core/user_profile.html", {
-        'is_family_member': FamilyUser.objects.filter(
-            custom_user_id=request.user)
-    })
+        # Messenger
+        # TODO: Move the Message creation to its own section
+        if request.POST:
+            try:
+                Message.objects.create(
+                    text=request.POST["text"],
+                    custom_user_id=request.user,
+                    family_chat_id=chat[0])
+                request.POST = None
+                redirect("core:user_profile")
+            except:
+                pass
 
-    return render_if_logged_in(request, target)
+        messages = []
+        if len(chat) > 0:
+            messages = Message.objects.filter(
+                family_chat_id=chat[0],
+                deleted=False).order_by(
+                "created_on").reverse()[:10]
+
+        #  Family Activities
+        fam_users = FamilyUser.objects.filter(
+            family_id=fam_user.family_id).exclude(
+                custom_user_id=request.user)
+
+        accomplishments = []
+        for user in fam_users:
+            try:
+                user_accomp = FamilyUserAccomplishment.objects.filter(
+                    family_user_id=user
+                ).order_by("created").reverse()[0]
+
+                # Get the creared/created date before proceeding with
+                # the Accomplishment details.
+                create_date = user_accomp.created
+
+                user_accomp = user_accomp.accomplishment_id.dict()
+                user_accomp["cleared_by"] = user.custom_user_id.full_name()
+                user_accomp["color"] = user.custom_user_id.color
+                user_accomp["icon"] = user.custom_user_id.icon
+                user_accomp["date"] = create_date
+                accomplishments += [user_accomp]
+            except (IndexError):
+                pass
+
+        return render(request, "core/user_profile.html", {
+            'family': fam_user.json_data(),
+            'family_activity': accomplishments,
+            'chat': list(messages)
+        })
+    except (FamilyUser.DoesNotExist, IndexError) as e:
+        print(e)
+        return redirect("core:user_final_step")
 
 
 def user_settings_page(request, lang_code: str = ""):

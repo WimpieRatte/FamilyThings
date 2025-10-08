@@ -5,8 +5,8 @@ from django.utils import timezone
 class AccomplishmentForm(forms.Form):
     name = forms.CharField(
         label="Name", max_length=100, required=True)
-    accomplishment_type = forms.ChoiceField(
-        label="Category", required=False)
+    accomplishment_type = forms.CharField(
+        label="Category", max_length=100, required=False)
     description = forms.CharField(label="Description", max_length=1000,
         widget=forms.Textarea, required=False)
     icon = forms.CharField(

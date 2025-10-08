@@ -16,7 +16,7 @@
 /* Modified colors and added font-colors to better match those alternative bg colors*/
   --bs-blue: #4b85d9;
   --bs-blue-font: #dee2e6;
-  --bs-pink: #d05f97;
+  --bs-pink: #fd77ba;
   --bs-pink-font: #212529;
   --bs-red: #c84855;
   --bs-red-font: #212529;
@@ -91,7 +91,7 @@
   --bs-white-rgb: 255, 255, 255;
   --bs-black-rgb: 0, 0, 0;
   --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --bs-font-monospace: "LXGW WenKai Mono TC", monospace; /*FamilyThings: Alternative font*/
   --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
   --bs-body-font-family: var(--bs-font-sans-serif);
   --bs-body-font-size: 1rem;
@@ -2948,7 +2948,7 @@ textarea.form-control-lg {
   --bs-btn-font-family: ;
   --bs-btn-font-size: 1rem;
   --bs-btn-font-weight: 400;
-  --bs-btn-line-height: 1.5;
+  --bs-btn-line-height: 1.25; /* From 1.5 to 1.2 */
   --bs-btn-color: var(--bs-body-color);
   --bs-btn-bg: transparent;
   --bs-btn-border-width: var(--bs-border-width);
@@ -7186,7 +7186,7 @@ input:disabled {
 .text-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  /*white-space: nowrap;*/ /* FamilyThings: Remove white-space rule */
 }
 
 .vr {
@@ -7369,6 +7369,11 @@ input:disabled {
 
 .d-none {
   display: none !important;
+}
+
+/* FamilyThings: added no-ptr */
+.no-ptr-evt {
+  pointer-events: none;
 }
 
 .shadow {

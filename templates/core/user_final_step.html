@@ -1,0 +1,53 @@
+{% extends "site/site_base.html" %}
+{% block title %}Final Step -{% endblock %}
+{% block content %}
+<div id="final-step-wrapper" class="container">
+    <div id="final-step" class="container rounded bg-dark p-2 pb-4 h-25 mh-25">
+        {% include 'site/heading_large.html' with id="final-step" label='Final Step'%}
+        <hr>
+        <form id="family-form" method="post" class="m-auto w-75 d-flex">
+            {% csrf_token %}
+            <div id="new-family" class="w-50 mx-2 bg-body-tertiary rounded p-2 mt-3">
+                <div class="w-100 m-auto pb-1 text-center fs-sm">
+                    <span id="lb-new-family-hint">You can create your own Family here.</span><br>
+                </div>
+                <div class="d-block m-auto text-center" style="width: fit-content;">
+                    {% include 'site/form_field.html' with id="family-name" field=form.family_name %}
+                    <button id="btn-create" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="button">Create</button>
+                </div>
+            </div>
+            <div id="family-invite" class="w-50 mx-2 bg-body-tertiary rounded p-2 mt-3">
+                <div class="w-100 m-auto pb-1 text-center fs-sm">
+                    <span id="lb-invite-hint">Already got a Family Invite? Add the code here.</span><br>
+                </div>
+                <div class="d-block m-auto text-center" style="width: fit-content;">
+                    {% include 'site/form_field.html' with id="" field=form.invite_code %}
+                    <button id="btn-apply" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="button">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $("#btn-create").click(function(event) {
+        event.preventDefault(); // Prevents the button from creating the default HTTPRequest
+        event.target.disabled = true; //  Disables the log in button
+
+        enableLoadingScreen();  // Function is defined in site_js
+        let form_data = $("#family-form")
+        $.ajax({ 
+            type: 'POST', url: '{% url "core:create_family" %}',
+            data: form_data.serializeArray(),
+            success: function(json) {
+                createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
+                setTimeout(function() {window.location.replace("{% url 'core:user_profile' %}");}, 1000);
+            },
+            error: function(xhr, errmsg, err) {
+                event.target.disabled = false;
+                createAlert(xhr.responseText, key="", type="danger");
+            }
+        });
+        disableLoadingScreen();
+    });
+</script>
+{% endblock %}

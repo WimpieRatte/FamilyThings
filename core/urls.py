@@ -1,9 +1,8 @@
 from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from core.session import change_language
-from . import views
-from . import user_auth
+from core.session import switch_language, switch_family
+from . import views, requests, user_auth
 
 # Ideally, its name is identical with the folder's
 app_name = "core"
@@ -13,17 +12,27 @@ core_urls = [
     path("", views.home, name="home"),
     path("login/", views.user_login_page, name="user_login"),
     path("register/", views.user_register, name="user_register"),
+    path("register/final_step/", views.user_final_step, name="user_final_step"),
     path("profile/", views.user_profile_page, name="user_profile"),
     path("settings/", views.user_settings_page, name="user_settings"),
     path("forgot_password/", views.forgot_password, name="forgot_password"),
     path("password_reset_sent/<str:reset_id>/", views.password_reset_sent, name="password_reset_sent"),
     path("reset_password/<str:reset_id>/", views.reset_password, name="reset_password"),
 
-    # Authentication and session (AJAX)
-    path("auth?log_in", user_auth.process_login, name="request_login"),
-    path("auth?log_out", user_auth.process_logout, name="request_logout"),
-    path("session?switch_language", change_language,
+    # Authentication and Session (AJAX)
+    path("auth/login", user_auth.process_login, name="request_login"),
+    path("auth/logout", user_auth.process_logout, name="request_logout"),
+    path("session/switch_language", switch_language,
          name="session_change_language"),
+    path("session/switch_family?id=<int:id>", switch_family,
+         name="session_switch_family"),
+
+    # Family (AJAX)
+    path("family/create", requests.create_family, name="create_family"),
+
+    # Messenger (AJAX)
+    path("message/delete/id=<uuid:id>", requests.delete_message,
+         name="delete_message")
 ]
 
 urlpatterns = [

@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-lg d-md-flex justify-content-evenly" style="max-height: 1800px">
     <div id="accomplishments-section" class="section container pb-4" style="width: 340px;">
-        {% include 'site/heading_section.html' with id="todays-accomplishments" label="Today's Accomplishments" value=todays_accomplishments.length %}
+        {% include 'site/heading_section.html' with id="todays-accomps" label="Today's Accomplishments" value=todays_accomplishments.length %}
         <div style="height: 16em;">
             <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2">
                 <!-- {% for entry in todays_accomplishments %}
@@ -27,40 +27,50 @@
             </div>
         </div>
     </div>
-    {% if is_family_member %}
-        <div style="width: 430px;">
-            {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
-            <div id="messager-section" class="pb-3 w-100" style="height: 24em;">
-                <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 mb-2 h-100 fs-sm overflow-y-scroll" style="overflow-x: visible !important;">
-                    <div id="message-wall" class="container rounded bg-light-subtle h-100">
-                        <div id="message-list" class="p-1">
-                            {% include 'home/message_item.html' with sender='You' content='Hey Thomas, ever heard of Ligma?' %}
-                            {% include 'home/message_item.html' with sender='Thomas' content="... Don't even try." %}
-                            {% include 'home/message_item.html' with sender='Wimpie' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
-                            {% include 'home/message_item.html' with sender='Padma' content="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero quasi dolores hic fuga aspernatur, aliquid sapiente saepe esse sunt! Corporis ea a quisquam dignissimos beatae dolore unde obcaecati temporibus nam." %}
-                        </div>
+    <div style="width: 430px;">
+        {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
+        <div id="messager-section" class="pb-3 w-100" style="height: 24em;">
+            <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 mb-2 h-100 fs-sm overflow-y-scroll" style="overflow-x: visible !important;">
+                <div id="message-wall" class="container rounded bg-light-subtle" style="min-height: 100%;">
+                    <div id="message-list" class="p-1">
+                    {% for message in chat %}
+                        {% if not message.deleted %}
+                            {% if message.custom_user_id.full_name == request.user.full_name %}
+                                {% include 'home/message_item.html' with sender=message.custom_user_id message=message class='text-end' can_delete=family.is_manager %}
+                            {% else %}
+                                {% include 'home/message_item.html' with sender=message.custom_user_id message=message class='text-start' can_delete=family.is_manager %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
                     </div>
                 </div>
             </div>
-            <!-- {% include 'site/heading_section.html' with label='Write Message'%} -->
-            <div id="message-box-wrapper" class="container rounded bg-dark rounded p-2 fs-sm"  style="width: 430px; height: 10em;">
-                <textarea id="textarea-message-wall" class="form-control" rows="3" placeholder="Write message..."></textarea>
-                <button id="button-message-wall" class="btn btn-primary mt-2 px-3" type="submit">Post</button>
+        </div>
+        <!-- {% include 'site/heading_section.html' with label='Write Message'%} -->
+        <div id="message-box-wrapper" class="container rounded bg-dark rounded p-2 fs-sm" style="width: 430px; height: 10em;">
+            <form id="message-form" method="post">
+                {% csrf_token %}
+                <div class="position-relative">
+                    <textarea id="txtarea-message-wall" name="text" class="form-control" rows="3" maxlength="150" placeholder="Write message..."></textarea>
+                    <div id="txtarea-message-wall-count" class="position-absolute bottom-0 end-0 fs-sm pe-1 text-end no-ptr-evt">0/150</div>
+                </div>
+                <button id="btn-message-post" class="btn btn-primary mt-1 px-3" value="OK" type="submit">Post</button>
+            </form>
+        </div>
+    </div>
+    <div id="feed-section" class="section container-sm pb-4" style="width: 340px;">
+        <div id="family-feed" style="height: 17em;">
+            {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
+            <div class="flex-column bg-dark rounded p-1 mh-25">
+                {% for entry in family_activity %}
+                    {% include 'home/family_accomplishment_item.html' with title=entry.name icon=entry.icon color=entry.color date=entry.date%}
+                {% endfor %}
+                <!-- {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
+                {% include 'home/family_accomplishment_item.html' with title='Did the Dishes' icon='android' color='purple'%}
+                {% include 'home/family_accomplishment_item.html' with title='Brushed their Teeth' icon='apple' color='green'%}
+                {% include 'home/family_accomplishment_item.html' with title='Cleaned up their Room' icon='android' color='purple'%} -->
             </div>
         </div>
-    {% endif %}
-    <div id="feed-section" class="section container-sm pb-4" style="width: 340px;">
-        {% if is_family_member %}
-            <div id="family-feed" style="height: 17em;">
-                {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
-                <div class="flex-column bg-dark rounded p-1 mh-25">
-                        {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
-                        {% include 'home/family_accomplishment_item.html' with title='Did the Dishes' icon='android' color='purple'%}
-                        {% include 'home/family_accomplishment_item.html' with title='Brushed their Teeth' icon='apple' color='green'%}
-                        {% include 'home/family_accomplishment_item.html' with title='Cleaned up their Room' icon='android' color='purple'%}
-                </div>
-            </div>
-        {% endif %}
         {% include 'site/heading_section.html' with id="calendar" label='Calendar'%}
         <div id="calendar" style="height: 16em;">
             <div id="calendar-wrapper" class="container rounded bg-dark rounded p-2 h-100 mh-100 overflow-visible">
@@ -91,7 +101,7 @@
             "dayHeadElem": "rd-day-head",
             "dayRow": "rd-days-row",
             "dayTable": "pt-1 d-block",
-            "month": "rd-month",
+            "month": "rd-month font-monospace",
             "next": "rd-next",
             "positioned": "rd-container-attachment",
             "selectedDay": "rd-day-selected",
@@ -102,9 +112,6 @@
         },
         "weekStart": current_date.getDay()
     });
-
-    /* Disable link to itself */
-    $("#nav-tooltip-profile").attr("style", "pointer-events: none; color: gray;")
 
     const recentAccContainer = $("#recent-accomplishments-container")
     const todaysAccContainer = $("#todays-accomplishments-container")
@@ -150,14 +157,54 @@
         target_container.append(
             accomplishmentTemplate.replace("%title%", data["name"])
             .replace("%date%", date)
-            .replace("%25icon%25", data["icon"])
+            .replace("%icon%", data["icon"])
             .replace("Accomplished on", localContext["accomplished"])
         )
     }
+
+
+    /* Message Box */
+    const messageBoxSymbolCounter = document.getElementById("txtarea-message-wall-count");
+    const messageBoxMaxLength = 150;
+    const messageBoxButton = document.getElementById("btn-message-post");
+    messageBoxButton.disabled = true;
+
+    updateTextLength = (value)=> {
+        messageBoxSymbolCounter.textContent = `${value}/${ messageBoxMaxLength}`;
+        if (value > 134 && value < 150){messageBoxSymbolCounter.style.color = "var(--bs-warning)";}
+        else if (value >= 150) {messageBoxSymbolCounter.style.color = "var(--bs-danger)";}
+        else {messageBoxSymbolCounter.style.color = "";}
+
+        if (value > 1) {messageBoxButton.disabled = false;}
+        else {messageBoxButton.disabled = true;}
+    }
+
+    $("#txtarea-message-wall").on('keydown', function (event) {updateTextLength(event.target.value.length);});
+    $("#txtarea-message-wall").on('keyup', function (event) {updateTextLength(event.target.value.length);});
+
+    document.querySelectorAll(".message-content").forEach(function(element) {
+        element.outerHTML = element.outerHTML.replace(/(\*{2}(.*?)\*{2})/g, "<strong>$2</strong>").replace(/(\*(.*?)\*)/g, "<i>$2</i>")
+    });
 </script>
 <style>
     .rd-day-selected {
         background-color: var(--bs-{{request.user.color}}) !important; /*#f67280;*/
     }
+
+    .message:hover > .badge {
+        display: block !important;
+    }
+
+    .message-container.text-start { margin-left: 10px !important; border-top-left-radius: 0px !important;}
+    .message-container.text-end { margin-right: 10px !important; border-top-right-radius: 0px !important; }
+
+    .message-container::after{
+        width: 0; height: 0; top: 0px;
+        content: ""; position: absolute; z-index: 1100;
+        border-top: 15px solid rgba(255,255,255,0.65);
+        border-color: inherit;
+    }
+    .message-container.text-start::after { border-left: 15px solid transparent; left: -15px; }
+    .message-container.text-end::after { border-right: 15px solid transparent; right:-15px; }
 </style>
 {% endblock %}

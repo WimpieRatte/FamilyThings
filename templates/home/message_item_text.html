@@ -1,0 +1,8 @@
+<div class="message-container position-relative w-100 rounded bg-primary p-2 fs-sm {{class}}"
+    style="z-index: 190; box-shadow: 5px 7px black; background-color: var(--bs-{{color}}) !important; border-color: var(--bs-{{color}}) !important; color: var(--bs-{{color}}-font) !important;">
+    <div class="position-relative">
+        <p id="message-sender-{{message.id}}" class="message-sender my-0 fw-bold" style="line-height: 1.25em;">{{name}}</p>
+        <p id="message-content-{{message.id}}" class="message-content my-0 pb-2" style="line-height: 1em;">{% autoescape off %}{{content}}{% endautoescape %}</p>
+        <div class="p-0 m-0 w-100 position-absolute top-100 translate-middle-y {{class}}" style="font-size: .75em;">{{message.created_on|time:"H:i"}}</div>
+    </div>
+</div>

@@ -1,10 +1,25 @@
-from django.http import JsonResponse
-from django.contrib.messages import add_message
 import json
+from django.contrib.messages import add_message
+from django.http import JsonResponse
+from django.shortcuts import redirect
+
+from .models import FamilyUser
 
 
-def update_session(request, lang_code: str = "", custom_cursor: bool = True):
+def update_session(request, lang_code: str = "", custom_cursor: bool = True,
+                   cache_last_visited_page: bool = True):
     """Updates the User's session as needed"""
+
+    if cache_last_visited_page:
+        request.session["last_visited_page"] = request.get_full_path()
+
+    #  Handling being in multiple Families at once
+    if (request.session.get("current_family", -1) == -1):
+        request.session["current_family"] = 0
+
+    if request.user.is_authenticated:
+        request.session["families"] = list(FamilyUser.objects.filter(
+            custom_user_id=request.user).order_by('join_date').reverse().values_list("family_id__name").reverse())
 
     #  Apply a language code based on either the existing value,
     #  an User's own setting, or lastly, the browser's.
@@ -26,7 +41,7 @@ def update_session(request, lang_code: str = "", custom_cursor: bool = True):
         request.session['use_custom_cursor'] = custom_cursor
 
 
-def change_language(request):
+def switch_language(request):
     """Changes the display language in the User's session"""
     request.session['lang_code'] = request.POST.get(
         "lang_code", request.LANGUAGE_CODE)
@@ -40,6 +55,16 @@ def change_language(request):
             'lang_code': 'lang_code'
             }
         )
+
+
+def switch_family(request, id: 0):
+    """Changes the display language in the User's session"""
+    request.session['current_family'] = id
+
+    # create_alert(request=request, ID="language-changed",
+    #              type="warning", text="Language changed into English.")
+
+    return redirect("core:user_profile")
 
 
 def create_alert(request: dict, type: str = "", ID: str = "",

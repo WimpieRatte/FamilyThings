@@ -1,4 +1,6 @@
 {% load static %}
+{% load tz %}
+{% timezone "Europe/Paris" %}
 <!doctype html>
 <html lang="en" data-bs-theme="dark" {% include 'site/site_bg_img.html' with image=request.user.background_image %}>
 <head>
@@ -24,3 +26,4 @@
 {% include 'site/site_footer.html' %}
 {% include 'site/site_js.html' with lang_code=lang_code %}
 </html>
+{% endtimezone %}

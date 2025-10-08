@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Accomplishment, FamilyUserAccomplishment, MeasurementType
+from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType, MeasurementType
 
 
 # Register your models here.
@@ -15,6 +15,11 @@ class FamilyUserAccomplishmentAdmin(admin.ModelAdmin):
 
     def accomplishment_name(self, obj: FamilyUserAccomplishment):
         return obj.accomplishment_id.name
+
+
+@admin.register(AccomplishmentType)
+class AccomplishmentTypeAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(MeasurementType)

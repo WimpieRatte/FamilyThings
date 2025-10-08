@@ -1,4 +1,4 @@
-<a id="dropdown-item-{{id}}" class="dropdown-item" href="{% url href %}" {% if new_tab %}target="_blank"{% endif %}>
+<a id="dropdown-item-{{id}}" class="dropdown-item" href="{% if href %}{% url href %}{% endif %}" {% if new_tab %}target="_blank"{% endif %}>
     <i id="dropdown-item-icon" class="bi bi-{{icon}} pe-2"></i>
-    <span id="dropdown-item-label-{{id}}">{{label}}</span>
+    <span id="dropdown-lb-{{id}}">{{label}}</span>
 </a>
