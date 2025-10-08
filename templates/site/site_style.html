@@ -30,6 +30,11 @@
         z-index: 80;
     }
 
+    .role-name:has(+ .role-name)::after {
+        content: ", ";
+        color: #ffffff;
+    }
+
 
     @media (max-width: 1350px) {
         html {

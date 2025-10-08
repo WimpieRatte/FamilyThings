@@ -23,6 +23,11 @@ urlpatterns = [
      path("get/name=<str:name>",
           requests.get_by_name, name="get_by_name"),
 
+     path("milestone/get/id=<uuid:ID>",
+          requests.get_milestone_by_id, name="get_milestone_by_id"),
+     path("milestone/edit/id=<uuid:ID>",
+          requests.edit_milestone, name="edit_milestone"),
+
      # Operations (Creating/Deleting)
      path("submit",
           requests.submit_accomplishment, name="submit_new"),

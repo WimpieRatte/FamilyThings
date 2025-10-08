@@ -18,8 +18,14 @@ def update_session(request, lang_code: str = "", custom_cursor: bool = True,
         request.session["current_family"] = 0
 
     if request.user.is_authenticated:
+        # A list with all the family names
         request.session["families"] = list(FamilyUser.objects.filter(
             custom_user_id=request.user).order_by('join_date').reverse().values_list("family_id__name").reverse())
+
+        # A dict with all the relevant info about the family you're currently switched to
+        # Name, Manager role
+        request.session["family_info"] = FamilyUser.objects.filter(
+            custom_user_id=request.user).order_by('join_date')[request.session["current_family"]].json_data()
 
     #  Apply a language code based on either the existing value,
     #  an User's own setting, or lastly, the browser's.

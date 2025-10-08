@@ -3,7 +3,7 @@
 {% block content %}
 {% load static %}
 <div id="todo-section" class="container-sm pb-4 w-100">
-    {% include 'site/heading_section.html' with label="Edit User Accomplishment" id="edit-user-accomplishment" %}
+    {% include 'site/heading_section.html' with label="Edit User Accomplishment" id="edit-user-accomp" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25 position-relative">
         <div id="accomplishments-wrapper" class="d-flex py-5">
             <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-2" style="width: 65%;">
@@ -14,7 +14,6 @@
                         {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
                     </div>
                     {% include 'site/form_field.html' with id="description" field=form.description optional=True %}
-                    {# Hidden Fields #}
                 </div>
                 {% include 'accomplishment/temp_accomp_icon_selection.html' with icons=icons initial=initial %}
                 <div class="d-flex gap-2 py-4 m-auto" style="width: fit-content;">

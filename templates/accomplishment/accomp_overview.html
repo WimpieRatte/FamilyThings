@@ -89,6 +89,8 @@
     var searchText = "";
     var searchSelector = "name";
 
+    var selectedMilestone = "" //Stores the UUID of the Accomplishment/Milestone that is being edited.
+
     /* Get Today's Accomplishments */
     const queryURL = "{{HOST}}/accomplishments/get"
     function createAccomplishmentsTable(length = 15, start = 1, search = "", selector = "name"){
@@ -153,10 +155,18 @@
         .replace("%icon%", accomplishment["icon"])
         .replace("%category%", accomplishment["type"])
         .replace("%description%", accomplishment["description"])
-        .replace("%measurement%", `${data["fields"]["measurement_quantity"]} ${accomplishment["measurement"]}`.replace("null", "x"))
         .replaceAll("%ID%", data["pk"])
         .replace("%repeatURL%", `"add%3Frepeat=${accomplishment["ID"]}""`)
         .replace("undefined", "N/A")
+
+        let measurement_data = "-"
+        if (accomplishment["measurement"] != null) {
+            measurement_data = `${data["fields"]["measurement_quantity"]} ${data["fields"]["measurement"]}`;
+        }
+        else if (data["fields"]["measurement_quantity"] != null && data["fields"]["measurement_quantity"] != 0) {
+            measurement_data = `${data["fields"]["measurement_quantity"]}x`;
+        }
+        templateDump = templateDump.replace("%measurement%", measurement_data);
         
         target_container.append(templateDump);
 
@@ -176,6 +186,37 @@
                     })
                 }
             });
+
+        $(`#edit-milestone-${data["pk"]}`).click(function(event) {
+            screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
+            screenTransition.style.transitionDuration = "0s";
+            main.style.pointerEvents = "none";
+            header.style.pointerEvents = "none";
+
+            selectedMilestone = $(this).val();
+
+            $.ajax({ 
+                type: 'POST', url: `{{HOST}}/accomplishments/milestone/get/id=${$(this).val()}`, data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function(milestone_data) {
+                    openPopup();
+
+                    // Fill the fields with the obtained data
+                    var fields = ['measurement', "measurement_quantity", "date_from_day", "date_from_month",
+                        "date_from_year", "date_to_day", "date_to_month", "date_to_year"]
+                    
+                    fields.forEach(function(field) {
+                        $(`#id_${field}`).val(milestone_data[field]);
+                    });
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr)
+                    screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
+                    main.style.pointerEvents = "initial";
+                    header.style.pointerEvents = "initial";
+                }
+            });
+        });
     }
 
     $("#previous-button").click(function(event) {
@@ -189,12 +230,28 @@
     $("#filter-form").submit(function(event) {
         event.preventDefault();
         searchText = new RegExp(`(${searchBar.value})`,'gi');
-        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector)
+        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
     });
 
     $("#filter-selector").change(function(event) {
         searchSelector = document.getElementById("filter-selector").value;
-        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector)
+        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
+    });
+
+    function openPopup(){
+        popupWindow.style.display = "block";
+    }
+
+    $("#btn-abort").click(function(event) {
+        popupWindow.style.display = "none";
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
+        main.style.pointerEvents = "initial";
+        header.style.pointerEvents = "initial";
+    });
+
+    $("#btn-apply-changes").click(function(event) {
+        console.log(selectedMilestone);
+        
     });
 
     /* Unused as it results in too many requests. */

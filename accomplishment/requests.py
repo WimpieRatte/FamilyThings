@@ -1,4 +1,5 @@
 import json
+import zoneinfo
 from django.http import JsonResponse, HttpResponseBadRequest, Http404
 from django.utils import timezone
 from django.core.serializers import serialize
@@ -125,12 +126,57 @@ def get_by_name(request, name: str):
         return Http404
 
 
+def get_milestone_by_id(request, ID):
+    accom: FamilyUserAccomplishment = FamilyUserAccomplishment.objects.get(
+        id=ID, family_user_id__custom_user_id=request.user)
+
+    from_date_tz = accom.from_date.astimezone(zoneinfo.ZoneInfo("Europe/Paris"))
+    to_date_tz = accom.to_date.astimezone(zoneinfo.ZoneInfo("Europe/Paris"))
+
+    return JsonResponse(data={
+        'measurement': accom.accomplishment_id.measurement_type_id,
+        'measurement_quantity': accom.measurement_quantity,
+        'date_from_day': from_date_tz.day, 'date_from_month': from_date_tz.month,
+        'date_from_year': from_date_tz.year, 'date_to_day': to_date_tz.day,
+        'date_to_month': to_date_tz.month, 'date_to_year': to_date_tz.year,
+    })
+
+
+def edit_milestone(request, ID):
+    def datetime_from_field(form: AccomplishmentForm, field: str = "",
+                            tz: str = "Europe/Paris"):
+        return timezone.datetime(
+            year=int(form.data[field+"_year"]),
+            month=int(form.data[field+"_month"]),
+            day=int(form.data[field+"_day"]),
+            tzinfo=zoneinfo.ZoneInfo(tz))
+
+    try:
+        accom: FamilyUserAccomplishment = FamilyUserAccomplishment.objects.get(
+            id=ID, family_user_id__custom_user_id=request.user)
+
+        form = AccomplishmentForm(data=request.POST)
+
+        if (request.POST["measurement_quantity"] == ""):
+            accom.measurement_quantity = 0
+        else:
+            accom.measurement_quantity = int(request.POST.get("measurement_quantity", 0))
+
+        accom.from_date = datetime_from_field(form=form, field="date_from")
+        accom.to_date = datetime_from_field(form=form, field="date_to")
+        accom.save()
+        return JsonResponse(data={'milestone': ID})
+    except (Exception):
+        return HttpResponseBadRequest()
+
+
+
 def submit_accomplishment(request):
     if not request.user.is_authenticated:
         return HttpResponseBadRequest(
             get_locale_text(
                 request=request, ID="login-required",
-                text="For this action, you need to login first."))
+                default_text="For this action, you need to login first."))
 
     family_user: FamilyUser = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
     if family_user is None:

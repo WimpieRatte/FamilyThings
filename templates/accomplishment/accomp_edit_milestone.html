@@ -3,19 +3,19 @@
 {% block content %}
 {% load static %}
 <div id="todo-section" class="container-sm pb-4 w-100">
-    {% include 'site/heading_section.html' with label="Edit User Accomplishment" id="edit-user-accomplishment" %}
+    {% include 'site/heading_section.html' with label="Edit User Accomplishment" id="edit-user-accomp" %}
     <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25 position-relative">
         <div id="accomplishments-wrapper" class="d-flex py-5">
             <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5" style="width: 65%;">
                 {% csrf_token %}
-                <div style="">
+                <div id="measurement-settings">
                     <div id="lb-measurement" class="pb-1">Measurement</div>
                     <div id="measurement-section" class="d-flex gap-2">
                         {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
                         {% include 'site/form_field.html' with id="" field=form.measurement %}
                     </div>
                 </div>
-                <div style="">
+                <div>
                     <div id="lb-time-range" class="pb-1">Time Range</div>
                     <div id="timeframe-section" class="flex-column gap-2">
                         {% include 'site/form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="pe-3" %}
@@ -42,5 +42,10 @@
     }
 </style>
 <script>
+    document.getElementById("id_measurement").disabled = true;
+
+    if ('{{form.data.measurement}}' == "None") {
+        document.getElementById("id_measurement").value = "x"
+    }
 </script>
 {% endblock %}

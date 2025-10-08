@@ -1,25 +1,24 @@
 from django import forms
-from django.utils import timezone
-from ..models.custom_user import CustomUser
+from ..constants import COLORS, LANGUAGES, TIMEZONES, YEARS
 
 
 class UserSettingsForm(forms.Form):
-    YEAR_CHOICES = list(reversed(range(1960, timezone.now().year-13)))
-
     first_name = forms.CharField(
         label="First Name", max_length=20, required=False)
     last_name = forms.CharField(
         label="Last Name", max_length=20, required=False)
     birthday = forms.DateField(
         required=False,
-        widget=forms.SelectDateWidget(years=YEAR_CHOICES),
+        widget=forms.SelectDateWidget(years=YEARS),
     )
     language = forms.ChoiceField(
-        label="Language", choices=CustomUser.LANG_CHOICES, required=True)
+        label="Language", choices=LANGUAGES, required=True)
+    tz = forms.ChoiceField(
+        label="Time Zone", choices=TIMEZONES, required=True)
     cursor = forms.BooleanField(
         label="Use Custom Cursor", required=False)
     color = forms.ChoiceField(
-        label="Color", required=True, choices=CustomUser.COLOR_CHOICES)
+        label="Color", required=True, choices=COLORS)
     user_icon = forms.FileField(required=False)
     background_image = forms.FileField(required=False)
     remove_icon = forms.BooleanField(

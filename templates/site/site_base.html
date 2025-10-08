@@ -13,8 +13,8 @@
     {% include 'site/site_style_overrides.html' with color=request.user.color cursor=request.session.use_custom_cursor %}
   </style>
 </head>
-{% include 'site/site_js_preload.html' %}
 {% include 'site/site_overlay.html' with messages=messages %}
+{% include 'site/site_js_preload.html' %}
 {% include 'site/site_header.html' with show_time=True %}
 <body>
   <main class="container px-4 py-2 mt-3 m-auto">

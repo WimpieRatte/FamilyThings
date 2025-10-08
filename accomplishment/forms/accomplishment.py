@@ -14,7 +14,7 @@ class AccomplishmentForm(forms.Form):
     measurement = forms.CharField(max_length=3,
         label="", required=False)
     measurement_quantity = forms.DecimalField(
-        label="", required=False, widget=forms.NumberInput())
+        label="", required=False, min_value=0, widget=forms.NumberInput())
     date_from = forms.DateField(label="From", required=False, initial=timezone.now, widget=forms.SelectDateWidget())
     date_to = forms.DateField(label="To", required=False, initial=timezone.now, widget=forms.SelectDateWidget())
     is_achievement = forms.BooleanField(label="Special Achievement", required=False)

@@ -11,10 +11,11 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from core.models import CustomUser, FamilyUser
-from core.forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
+from .models import CustomUser, FamilyUser
+from .forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
+from .session import update_session, create_alert, get_locale_text
+from .constants import COLORS
 
-from core.session import update_session, create_alert, get_locale_text
 from accomplishment.models import Accomplishment, FamilyUserAccomplishment
 from messenger.models import FamilyChat, Message
 
@@ -73,38 +74,38 @@ def user_register(request):
                 create_alert(request=request, ID="password-invalid", type="error",
                     text="Password must be at least 8 characters long, include one uppercase letter, and one special character.")
 
-        if user_data_has_error:
-            return redirect("core:user_register")
+            if user_data_has_error:
+                return redirect("core:user_register")
+            else:
+                # create new user in database:
+                new_user: CustomUser = CustomUser.objects.create_user(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    username=username,
+                    password=password,
+                )
+
+                new_accomp, created= Accomplishment.objects.get_or_create(
+                    name="First Step",
+                    description="Create an Account",
+                    icon="person-arms-up",
+                    accomplishment_type_id=None,
+                    measurement_type_id=None
+                )
+                FamilyUserAccomplishment.objects.create(
+                    created_by=new_user,
+                    accomplishment_id=new_accomp,
+                    measurement_quantity=1
+                )
+
+                create_alert(request=request, ID="account-created", type="success",
+                        text="Account has been successfully created. You may login now.")
+                return redirect("core:user_login")
         else:
-            # create new user in database:
-            new_user: CustomUser = CustomUser.objects.create_user(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                username=username,
-                password=password,
-            )
-
-            new_accomp, created= Accomplishment.objects.get_or_create(
-                name="First Step",
-                description="Create an Account",
-                icon="person-arms-up",
-                accomplishment_type_id=None,
-                measurement_type_id=None
-            )
-            FamilyUserAccomplishment.objects.create(
-                created_by=new_user,
-                accomplishment_id=new_accomp,
-                measurement_quantity=1
-            )
-
-            create_alert(request=request, ID="account-created", type="success",
-                    text="Account has been successfully created. You may login now.")
-            return redirect("core:user_login")
-    else:
-        return render(
-            request, "core/user_register.html",
-            {'form': form})
+            return render(
+                request, "core/user_register.html",
+                {'form': form})
 
 
 def user_final_step(request, lang_code: str = ""):
@@ -201,7 +202,7 @@ def user_settings_page(request, lang_code: str = ""):
 
     form: UserSettingsForm = UserSettingsForm(
         #  Autofill form based on existing user settings
-        data={
+        initial={
             "first_name": request.user.first_name,
             "last_name": request.user.last_name,
             "language": user.lang_code,
@@ -253,7 +254,7 @@ def user_settings_page(request, lang_code: str = ""):
         request,
         "core/user_settings.html",
         {
-            "colors": CustomUser.COLOR_CHOICES,
+            "colors": COLORS,
             "form": UserSettingsForm(
                 #  Autofill form based on existing user settings
                 data={

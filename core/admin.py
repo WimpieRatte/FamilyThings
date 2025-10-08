@@ -16,4 +16,4 @@ class FamilyAdmin(admin.ModelAdmin):
 
 @admin.register(FamilyUser)
 class FamilyUserAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['family_id__name', 'custom_user_id__username', 'custom_user_id__username']

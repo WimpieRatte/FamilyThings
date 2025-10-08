@@ -1,3 +1,10 @@
-from django.test import TestCase
+from django.test import Client, TestCase
+from django.urls import reverse
 
-# Create your tests here.
+
+class AccomplishmentTests(TestCase):
+    def test_bad_request_when_not_logged_in(self):
+        url = reverse("accomplishment:get")
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 400)
+
