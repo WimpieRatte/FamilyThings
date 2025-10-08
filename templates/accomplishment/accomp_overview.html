@@ -208,6 +208,12 @@
                     fields.forEach(function(field) {
                         $(`#id_${field}`).val(milestone_data[field]);
                     });
+
+                    $(`#id_measurement`).prop( "disabled", true )
+                    if (milestone_data['measurement'] == null) {
+                        console.log("nothing x.x")
+                        $(`#id_measurement`).val("x");
+                    }
                 },
                 error: function(xhr, errmsg, err) {
                     console.log(xhr)
@@ -251,7 +257,24 @@
 
     $("#btn-apply-changes").click(function(event) {
         console.log(selectedMilestone);
-        
+
+        let form_data = $("#edit-milestone-form")
+            
+        $.ajax({ 
+            type: 'POST', url: `{{HOST}}/accomplishments/milestone/edit/id=${selectedMilestone}`, 
+            data: form_data.serializeArray(),
+            success: function(milestone_data) {
+                console.log("success!")
+                createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
+            },
+            error: function(xhr, errmsg, err) {
+                console.log(xhr)
+            }
+        });
+        popupWindow.style.display = "none";
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
+        main.style.pointerEvents = "initial";
+        header.style.pointerEvents = "initial";
     });
 
     /* Unused as it results in too many requests. */

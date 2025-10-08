@@ -1,9 +1,8 @@
-{% include 'site/heading_section.html' with label="Edit User Accomplishment" id="edit-user-accomp" class='m-auto' %}
+{% include 'site/heading_section.html' with label="Edit Milestone" id="edit-user-accomp" class='m-auto' %}
 <div id="accomplishments" class="rounded bg-dark px-5 h-25 mh-25 overflow-visible">
     <div id="accomplishments-wrapper" class="d-flex p-5">
-        <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5">
+        <form id="edit-milestone-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5">
             {% csrf_token %}
-            <input id="milestone-source" type="hidden" name="csrfmiddlewaretoken" value="">
             <div id="measurement-settings">
                 <div id="lb-measurement" class="pb-1">Measurement</div>
                 <div id="measurement-section" class="d-flex gap-2">
