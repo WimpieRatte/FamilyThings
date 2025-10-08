@@ -207,6 +207,7 @@ def submit_accomplishment(request):
                 print(new_acc.accomplishment_type_id.name)
             new_acc.description=form.cleaned_data.get("description", " "),
             new_acc.icon=form.cleaned_data.get("icon", "")
+            new_acc.is_achievement=form.cleaned_data.get("is_achievement", False)
             new_acc.save()
 
         FamilyUserAccomplishment.objects.get_or_create(
