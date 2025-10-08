@@ -22,7 +22,9 @@ class FamilyUserAccomplishment(models.Model):
         on_delete=models.CASCADE,
         related_name="family_user_accomplishments"
     )
-    measurement_quantity = models.BigIntegerField()
+    measurement_quantity = models.BigIntegerField(
+        null=True
+    )
     created = models.DateTimeField(
         auto_now_add=True
     )
