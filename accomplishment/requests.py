@@ -1,6 +1,6 @@
 import json
 import zoneinfo
-from django.http import JsonResponse, HttpResponseBadRequest, Http404
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.utils import timezone
 from django.core.serializers import serialize
 from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType, MeasurementType
@@ -123,10 +123,10 @@ def get_by_name(request, name: str):
                 'icon': result.icon
                 })
     except (Accomplishment.DoesNotExist):
-        return Http404
+        return HttpResponseNotFound()
 
 
-def get_milestone_by_id(request, ID):
+def get_accomp_by_id(request, ID):
     accom: FamilyUserAccomplishment = FamilyUserAccomplishment.objects.get(
         id=ID, family_user_id__custom_user_id=request.user)
 
@@ -134,16 +134,18 @@ def get_milestone_by_id(request, ID):
     to_date_tz = accom.to_date.astimezone(zoneinfo.ZoneInfo("Europe/Paris"))
 
     accom_details = accom.accomplishment_id.dict()
-    return JsonResponse(data={
-        'measurement': accom_details['measurement'],
+    accom_details.update({
+        'created': accom.created,
         'measurement_quantity': accom.measurement_quantity,
         'date_from_day': from_date_tz.day, 'date_from_month': from_date_tz.month,
         'date_from_year': from_date_tz.year, 'date_to_day': to_date_tz.day,
         'date_to_month': to_date_tz.month, 'date_to_year': to_date_tz.year,
     })
+    print(accom_details)
+    return JsonResponse(data=accom_details)
 
 
-def edit_milestone(request, ID):
+def edit_accomp(request, ID):
     def datetime_from_field(form: AccomplishmentForm, field: str = "",
                             tz: str = "Europe/Paris"):
         return timezone.datetime(

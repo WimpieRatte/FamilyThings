@@ -34,11 +34,49 @@
         }, 4000);
     }
 
+
+    // Popups
     const popupWindow = document.querySelector('#popup-container');
 
     popupWindow.style.display = "none"
 
-    function openPopup() {
-        popupWindow.style.display = "block"
+    var activePopup = ""
+    function openPopup(name = ""){
+        popupWindow.style.display = "block";
+        main.style.pointerEvents = "none";
+        header.style.pointerEvents = "none";
+
+        if (name != "") {
+            document.getElementById(name).style.display = "block";
+            activePopup = name;
+        }
+    }
+
+    function closePopup(){
+        popupWindow.style.display = "none";
+        main.style.pointerEvents = "initial";
+        header.style.pointerEvents = "initial";
+
+        if (activePopup != "") {
+            document.getElementById(activePopup).style.display = "none";
+            activePopup = "";
+        }
+    }
+
+    // AJAX
+    function basicAJAX(type = "POST", url, data) {
+        enableLoadingScreen();
+        return $.ajax({ 
+            type: type, url: url, data: data,
+            success: function(result) { 
+                if (result["alert-message"]) { createAlert(text=result["alert-message"], key="", type=result["alert-type"]); }
+                disableLoadingScreen();
+                return result;
+            },
+            error: function(xhr, errmsg, err) {
+                disableLoadingScreen();
+                return null;
+            }
+        });
     }
 </script>
