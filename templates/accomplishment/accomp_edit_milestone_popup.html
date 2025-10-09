@@ -1,27 +1,28 @@
-{% include 'site/heading_section.html' with label="Edit Milestone" id="edit-user-accomp" class='m-auto' %}
-<div id="accomplishments" class="rounded bg-dark px-5 h-25 mh-25 overflow-visible">
-    <div id="accomplishments-wrapper" class="d-flex p-5">
-        <form id="edit-milestone-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5">
-            {% csrf_token %}
-            <div id="measurement-settings">
-                <div id="lb-measurement" class="pb-1">Measurement</div>
-                <div id="measurement-section" class="d-flex gap-2">
-                    {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
-                    {% include 'site/form_field.html' with id="" field=form.measurement %}
+<div id="edit-milestone-popup" style="display: none; margin-bottom: 12rem !important;">
+    {% include 'site/heading_section.html' with label="Edit Milestone" id="edit-user-accomp" class='m-auto' %}
+    <div class="rounded bg-dark px-5 d-block pb-5">
+        <div id="accomplishments-wrapper" class="d-flex p-5">
+            <form id="edit-milestone-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5">
+                {% csrf_token %}
+                <div id="measurement-settings">
+                    <div id="measurement-section" class="d-flex gap-2 ps-4 pt-3">
+                        {% include 'site/form_field.html' with id="measurement-value" field=form.measurement_quantity %}
+                        {% include 'site/form_field.html' with id="measurement-type" field=form.measurement %}
+                    </div>
                 </div>
-            </div>
-            <div>
-                <div id="lb-time-range" class="pb-1">Time Range</div>
-                <div id="timeframe-section" class="flex-column gap-2">
-                    {% include 'site/form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="pe-3" %}
-                    {% include 'site/form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
+                <div>
+                    <div id="lb-time-range" class="pb-1">Time Range</div>
+                    <div id="timeframe-section" class="flex-column gap-2">
+                        {% include 'site/form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="pe-3" %}
+                        {% include 'site/form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
+                    </div>
                 </div>
-            </div>
-            </div>
-            <div class="d-flex gap-2 pb-4 m-auto" style="width: fit-content;">
-                <button id="btn-apply-changes" class="btn btn-primary border-primary" type="button">Submit Change</button>
-                <button id="btn-abort" class="btn btn-danger" type="button">Abort</button>
-            </div>
-        </form>
+                </div>
+                <div class="d-flex gap-2 pb-4 m-auto" style="width: fit-content;">
+                    <button id="btn-apply-changes" class="btn btn-primary border-primary" type="button">Submit Change</button>
+                    <button id="btn-abort" class="btn btn-danger" type="button">Abort</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

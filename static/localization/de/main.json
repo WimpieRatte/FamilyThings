@@ -46,6 +46,8 @@
     "lb-time-range": "Zeitraum",
     "lb-date-from": "Von",
     "lb-date-to": "Bis",
+    "lb-measurement-type": "Typ",
+    "lb-measurement-value": "Wert",
     "btn-login": "Einloggen",
     "btn-register": "Abschließen",
     "btn-clear": "Löschen",

@@ -40,11 +40,16 @@ class Accomplishment(models.Model):
     is_achievement = models.BooleanField(default=False)
 
     def dict(self):
+        measurement: str = None
+
+        if (self.measurement_type_id):
+            measurement = self.measurement_type_id.abbreviation
+
         output: dict = {
             'ID': self.id,
             'name': self.name, 'description': self.description,
             'icon': self.icon, 'is_achievement': self.is_achievement,
-            'measurement': self.measurement_type_id,
+            'measurement': measurement,
         }
 
         if self.accomplishment_type_id:

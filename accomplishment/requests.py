@@ -3,7 +3,7 @@ import zoneinfo
 from django.http import JsonResponse, HttpResponseBadRequest, Http404
 from django.utils import timezone
 from django.core.serializers import serialize
-from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType
+from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType, MeasurementType
 from .forms.accomplishment import AccomplishmentForm
 from core.models.family import Family
 from core.models.family_user import FamilyUser
@@ -133,8 +133,9 @@ def get_milestone_by_id(request, ID):
     from_date_tz = accom.from_date.astimezone(zoneinfo.ZoneInfo("Europe/Paris"))
     to_date_tz = accom.to_date.astimezone(zoneinfo.ZoneInfo("Europe/Paris"))
 
+    accom_details = accom.accomplishment_id.dict()
     return JsonResponse(data={
-        'measurement': accom.accomplishment_id.measurement_type_id,
+        'measurement': accom_details['measurement'],
         'measurement_quantity': accom.measurement_quantity,
         'date_from_day': from_date_tz.day, 'date_from_month': from_date_tz.month,
         'date_from_year': from_date_tz.year, 'date_to_day': to_date_tz.day,
@@ -160,7 +161,7 @@ def edit_milestone(request, ID):
         if (request.POST.get("measurement_quantity", "") == ""):
             accom.measurement_quantity = 0
         else:
-            accom.measurement_quantity = int(request.POST.get("measurement_quantity", 0))
+            accom.measurement_quantity = float(request.POST.get("measurement_quantity", 0))
 
         accom.from_date = datetime_from_field(form=form, field="date_from")
         accom.to_date = datetime_from_field(form=form, field="date_to")
@@ -190,11 +191,11 @@ def submit_accomplishment(request):
 
     form = AccomplishmentForm(data=request.POST)
     if form.is_valid():
-
+        print(form.cleaned_data)
         # We want to be strict with the name matching, so we only
         # search an Accomplishment with the same name and user,
         # and otherwise create a new one.
-        new_acc, created = Accomplishment.objects.get_or_create(
+        new_accomp, created = Accomplishment.objects.get_or_create(
             created_by=request.user,
             name=form.cleaned_data.get("name"),
         )
@@ -206,16 +207,24 @@ def submit_accomplishment(request):
                     name=form.cleaned_data.get("accomplishment_type", ""),
                     description=""
                 )[0]
-                new_acc.accomplishment_type_id = accomp_type
-                print(new_acc.accomplishment_type_id.name)
-            new_acc.description=form.cleaned_data.get("description", ""),
-            new_acc.icon=form.cleaned_data.get("icon", "")
-            new_acc.is_achievement=form.cleaned_data.get("is_achievement", False)
-            new_acc.save()
+                new_accomp.accomplishment_type_id = accomp_type
+
+            if form.cleaned_data.get("measurement", "") != "":
+                measurement: MeasurementType = MeasurementType.objects.get_or_create(
+                    name=form.cleaned_data.get("measurement", ""),
+                    abbreviation=form.cleaned_data.get("measurement", ""),
+                    description=""
+                )[0]
+                new_accomp.measurement_type_id = measurement
+
+            new_accomp.description=form.cleaned_data.get("description", ""),
+            new_accomp.icon=form.cleaned_data.get("icon", "")
+            new_accomp.is_achievement=form.cleaned_data.get("is_achievement", False)
+            new_accomp.save()
 
         FamilyUserAccomplishment.objects.get_or_create(
             family_user_id=family_user,
-            accomplishment_id=new_acc,
+            accomplishment_id=new_accomp,
             created_by=request.user,
             measurement_quantity=form.cleaned_data.get("measurement_quantity", 1),
             from_date=timezone.now(),

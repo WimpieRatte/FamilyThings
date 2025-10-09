@@ -1,5 +1,8 @@
 {% extends "site/site_base.html" %}
 {% block title %}Accomplishments -{% endblock %}
+{% block popups %}
+{% include 'accomplishment/accomp_edit_milestone_popup.html' %}
+{% endblock %}
 {% block content %}
 <div id="accomplishments-overview" class="container-sm pb-4 w-100">
     {% include 'site/heading_section.html' with label="Accomplishments" id="accomplishments" %}
@@ -91,6 +94,7 @@
     var searchSelector = "name";
 
     var selectedMilestone = "" //Stores the UUID of the Accomplishment/Milestone that is being edited.
+    var activePopup = ""
 
 
     /* Get Today's Accomplishments */
@@ -163,10 +167,10 @@
 
         let measurement_data = "-"
         if (accomplishment["measurement"] != null) {
-            measurement_data = `${data["fields"]["measurement_quantity"]} ${data["fields"]["measurement"]}`;
+            measurement_data = `${data["fields"]["measurement_quantity"]}${accomplishment["measurement"]}`;
         }
         else if (data["fields"]["measurement_quantity"] != null && data["fields"]["measurement_quantity"] != 0) {
-            measurement_data = `${data["fields"]["measurement_quantity"]}x`;
+            measurement_data = `${parseInt(data["fields"]["measurement_quantity"])}x`;
         }
         templateDump = templateDump.replace("%measurement%", measurement_data);
         
@@ -196,7 +200,7 @@
                 type: 'POST', url: `{{HOST}}/accomplishments/milestone/get/id=${$(this).val()}`, data: {
                     csrfmiddlewaretoken: '{{ csrf_token }}'},
                 success: function(milestone_data) {
-                    openPopup();
+                    openPopup("edit-milestone-popup");
 
                     // Fill the fields with the obtained data
                     var fields = ['measurement', "measurement_quantity", "date_from_day", "date_from_month",
@@ -239,24 +243,29 @@
         createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
     });
 
-    function openPopup(){
-
-        // Defined in site/site_js.html
-        screenTransition.style.transitionDuration = "0s";
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
+    function openPopup(name = ""){
 
         popupWindow.style.display = "block";
         main.style.pointerEvents = "none";
         header.style.pointerEvents = "none";
+
+        if (name != "") {
+            document.getElementById(name).style.display = "block";
+            activePopup = name;
+        }
+
     }
 
     function closePopup(){
 
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
-
         popupWindow.style.display = "none";
         main.style.pointerEvents = "initial";
         header.style.pointerEvents = "initial";
+
+        if (activePopup != "") {
+            document.getElementById(activePopup).style.display = "none";
+            activePopup = "";
+        }
     }
 
     $("#btn-abort").click(function(event) {

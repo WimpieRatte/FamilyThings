@@ -13,6 +13,12 @@
     {% include 'site/site_style_overrides.html' with color=request.user.color cursor=request.session.use_custom_cursor %}
   </style>
 </head>
+<div id="popup-container" class="position-absolute vw-100 vh-100" style="display: none; z-index: 1051;">
+    <div id="popup-cover" class="position-absolute vw-100 vh-100 top-0 start-0 no-ptr-evt"></div>
+    <div id="popups" class="position-absolute start-50 top-50 translate-middle overflow-visible">
+      {% block popups %}{% endblock %}
+    </div>
+</div>
 {% include 'site/site_overlay.html' with messages=messages %}
 {% include 'site/site_js_preload.html' %}
 {% include 'site/site_header.html' with show_time=True %}
