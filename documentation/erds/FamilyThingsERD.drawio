@@ -1644,7 +1644,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="HjLLyKO1osjCQgOKCF4v-261" value="These have to be limited to the column headers in finance.Transaction" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;position2=0;" parent="1" vertex="1">
-          <mxGeometry x="340" y="1100" width="120" height="90" as="geometry" />
+          <mxGeometry x="332" y="1020" width="120" height="90" as="geometry" />
         </mxCell>
         <mxCell id="HjLLyKO1osjCQgOKCF4v-265" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToMany;startArrow=ERmandOne;rounded=0;" parent="1" source="HjLLyKO1osjCQgOKCF4v-248" target="HjLLyKO1osjCQgOKCF4v-262" edge="1">
           <mxGeometry width="100" height="100" relative="1" as="geometry">
