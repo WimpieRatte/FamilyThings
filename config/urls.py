@@ -21,5 +21,7 @@ urlpatterns = [
     path("", include("core.urls", namespace="core")),  # Main App ('core')
     path("accomplishments/",  # Accomplishment
          include("accomplishment.urls", namespace='accomplishment')),
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("finance/",          # Finance
+         include("finance.urls", namespace='finance')),
 ]
