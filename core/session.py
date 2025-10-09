@@ -18,8 +18,14 @@ def update_session(request, lang_code: str = "", custom_cursor: bool = True,
         request.session["current_family"] = 0
 
     if request.user.is_authenticated:
+        # A list with all the family names
         request.session["families"] = list(FamilyUser.objects.filter(
             custom_user_id=request.user).order_by('join_date').reverse().values_list("family_id__name").reverse())
+
+        # A dict with all the relevant info about the family you're currently switched to
+        # Name, Manager role
+        request.session["family_info"] = FamilyUser.objects.filter(
+            custom_user_id=request.user).order_by('join_date')[request.session["current_family"]].json_data()
 
     #  Apply a language code based on either the existing value,
     #  an User's own setting, or lastly, the browser's.
@@ -91,16 +97,16 @@ def create_alert(request: dict, type: str = "", ID: str = "",
 
 
 def get_locale_text(request: dict, ID: str = "",
-                    default_text: str = "", insert: str = " "):
+                    default_text: str = " ", insert: str = " ") -> str:
     # Try to load one of localization files.
     try:
         file: str = f"./static/localization/{request.session['lang_code']}/alerts.json"
         raw_json: str = open(file, encoding='utf-8').read()
         parsed_json = json.loads(raw_json)
-        return parsed_json[ID].replace("%PLACEHOLDER%", insert),
+        return parsed_json[ID].replace("%PLACEHOLDER%", insert)
     # Otherwise, proceed with the default text.
     except (Exception):
-        return default_text.replace("%PLACEHOLDER%", insert),
+        return default_text.replace("%PLACEHOLDER%", insert)
 
 
 class JsonResponseAlert(JsonResponse):

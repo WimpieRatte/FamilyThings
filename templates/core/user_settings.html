@@ -15,10 +15,12 @@
                 </div><br>
                 <form id="settings-form" class="mb-3 pe-5" enctype="multipart/form-data" method="post" style="width: fit-content !important;">
                     {% csrf_token %}
-                    {% include 'site/form_field.html' with id="first-name" field=form.first_name optional=True %}
-                    {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}
+                    <div class="d-flex gap-2">
+                        {% include 'site/form_field.html' with id="first-name" field=form.first_name optional=True %}
+                        {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}
+                    </div>
                     {% include 'site/form_field.html' with id="birthday" field=form.birthday optional=True %}
-                    <div class="d-flex" style="gap: 20px;">
+                    <div class="d-flex gap-5">
                         {% include 'site/form_field.html' with id="language" field=form.language %}
                         {% include 'site/form_field.html' with id="cursor" field=form.cursor %}
                     </div>

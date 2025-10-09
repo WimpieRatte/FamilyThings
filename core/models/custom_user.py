@@ -1,34 +1,11 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
+from ..constants import COLORS, LANGUAGES
 
 
 class CustomUser(AbstractUser):
     """The default User class of FamilyThings."""
-    # Color constants; used as the site's primary color.
-    # The associated field can be found under 'Personalization-related fields'
-    BLUE = "blue"
-    INDIGO = "indigo"
-    PURPLE = "purple"
-    PINK = "pink"
-    RED = "red"
-    ORANGE = "orange"
-    YELLOW = "yellow"
-    GREEN = "green"
-    TEAL = "teal"
-    CYAN = "cyan"
-    COLOR_CHOICES = {
-        BLUE: "Blue", INDIGO: "Indigo", PURPLE: "Purple",
-        PINK: "Pink", RED: "Red", ORANGE: "Orange",
-        YELLOW: "Yellow", GREEN: "Green", TEAL: "Teal", CYAN: "Cyan"
-    }
-
-    ENGLISH = "en"
-    GERMAN = "de"
-    LANG_CHOICES = {
-        ENGLISH: "English", GERMAN: "German"
-    }
-
     # Overriding Django's built-in AbstractUser
     email = models.EmailField(unique=True)
 
@@ -48,19 +25,18 @@ class CustomUser(AbstractUser):
     birthday = models.DateField(blank=True, null=True)
     color = models.CharField(
         max_length=6,
-        choices=COLOR_CHOICES,
-        default=BLUE)
+        choices=COLORS,
+        default="blue")
     icon = models.ImageField(
         blank=True, null=True,
         upload_to="icons/")
     background_image = models.ImageField(
         blank=True, null=True,
         upload_to="backgrounds/")
-
     # Misc. settings
     lang_code = models.CharField(
         max_length=3,
-        choices=LANG_CHOICES,
+        choices=LANGUAGES,
         default="")
     cursor = models.BooleanField(
         default=True
@@ -75,9 +51,6 @@ class CustomUser(AbstractUser):
         if self.first_name != "":
             return f"{self.first_name} {self.last_name}".replace(" None", "")
         return self.username
-
-    def is_family_member(self):
-        return True # TODO: Get this check implemented properly
 
     class Meta:
         # White space is used as a workaround

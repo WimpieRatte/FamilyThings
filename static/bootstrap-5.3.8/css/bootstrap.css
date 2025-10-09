@@ -7376,6 +7376,11 @@ input:disabled {
   pointer-events: none;
 }
 
+/* FamilyThings: added w-fit */
+.w-fit {
+  width: fit-content;
+}
+
 .shadow {
   box-shadow: var(--bs-box-shadow) !important;
 }

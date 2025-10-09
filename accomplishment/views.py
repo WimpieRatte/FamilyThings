@@ -26,7 +26,8 @@ def page_overview(request, lang_code: str = ""):
         request, "accomplishment/accomp_overview.html",
         {
             'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=recent_additions))),
-            'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan']
+            'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan'],
+            'form': AccomplishmentForm()
         })
 
     return render_if_logged_in(request, target)
@@ -78,12 +79,12 @@ def page_edit_user_accomplishment(request, lang_code: str = "", ID: int = -1):
 
         if (request.POST):
             form = AccomplishmentForm(data=request.POST)
-            print(form.data)
-            if (request.POST["measurement"]):
-                accom.accomplishment_id.measurement_type_id = form.data.get(
-                    "measurement", accom.accomplishment_id.measurement_type_id)
 
-            accom.measurement_quantity = request.POST["measurement_quantity"]
+            if (request.POST["measurement_quantity"] == ""):
+                accom.measurement_quantity = 0
+            else:
+                accom.measurement_quantity = int(request.POST.get("measurement_quantity", 0))
+
             accom.from_date = datetime_from_field(form=form, field="date_from")
             accom.to_date = datetime_from_field(form=form, field="date_to")
             accom.save()

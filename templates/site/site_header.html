@@ -20,8 +20,8 @@
               {% include 'header/dropdown_item.html' with href='core:user_login' id="log-in" icon='box-arrow-right' label='Log In' %}
             {% else %}
               <small id="dropdown-item-role" class="dropdown-item no-ptr-evt">
-                {% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.user.is_manager %}<br>
-                {{ family.name }}
+                {% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.session.family_info.is_manager %}<br>
+                {{ request.session.family_info.name }}
               </small>
               <li><hr class="dropdown-divider"></li>
               {% include 'header/dropdown_item.html' with href='core:user_settings' id="user-settings" icon='gear' label='Settings' %}
@@ -34,10 +34,10 @@
               {% include 'header/dropdown_item.html' with href='core:request_logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
               {% if request.session.families|length > 1 %}
                 <li><hr class="dropdown-divider"></li>
-                <small id="lb-switch-to" class="dropdown-item no-ptr-evt">Switch to</small>
+                <small id="lb-switch-to" class="dropdown-item no-ptr-evt" style="line-height: .75em;">Switch to</small>
                 {% for family in request.session.families %}
                   {% if request.session.current_family != forloop.counter0 %}
-                  <a href="{% url 'core:session_switch_family' forloop.counter0 %}"><li class="dropdown-item link-underline-opacity-0 link-underline" style="overflow-x: hidden;">
+                  <a href="{% url 'core:session_switch_family' forloop.counter0 %}" class="link-underline-opacity-0 link-underline"> <li class="dropdown-item" style="overflow-x: hidden;">
                     <small>{{family.0}}</small></li></a>
                   {% endif %}
                 {% endfor %}

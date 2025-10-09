@@ -16,14 +16,29 @@
         setTimeout(function() {alert.close();}, 5000);
     }
 
+    var alertContainer = $("#alert-container")
+    var alertList = []
+
     function createAlert(text = "", key = "", type = "warning") {
 
         if (localAlertText && localAlertText[key]){
             text = localAlertText[key];
         }
-        
-        var new_alert = new bootstrap.Alert($("#alert-container").append(
+
+        alertList.push(alertContainer.prepend(
             `<div class="alert alert-dismissible fade show m-0 mt-1 alert-${type}" role="alert" style="pointer-events: auto;"><span>${text}</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`));
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`).children()[0]);
+
+        setTimeout(function() { 
+            new bootstrap.Alert(alertList.shift()).close();
+        }, 4000);
+    }
+
+    const popupWindow = document.querySelector('#popup-container');
+
+    popupWindow.style.display = "none"
+
+    function openPopup() {
+        popupWindow.style.display = "block"
     }
 </script>

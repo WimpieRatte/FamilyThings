@@ -4,6 +4,7 @@
     /* Constants & Initialization for the entire Overlay */
     const root = document.querySelector(":root");
     const body = document.querySelector("body");
+    const header = document.querySelector("header");
     const main = document.querySelector("main");
 
     const overlay = document.querySelector("#overlay");
@@ -194,9 +195,8 @@
     });
 
     /* Close Alerts after five seconds */
+    let alerts = document.querySelectorAll('.alert');
     setTimeout(function() {
-        let alerts = document.querySelectorAll('.alert');
-
         alerts.forEach(function(alert) {
             let bsAlert = new bootstrap.Alert(alert);
             bsAlert.close(); // removes element from DOM
