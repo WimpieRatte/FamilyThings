@@ -115,13 +115,27 @@ def get_by_name(request, name: str):
         return HttpResponseBadRequest()
 
     try:
-        result: Accomplishment = Accomplishment.objects.get(name=name)
+        result: Accomplishment = Accomplishment.objects.get(name__iexact=name)
         return JsonResponse(
             data={
                 'name': result.name,
                 'description': result.description,
                 'icon': result.icon
                 })
+    except (Accomplishment.DoesNotExist):
+        return HttpResponseNotFound()
+
+
+def get_names(request):
+    """Return details about an Accomplishment if the name matches,
+    otherwise return Http404"""
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest()
+
+    try:
+        result: Accomplishment = Accomplishment.objects.filter(created_by=request.user).values_list("name")
+        return JsonResponse(
+            data={'name': list(reversed(result))})
     except (Accomplishment.DoesNotExist):
         return HttpResponseNotFound()
 

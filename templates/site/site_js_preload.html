@@ -63,6 +63,19 @@
         }
     }
 
+    /* Loading Screen */
+    const screenTransition = document.querySelector("#screen-transition");
+    const loadingArrow = document.querySelector('#loading-arrow');
+
+    function enableLoadingScreen() {
+        loadingArrow.style = "opacity: 1";
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 1)";
+    }
+    function disableLoadingScreen() {
+        loadingArrow.style = "opacity: 0";
+        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    }
+
     // AJAX
     function basicAJAX(type = "POST", url, data) {
         enableLoadingScreen();

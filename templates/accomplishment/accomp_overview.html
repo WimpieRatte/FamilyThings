@@ -53,7 +53,7 @@
                 <div style="width: 35%">
                     {% include 'site/heading_small.html' with title="Had any recent Accomplishments?" id="any-recent-accomps" class='text-center pt-1' %}
                     <div id="new-accomplishment-wrapper" class="w-auto m-auto pb-4">
-                        <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
+                        <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" data-tooltip-context="Add New">
                             <h4 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
                             <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-1"></i></h4>
                         </a>
@@ -299,10 +299,27 @@
     var nameTakenText = document.getElementById("lb-name-taken-prompt");
     var foundAccompText = document.getElementById("found-accomp");
 
+    // Get Accomplishment names
+    let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.when( basicAJAX(type="POST", url=`{% url 'accomplishment:get_names' %}`, data=AJAXData) )
+        .done(function( accompData ) {
+            let dataList = document.getElementById("accomp-suggestions");
+            accompData["name"].forEach(function(name) {
+                console.log(name)
+                dataList.appendChild(document.createElement("option")).value = name[0]
+            });
+            console.log(dataList);
+        })
+
     // Open Name Prompt
     $("#add-new-button").click(function(event) {
         event.preventDefault();
         nameField.value = ""
+        openPopup("name-prompt-popup");
+    });
+
+    $("#btn-create-new").click(function(event) {
+        closePopup()
         openPopup("name-prompt-popup");
     });
 
@@ -345,7 +362,9 @@
         repeatButton.disabled = true;
         foundAccompText.textContent = "";
         foundAccompText.className = "";
-    })
+        nameTakenText.style.display = "none";
+        nameAvailableText.style.display = "none";
+    });
 
 </script>
 <style>
