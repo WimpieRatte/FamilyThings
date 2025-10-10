@@ -38,28 +38,30 @@
     // Popups
     const popupWindow = document.querySelector('#popup-container');
 
-    popupWindow.style.display = "none"
+    if (popupWindow) {
+        popupWindow.style.display = "none"
 
-    var activePopup = ""
-    function openPopup(name = ""){
-        popupWindow.style.display = "block";
-        main.style.pointerEvents = "none";
-        header.style.pointerEvents = "none";
+        var activePopup = ""
+        function openPopup(name = ""){
+            popupWindow.style.display = "block";
+            main.style.pointerEvents = "none";
+            header.style.pointerEvents = "none";
 
-        if (name != "") {
-            document.getElementById(name).style.display = "block";
-            activePopup = name;
+            if (name != "") {
+                document.getElementById(name).style.display = "block";
+                activePopup = name;
+            }
         }
-    }
 
-    function closePopup(){
-        popupWindow.style.display = "none";
-        main.style.pointerEvents = "initial";
-        header.style.pointerEvents = "initial";
+        function closePopup(){
+            popupWindow.style.display = "none";
+            main.style.pointerEvents = "initial";
+            header.style.pointerEvents = "initial";
 
-        if (activePopup != "") {
-            document.getElementById(activePopup).style.display = "none";
-            activePopup = "";
+            if (activePopup != "") {
+                document.getElementById(activePopup).style.display = "none";
+                activePopup = "";
+            }
         }
     }
 
