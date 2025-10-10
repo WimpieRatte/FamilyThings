@@ -39,7 +39,7 @@ class Accomplishment(models.Model):
     )
     is_achievement = models.BooleanField(default=False)
 
-    def dict(self):
+    def serialized(self):
         measurement: str = None
 
         if (self.measurement_type_id):
@@ -47,13 +47,13 @@ class Accomplishment(models.Model):
 
         output: dict = {
             'ID': self.id,
-            'name': self.name, 'description': self.description,
+            'name': self.name, 'description': "".join(self.description.replace("'", "")),
             'icon': self.icon, 'is_achievement': self.is_achievement,
             'measurement': measurement,
         }
 
         if self.accomplishment_type_id:
-            output['type'] = str(self.accomplishment_type_id.name).replace("None", "-"),
+            output['type'] = self.accomplishment_type_id.name
         return output
 
     class Meta:

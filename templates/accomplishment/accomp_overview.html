@@ -62,7 +62,7 @@
                     {% include 'site/heading_small.html' with title="Recent Additions (Click to repeat)" id="recent-additions" class='text-center pt-1' %}
                     <div class="d-flex justify-content-center flex-wrap gap-1" style="width: fit-content;">
                         {% for entry in recent_additions %}
-                            <a href="{% url 'accomplishment:add_new' entry.id %}" class="link-underline link-underline-opacity-0 tooltip-source" data-tooltip-context="Repeat" data-tooltip-content='"{{entry.name}}"'>
+                            <a data-data="{{entry.serialized}}" onclick="openRepeat(this)" value={{entry.id}} class="link-underline link-underline-opacity-0 tooltip-source" data-tooltip-context="Repeat" data-tooltip-content='"{{entry.name}}"'>
                                 {% with color=colors|random %}
                                 <div class="rounded-2 p-1" style="color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});">{{entry.name}} <span class="bi bi-repeat"></span></div>
                                 {% endwith %}
@@ -83,298 +83,41 @@
     }
 </style>
 <script>
-    var todaysAccContainer = $("#accomplishments-table-body");
-    var searchBar = document.getElementById("search-filter");
-    var tablePreviousButton = document.getElementById("previous-button");
-    var tableNextButton = document.getElementById("next-button");
-    var accomTableBody = document.getElementById("accomplishments-table-body")
-
-    var getAccompURL = "{{HOST}}/accomplishments/milestone/get/id="
-    var editAccompURL = "{{HOST}}/accomplishments/milestone/edit/id="
+    var getAccompURL = "{{HOST}}/accomplishments/entry/get/id="
+    var editAccompURL = "{{HOST}}/accomplishments/entry/edit/id="
+    var repeatAccompURL = "{{HOST}}/accomplishments/entry/repeat"
     var currentAJAXURL = editAccompURL;
 
-    var currentIndex = 1;
-    var currentEnd = 0;
-    var totalEntries = 0;
+    var selectedAccomplishment = "" //Stores the ID of the Accomplishment/Template that is being edited.
 
-    var searchText = "";
-    var searchSelector = "name";
+    function openRepeat(data) {
+        let _data = data.getAttribute("data-data").replaceAll(`'`, `"`).replaceAll(`None`, `null`).replaceAll(`False`, `false`)
+        console.log(_data)
+        accomplishmentStorage = JSON.parse(_data)
+        closePopup();
+        openPopup("repeat-accomp-popup");
 
-    var selectedAccomplishment = "" //Stores the UUID of the Accomplishment/Milestone that is being edited.
+        Object.entries(accomplishmentStorage).forEach(function(field) {
+            let form_field = document.querySelector(`#repeat-accomp-form #id_${field[0]}`)
 
-
-    /* Get Today's Accomplishments */
-    const queryURL = "{{HOST}}/accomplishments/get"
-    function createAccomplishmentsTable(length = 15, start = 1, search = "", selector = "name"){
-        tablePreviousButton.disabled = true;
-        tableNextButton.disabled = true;
-        currentIndex = start;
-
-        let queryURLFinal = `${queryURL}/amount=${length}/start=${start}/selector='${selector}'`
-
-        if (search != ""){queryURLFinal+=`/key='${search}'`}
-        $.get(queryURLFinal, function() {})
-        .done(function(response) {
-            var index = 0;
-            todaysAccContainer.empty();
-            Object.entries(response.result).forEach(function(entry) {
-                let data = entry[1];
-                createTableEntry(todaysAccContainer, data, start+index, searchText, selector)
-                index++;
-            });
-
-            currentEnd = start + Object.entries(response.result).length;
-            totalEntries = response.total;
-            if (currentEnd-1 < totalEntries){tableNextButton.disabled = false;}
-            document.getElementById("range-start").textContent = start;
-            document.getElementById("range-end").textContent = start - 1 + Object.entries(response.result).length;
-            document.getElementById("range-total").textContent = response.total;
-
-            applyLocaleToPage() /* Refresh all language content */
-            updateTooltips(); // Required to make the new Entries interactable
-        })
-        .fail(function(err) {console.log(err);})
-
-        if (currentIndex > 1){tablePreviousButton.disabled = false;}
-    }
-    createAccomplishmentsTable()
-
-    /* Dynamically create Accomplishment entries */
-    const tableEntryTemplate = `{% include "accomplishment/temp_accomp_entry.html" %}`
-
-    function createTableEntry(target_container, data, index, highlight = "", selector = "name"){
-
-        // Get the date
-        let language = languageCode;
-        if (language == ""){language="en";}
-
-        creation_date = new Date(data["fields"]["created"]).toLocaleTimeString(language, {
-            year: "numeric", month: "short", day: "numeric",
-            hour: '2-digit', minute:'2-digit'})
-        
-        // Prepare the template and retrieve the Accomplishment details
-        let accom_template = data["fields"]["accomplishment"];
-        let templateDump = tableEntryTemplate;
-        let accomp_name = accom_template["name"];
-
-        /* Highlight the name based on the search query */
-        if (highlight != "" && selector == 'name') {accomp_name = accomp_name.replace(highlight, `<strong>$1</strong>`)}
-
-        /* Turn the whole name + icon yellow */
-        if (accom_template["is_achievement"]) { templateDump = templateDump.replace("%name_style%", 'style="color: #ddc67f !important;"')}
-            else { templateDump = templateDump.replace("%name_style%", '')}
-        
-        
-        // Apply most of the template
-        templateDump = templateDump.replace("%index%", index)
-        .replace("%date_created%", creation_date)
-        .replaceAll("%name%", accomp_name)
-        .replaceAll("%ID%", data["pk"])
-        .replace("%icon%", accom_template["icon"])
-        .replace("%category%", accom_template["type"])
-        .replace("%description%", accom_template["description"])
-        .replace("%repeatURL%", `"add%3Frepeat=${accom_template["ID"]}""`)
-        .replace("undefined", "N/A")
-
-        // Process Measurement Data
-        let measurement_data = "-"
-        if (accom_template["measurement"] != null) {
-            measurement_data = `${data["fields"]["measurement_quantity"]}${accom_template["measurement"]}`;
-        }
-        else if (data["fields"]["measurement_quantity"] != null && data["fields"]["measurement_quantity"] != 0) {
-            measurement_data = `${parseInt(data["fields"]["measurement_quantity"])}x`;
-        }
-        templateDump = templateDump.replace("%measurement%", measurement_data);
-        
-        target_container.append(templateDump);
-
-
-        // Add Delete Accomplishment prompt to the generated entry
-        var deleteURL = "{{HOST}}/accomplishments/delete/id="
-        document.getElementById(`delete-accomplishment-btn-${data["pk"]}`).addEventListener("click", (event) => {
-            let accomp_id = event.currentTarget.getAttribute("data-accomp-id");
-            if (confirm(`Are you sure you want to delete this entry?\n(This cannot be undone!)`)) {
-                $.get( `${deleteURL}${accomp_id}`, function() {})
-                .done(function(response) {
-                    createAlert("Accomplishment has been removed.", key="", type="warning");
-                    createAccomplishmentsTable(length=15, start=currentIndex, search=searchBar.value);
-                })
-                .fail(function(err) {
-                    createAlert(xhr.responseText, key="", type="danger");
-                })
+            if (form_field){
+                console.log(field)
+                form_field.value = field[1];
             }
         });
 
+        //Apply name and icon
+        document.querySelector(`#repeat-accomp-popup #edit-accomp-name`).textContent = accomplishmentStorage["name"]
+        document.querySelector(`#repeat-accomp-popup #edit-accomp-icon`).className = `bi bi-${accomplishmentStorage["icon"]} h5`;
+        document.querySelector(`#repeat-accomp-popup #lb-created-on`).textContent = ""
 
-        $(`#edit-accomp-${data["pk"]}`).click(function(event) {
-            selectedAccomplishment = $(this).val();
-            currentAJAXURL = editAccompURL;
-
-            let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-
-            let accompData = null
-            
-            $.when( basicAJAX(type="POST", url=`${getAccompURL}${$(this).val()}`, data=AJAXData) )
-            .done(function( accompData ) {
-                if (accompData != null){
-                    openPopup("edit-accomp-popup");
-
-                    // Fill the fields with the obtained data
-                    var fields = ['measurement', "measurement_quantity", "date_from_day", "date_from_month",
-                        "date_from_year", "date_to_day", "date_to_month", "date_to_year"]
-                    
-                    fields.forEach(function(field) {
-                        $(`#id_${field}`).val(accompData[field]);
-                    });
-
-                    $('#edit-accomp-name').text(accompData["name"]);
-                    document.getElementById('edit-accomp-icon').className = `bi bi-${accompData["icon"]}`;
-
-                    $('#edit-accomp-created').text(new Date(accompData["created"]).toLocaleDateString(language, {
-                        weekday: "short", year: "numeric",
-                        month: "short", day: "numeric",}));
-
-                    $(`#id_measurement`).prop( "disabled", true )
-                    // If the user has not Measurement type but a quantity specified, use x (amount of times)
-                    if (accompData['measurement'] == null) {
-                        $(`#id_measurement`).val("x");
-                    }
-                }
-            });
-        });
+        document.querySelector(`#repeat-accomp-popup #id_measurement`).disabled = true;
     }
-    //
 
-    // "Previous" button = offset search by -15; "Next" button = offset search by +15;
-    $("#previous-button").click(function(event) { createAccomplishmentsTable(15, currentIndex-15, searchBar.value, searchSelector); });
-    $("#next-button").click(function(event) { createAccomplishmentsTable(15, currentIndex+15, searchBar.value, searchSelector); });
-
-    // Automatically run after a short period,
-    // and only make a query if the user made an input since then.
-    var previousSearch = ""
-    function updateSearch() {
-        if (previousSearch != searchBar.value){
-            previousSearch = searchBar.value;
-            searchText = new RegExp(`(${searchBar.value})`,'gi');
-            createAccomplishmentsTable(15, currentIndex, searchBar.value, searchSelector);
-        }
-        setTimeout(function() { updateSearch() }, 300);
-    }
-    updateSearch()
-
-    // Run search immediately if they pressed enter (filter-form) or changed the filter selector (filter-selector)
-    $("#filter-form").submit(function(event) {
-        event.preventDefault();
-        searchText = new RegExp(`(${searchBar.value})`,'gi');
-        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-    });
-
-    $("#filter-selector").change(function(event) {
-        searchSelector = document.getElementById("filter-selector").value;
-        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-    });
-
-    // Generic Abort button for all popups
-    $(".btn-abort-edit").click(function(event) { closePopup();});
-    $(".btn-abort-create").click(function(event) { closePopup();});
-
-
-
-    $("#btn-apply-changes").click(function(event) {
-        let form_data = $("#edit-accomp-form");
-
-        basicAJAX(type="POST", url=`{{HOST}}/accomplishments/milestone/edit/id=${selectedAccomplishment}`, data=form_data.serializeArray())
-        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-        closePopup();
-    });
-
-
-    /* Duplicate Check */
-    var nameCheckURL = "{{HOST}}/accomplishments/get/name="
-
-    var nameField = document.getElementById("lb-new-accomp-prompt")
-    var submitButton = document.getElementById("btn-create-new");
-    var repeatButton = document.getElementById("btn-repeat");
-
-    var nameAvailableText = document.getElementById("lb-name-available");
-    var nameTakenText = document.getElementById("lb-name-taken-prompt");
-    var foundAccompText = document.getElementById("found-accomp");
-
-    // Get Accomplishment names
-    let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-    $.when( basicAJAX(type="POST", url=`{% url 'accomplishment:get_names' %}`, data=AJAXData) )
-        .done(function( accompData ) {
-            let dataList = document.getElementById("accomp-suggestions");
-            accompData["name"].forEach(function(name) {
-                console.log(name)
-                dataList.appendChild(document.createElement("option")).value = name[0]
-            });
-            console.log(dataList);
-        })
-
-    // Open Name Prompt
-    $("#add-new-button").click(function(event) {
-        event.preventDefault();
-        nameField.value = ""
-        openPopup("name-prompt-popup");
-    });
-
-    $("#btn-create-new").click(function(event) {
-        closePopup()
-        openPopup("name-prompt-popup");
-    });
-
-    $("#btn-repeat").click(function(event) {
-        closePopup()
-        openPopup("repeat-accomp-popup");
-    });
-
-    var previousName = ""
-    function nameCheckAvailable() {
-        if (nameField.value.length > 4 && previousName != nameField.value){
-            previousName = nameField.value;
-
-            $.ajax({ 
-                type: 'POST', url: `${nameCheckURL}${nameField.value}`, data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'},
-                success: function(result) {
-                    submitButton.style.display = "none";
-                    nameAvailableText.style.display = "none";
-
-                    repeatButton.style.display = "block";
-                    repeatButton.disabled = false;
-                    nameTakenText.style.display = "block";
-                    foundAccompText.textContent = result["name"];
-                    foundAccompText.className = `bi bi-${result["icon"]} h5`;
-                },
-                error: function(xhr, errmsg, err) {
-                    submitButton.style.display = "block";
-                    submitButton.disabled = false;
-                    nameAvailableText.style.display = "block";
-
-                    repeatButton.style.display = "none";
-                    nameTakenText.style.display = "none";
-                    foundAccompText.textContent = "";
-                    foundAccompText.className = "";
-                }
-            });
-        }
-        setTimeout(function() { nameCheckAvailable() }, 1000);
-    }
-    nameCheckAvailable();
-
-    $("#lb-new-accomp-prompt").keyup(function(event) {
-        submitButton.disabled = true;
-        repeatButton.disabled = true;
-        foundAccompText.textContent = "";
-        foundAccompText.className = "";
-        nameTakenText.style.display = "none";
-        nameAvailableText.style.display = "none";
-    });
-
-
-    // Repeat Accomplishment Popup
-
+    {% include 'accomplishment/js_accomp_search_table.js' %}
+    {% include 'accomplishment/js_accomp_edit_accomp_prompt.js' %}
+    {% include 'accomplishment/js_accomp_repeat_accomp_prompt.js' %}
+    {% include 'accomplishment/js_accomp_name_prompt.js' %}
 </script>
 <style>
     #btn-actions {

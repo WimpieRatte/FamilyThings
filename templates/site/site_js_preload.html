@@ -83,15 +83,14 @@
         enableLoadingScreen();
         return $.ajax({ 
             type: type, url: url, data: data,
-            success: function(result) { 
+            success: function(result) {
                 if (result["alert-message"]) { createAlert(text=result["alert-message"], key="", type=result["alert-type"]); }
+                disableLoadingScreen(); 
+                return result; },
+            error: function(result) { 
+                if (result["responseText"]) { createAlert(text=result["responseText"], key="", type="danger"); }
                 disableLoadingScreen();
-                return result;
-            },
-            error: function(xhr, errmsg, err) {
-                disableLoadingScreen();
-                return null;
-            }
+                return null; }
         });
     }
 </script>

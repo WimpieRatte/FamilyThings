@@ -25,10 +25,12 @@ urlpatterns = [
      path("get/names",
           requests.get_names, name="get_names"),
 
-     path("milestone/get/id=<uuid:ID>",
-          requests.get_accomp_by_id, name="get_milestone_by_id"),
-     path("milestone/edit/id=<uuid:ID>",
-          requests.edit_accomp, name="edit_milestone"),
+     path("entry/get/id=<uuid:ID>",
+          requests.get_accomp_by_id, name="get_by_id"),
+     path("entry/edit/id=<uuid:ID>",
+          requests.edit_accomp, name="edit_accomp"),
+     path("entry/repeat",
+          requests.repeat_accomplishment, name="repeat_accomp"),
 
      # Operations (Creating/Deleting)
      path("submit",

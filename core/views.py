@@ -165,7 +165,7 @@ def user_profile_page(request, lang_code: str = ""):
                 # the Accomplishment details.
                 create_date = user_accomp.created
 
-                user_accomp = user_accomp.accomplishment_id.dict()
+                user_accomp = user_accomp.accomplishment_id.__dict__()
                 user_accomp["cleared_by"] = user.custom_user_id.full_name()
                 user_accomp["color"] = user.custom_user_id.color
                 user_accomp["icon"] = user.custom_user_id.icon
