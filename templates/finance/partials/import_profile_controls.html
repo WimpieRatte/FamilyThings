@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-10 offset-1">
+        <div class="mb-3">
+            <label for="txtName" class="form-label">Name</label>
+            <input type="email" class="form-control" id="txtName" placeholder="Enter name here..." value="{{ profile.name|default:'' }}">
+        </div>
+        <div class="mb-3">
+            <label for="txtDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="txtDescription" rows="3" placeholder="Enter description here...">{{ profile.description|default:"" }}</textarea>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary" value="{{ profile.id }}" id="btnSaveProfileMapping">Save</button>
+    </div>
+</div>
+
+<script>
+  // Check if button pressed
+  $('#btnSaveProfileMapping').click(function(e) {
+
+    e.preventDefault();  // Prevent default form submission behavior
+    $.ajax({  // do a hidden postback to the url(view) below
+      type: 'POST',
+      url: '{% url 'finance:save_import_profile' %}',  //which URL mapping to redirect to
+      data: {
+        profile_id: $(this).val(),  // get value of button that triggered the event
+        profile_name: $("#txtName").val(),
+        profile_description: $("#txtDescription").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        action: 'post'
+      },
+      success: function(json) {
+        document.getElementById("btnSaveProfileMapping").value = json.profile_id;
+        alert('Saved!');
+        window.location.href = "{% url 'finance:import_profiles' %}";  // redirect after save
+      },
+      error: function(xhr, errmsg, err) {
+        console.log(errmsg);
+      }
+    });
+  })
+
+</script>

@@ -1,0 +1,68 @@
+{% extends "site/site_base.html" %}
+{% block title %}Finance: Import Profiles{% endblock %}
+
+{% block append_to_head %}
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div id="import-profiles" class="container-sm pb-4 w-100">
+    {% include 'site/heading_section.html' with label="Import Profiles" id="import_profiles" %}
+
+    {% comment %} Name and Description Area: {% endcomment %}
+    <div id="import_profile_details_container" class="container rounded bg-dark p-2 h-25 mh-25">
+        <div>
+            <label for="import-profile-selector" class="form-label">
+                Select Import Profile
+            </label>
+            <select class="form-select"
+                    aria-label="Select Import Profile"
+                    id="import-profile-selector"
+                    name="import_profile_selector"
+                    tooltip="Select the import profile to edit."
+                    hx-get="{% url 'finance:import_profile_controls' %}"
+                    hx-trigger="change"
+                    hx-target="#import_profile_controls">
+                {% if not profiles %}
+                    <option selected>Create New</option>
+                {% endif %}
+                {% for profile in profiles %}
+                    {% if selected_profile_id == profile.id %}
+                        <option selected value="{{ profile.id }}">{{ profile.name }}</option>
+                    {% else %}
+                        <option value="{{ profile.id }}" >{{ profile.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div id="import_profile_controls">
+            {% include 'finance/partials/import_profile_controls.html' %}
+        </div>
+    <br>
+    </div>
+    <br>
+
+    {% comment %} Mapping Area: {% endcomment %}
+    <div id="import_profile_mapping_container" class="container rounded bg-dark p-2 h-25 mh-25">
+        <label class="form-label">
+            Customise Mapping
+        </label>
+
+        <table class="table">
+            <thead>
+                <tr>
+                <th scope="col">File Header</th>
+                <th scope="col">Destination Column</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td>Mark</td>
+                <td>Mark</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
