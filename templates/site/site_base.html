@@ -12,6 +12,7 @@
   <style>
     {% include 'site/site_style_overrides.html' with color=request.user.color cursor=request.session.use_custom_cursor %}
   </style>
+  {% block append_to_head %}{% endblock %}
 </head>
 <div id="popup-container" class="position-absolute vw-100 vh-100" style="display: none; z-index: 1051;">
     <div id="popup-cover" class="position-absolute vw-100 vh-100 top-0 start-0 no-ptr-evt"></div>

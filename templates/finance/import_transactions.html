@@ -1,0 +1,54 @@
+{% extends "site/site_base.html" %}
+{% block title %}Finance: Import Transactions{% endblock %}
+{% block content %}
+<div id="accomplishments-overview" class="container-sm pb-4 w-100">
+    {% include 'site/heading_section.html' with label="Import Transactions" id="import_transactions" %}
+    <div id="import_transactions_container" class="container rounded bg-dark p-2 h-25 mh-25">
+        <div class="row g-2 align-items-end">
+            <div class="col">
+                <label for="import-profile-selector" class="form-label">
+                    Select Import Profile
+                </label>
+                <select class="form-select"
+                        aria-label="Select Import Profile"
+                        id="import-profile-selector"
+                        name="import_profile_selector"
+                        tooltip="If this is a file format you haven't imported before, please first create a new import profile accordingly."
+                        onchange="change(this.value)">
+                    {% if not profiles %}
+                        <option selected>Create New</option>
+                    {% endif %}
+                    {% for profile in profiles %}
+                        <option value="{{ profile.id }}">{{ profile.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-primary" id="btnEditProfiles" href="{% url 'finance:import_profiles' %}">Edit Profiles</a>
+            </div>
+        </div>
+        <br>
+        <div class="row g-2 align-items-end">
+            <div class="col">
+                <label for="formFile" class="form-label">Select file to upload</label>
+                <input class="form-control" id="formFile" type="file">
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-primary" id="btnLoadHeaders">
+                    Load Headers
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    function change(val){
+        document.getElementById("btnEditProfiles").href = "{% url 'finance:import_profiles' %}?import_profile_selector=" + val;
+    }
+
+</script>
+
+{% endblock %}

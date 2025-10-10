@@ -3,9 +3,8 @@ from core.models import Family
 
 
 class ImportProfile(models.Model):
-    id = models.IntegerField(
-        primary_key=True,
-        unique=True
+    id = models.AutoField(
+        primary_key=True
     )
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000, blank=True)
