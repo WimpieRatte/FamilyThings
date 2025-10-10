@@ -3,6 +3,7 @@
 {% block popups %}
     {% include 'accomplishment/accomp_popup_name_prompt.html' %}
     {% include 'accomplishment/accomp_popup_edit_accomp.html' %}
+    {% include 'accomplishment/accomp_popup_repeat_accomp.html' %}
     {% include 'accomplishment/accomp_popup_edit_template.html' %}
 {% endblock %}
 {% block content %}
@@ -323,6 +324,11 @@
         openPopup("name-prompt-popup");
     });
 
+    $("#btn-create-new").click(function(event) {
+        closePopup()
+        openPopup("repeat-accomp-popup");
+    });
+
     var previousName = ""
     function nameCheckAvailable() {
         if (nameField.value.length > 4 && previousName != nameField.value){
@@ -365,6 +371,9 @@
         nameTakenText.style.display = "none";
         nameAvailableText.style.display = "none";
     });
+
+
+    // Repeat Accomplishment Popup
 
 </script>
 <style>
