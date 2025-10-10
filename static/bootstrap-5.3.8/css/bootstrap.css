@@ -179,8 +179,8 @@ body {
 main {
     overflow-x: hidden;
     overflow-y: auto;
-    height: 95vh;
-    min-height: 95vh;
+    height: 70vh;
+    /*min-height: 95vh; */
     /*height: 95vh;*/
 }
 

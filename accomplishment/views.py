@@ -128,7 +128,7 @@ def page_edit_accomplishment_details(request, lang_code: str = "", ID: int = -1)
             accom_details.save()
             return redirect("accomplishment:overview")
 
-        accomp_data = accom_details.__dict__()
+        accomp_data = accom_details.serialized()
 
         form = AccomplishmentForm(data=accomp_data)
 

@@ -53,22 +53,7 @@ $("#name-prompt-popup #btn-repeat").click(function(event) {
     if (accomplishmentStorage != null){
         closePopup();
         openPopup("repeat-accomp-popup");
-        
-        Object.entries(accomplishmentStorage).forEach(function(field) {
-            let form_field = document.querySelector(`#repeat-accomp-form #id_${field[0]}`)
-
-            if (form_field){
-                form_field.value = field[1];
-            }
-        });
-
-        //Apply name and icon
-        document.querySelector(`#repeat-accomp-popup #edit-accomp-name`).textContent = accomplishmentStorage["name"]
-        document.querySelector(`#repeat-accomp-popup #edit-accomp-icon`).className = `bi bi-${accomplishmentStorage["icon"]} h5`;
-        document.querySelector(`#repeat-accomp-popup #lb-created-on`).textContent = ""
-
-        document.querySelector(`#repeat-accomp-popup #id_measurement`).disabled = true;
-
+        prepareRepeat()
         // Only run this after carrying all the nesssiary accomplishment data
         resetNamePrompt();
     }

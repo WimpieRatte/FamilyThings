@@ -68,6 +68,8 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
     /* Highlight the name based on the search query */
     if (highlight != "" && selector == 'name') { accomp_name = accomp_name.replace(highlight, `<strong>$1</strong>`) }
 
+    //accomp_name = `<span class='position-relative'><span id='lb-new' class='bg-primary p-1 rounded fs-sm position-absolute start-100 top-50 translate-middle'>New</span>${accomp_name}</span>`
+
     /* Turn the whole name + icon yellow */
     if (accom_template["is_achievement"]) { templateDump = templateDump.replace("%name_style%", 'style="color: #ddc67f !important;"') }
     else { templateDump = templateDump.replace("%name_style%", '') }
