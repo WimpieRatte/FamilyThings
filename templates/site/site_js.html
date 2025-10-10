@@ -8,10 +8,8 @@
     const main = document.querySelector("main");
 
     const overlay = document.querySelector("#overlay");
-    const screenTransition = document.querySelector("#screen-transition");
     const cursor = document.querySelector('#cursor-base');
     const cursorImage = document.querySelector('#cursor-image');
-    const loadingArrow = document.querySelector('#loading-arrow');
     const tooltip = document.querySelector('#tooltip');
 
     const imgCursorRegular = '/static/icons/cursor/cursor-regular.svg';
@@ -178,15 +176,6 @@
         });
     });
 
-    /* Loading Screen */
-    function enableLoadingScreen() {
-        loadingArrow.style = "opacity: 1";
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 1)";
-    }
-    function disableLoadingScreen() {
-        loadingArrow.style = "opacity: 0";
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
-    }
     /* Since it is enabled on boot, disable it after a short time. */
     $( document ).ready(function() {
         setTimeout(function(){

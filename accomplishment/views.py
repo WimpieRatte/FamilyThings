@@ -2,7 +2,7 @@ import zoneinfo
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType
+from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType, MeasurementType
 from .forms.accomplishment import AccomplishmentForm
 from . import constants
 from core.views import render_if_logged_in
@@ -46,7 +46,8 @@ def page_new_accomplishment(request, lang_code: str = "", ID: int = -1):
             'name': accom.name,
             'description': accom.description,
             'icon': accom.icon,
-            'is_achievement': accom.is_achievement
+            'is_achievement': accom.is_achievement,
+            'measurement': accom.measurement_type_id.abbreviation
         })
 
     return render(
@@ -121,17 +122,13 @@ def page_edit_accomplishment_details(request, lang_code: str = "", ID: int = -1)
             if request.POST.get("accomplishment_type", "") != "":
                 accom_details.accomplishment_type_id = AccomplishmentType.objects.get_or_create(
                         name=request.POST["accomplishment_type"])[0]
+            if request.POST.get("measurement", "") != "":
+                accom_details.measurement_type_id = MeasurementType.objects.get_or_create(
+                        abbreviation=request.POST["measurement"])[0]
             accom_details.save()
             return redirect("accomplishment:overview")
 
-        accomp_data: dict = {
-            'name': accom_details.name, 'description': accom_details.description,
-            'icon': accom_details.icon
-        }
-
-        # Apply the name of the AccomplishmentType if it was defined
-        if accom_details.accomplishment_type_id:
-            accomp_data["accomplishment_type"] = accom_details.accomplishment_type_id.name
+        accomp_data = accom_details.dict()
 
         form = AccomplishmentForm(data=accomp_data)
 

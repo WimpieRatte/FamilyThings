@@ -9,7 +9,7 @@ class MeasurementType(models.Model):
         editable=False
     )
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
+    description = models.CharField(max_length=1000, null=True, blank=True)
     abbreviation = models.CharField(max_length=20)
 
     class Meta:

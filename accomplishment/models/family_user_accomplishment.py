@@ -15,31 +15,48 @@ class FamilyUserAccomplishment(models.Model):
     family_user_id = models.ForeignKey(
         FamilyUser,
         on_delete=models.CASCADE,
-        related_name="accomplishments"
+        related_name="accomplishments",
+        editable=False
     )
     accomplishment_id = models.ForeignKey(
         Accomplishment,
         on_delete=models.CASCADE,
-        related_name="family_user_accomplishments"
+        related_name="family_user_accomplishments",
+        null=True,
+        blank=True,
+        editable=False
     )
-    measurement_quantity = models.BigIntegerField(
-        null=True
+    measurement_quantity = models.DecimalField(
+        null=True,
+        blank=True,
+        decimal_places=2,
+        max_digits=18
     )
     created = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
+        editable=False
     )
-    from_date = models.DateTimeField()
-    to_date = models.DateTimeField()
+    from_date = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+    to_date = models.DateTimeField(
+        null=True,
+        blank=True
+    )
     created_by = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="created_family_user_accomplishments"
+        related_name="created_family_user_accomplishments",
+        editable=False
     )
     chore_assignment_id = models.ForeignKey(
         CustomUser,
         null=True,
+        blank=True,
         on_delete=models.CASCADE,
-        related_name="chore_completions"
+        related_name="chore_completions",
+        editable=False
     )
 
     def get_accomplishment(self):

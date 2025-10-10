@@ -11,7 +11,7 @@ class AccomplishmentAdmin(admin.ModelAdmin):
 
 @admin.register(FamilyUserAccomplishment)
 class FamilyUserAccomplishmentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'accomplishment_id', 'accomplishment_name', 'created_by']
+    list_display = ['id', 'created', 'accomplishment_id', 'accomplishment_name', 'created_by']
 
     def accomplishment_name(self, obj: FamilyUserAccomplishment):
         return obj.accomplishment_id.name
@@ -24,4 +24,4 @@ class AccomplishmentTypeAdmin(admin.ModelAdmin):
 
 @admin.register(MeasurementType)
 class MeasurementTypeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['name', 'abbreviation']

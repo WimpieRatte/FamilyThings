@@ -1,5 +1,11 @@
 {% extends "site/site_base.html" %}
 {% block title %}Accomplishments -{% endblock %}
+{% block popups %}
+    {% include 'accomplishment/accomp_popup_name_prompt.html' %}
+    {% include 'accomplishment/accomp_popup_edit_accomp.html' %}
+    {% include 'accomplishment/accomp_popup_repeat_accomp.html' %}
+    {% include 'accomplishment/accomp_popup_edit_template.html' %}
+{% endblock %}
 {% block content %}
 <div id="accomplishments-overview" class="container-sm pb-4 w-100">
     {% include 'site/heading_section.html' with label="Accomplishments" id="accomplishments" %}
@@ -11,7 +17,7 @@
                         {% include 'site/heading_small.html' with label="All Activity" id="all-activity" %}
                         <form id="filter-form">
                             <div class="d-flex pe-3">
-                                <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter Milestones..." aria-label="Search">
+                                <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter Accomplishments..." aria-label="Search">
                                 <select id="filter-selector" class="form-select fs-sm">
                                     <option selected value="name">Name</option>
                                     <option value="uncategorized">Name (w/o Category)</option>
@@ -48,7 +54,7 @@
                 <div style="width: 35%">
                     {% include 'site/heading_small.html' with title="Had any recent Accomplishments?" id="any-recent-accomps" class='text-center pt-1' %}
                     <div id="new-accomplishment-wrapper" class="w-auto m-auto pb-4">
-                        <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
+                        <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" data-tooltip-context="Add New">
                             <h4 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
                             <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-1"></i></h4>
                         </a>
@@ -83,6 +89,10 @@
     var tableNextButton = document.getElementById("next-button");
     var accomTableBody = document.getElementById("accomplishments-table-body")
 
+    var getAccompURL = "{{HOST}}/accomplishments/milestone/get/id="
+    var editAccompURL = "{{HOST}}/accomplishments/milestone/edit/id="
+    var currentAJAXURL = editAccompURL;
+
     var currentIndex = 1;
     var currentEnd = 0;
     var totalEntries = 0;
@@ -90,7 +100,7 @@
     var searchText = "";
     var searchSelector = "name";
 
-    var selectedMilestone = "" //Stores the UUID of the Accomplishment/Milestone that is being edited.
+    var selectedAccomplishment = "" //Stores the UUID of the Accomplishment/Milestone that is being edited.
 
 
     /* Get Today's Accomplishments */
@@ -133,101 +143,126 @@
     const tableEntryTemplate = `{% include "accomplishment/temp_accomp_entry.html" %}`
 
     function createTableEntry(target_container, data, index, highlight = "", selector = "name"){
+
+        // Get the date
         let language = languageCode;
         if (language == ""){language="en";}
+
         creation_date = new Date(data["fields"]["created"]).toLocaleTimeString(language, {
             year: "numeric", month: "short", day: "numeric",
             hour: '2-digit', minute:'2-digit'})
-
-        let accomplishment = data["fields"]["accomplishment"];
+        
+        // Prepare the template and retrieve the Accomplishment details
+        let accom_template = data["fields"]["accomplishment"];
         let templateDump = tableEntryTemplate;
-        let accomp_name = accomplishment["name"];
+        let accomp_name = accom_template["name"];
 
         /* Highlight the name based on the search query */
         if (highlight != "" && selector == 'name') {accomp_name = accomp_name.replace(highlight, `<strong>$1</strong>`)}
 
         /* Turn the whole name + icon yellow */
-        if (accomplishment["is_achievement"]) { templateDump = templateDump.replace("%name_style%", 'style="color: #ddc67f !important;"')}
+        if (accom_template["is_achievement"]) { templateDump = templateDump.replace("%name_style%", 'style="color: #ddc67f !important;"')}
             else { templateDump = templateDump.replace("%name_style%", '')}
         
-        /* Insert the rest */
+        
+        // Apply most of the template
         templateDump = templateDump.replace("%index%", index)
-        .replaceAll("%name%", accomp_name)
         .replace("%date_created%", creation_date)
-        .replace("%icon%", accomplishment["icon"])
-        .replace("%category%", accomplishment["type"])
-        .replace("%description%", accomplishment["description"])
+        .replaceAll("%name%", accomp_name)
         .replaceAll("%ID%", data["pk"])
-        .replace("%repeatURL%", `"add%3Frepeat=${accomplishment["ID"]}""`)
+        .replace("%icon%", accom_template["icon"])
+        .replace("%category%", accom_template["type"])
+        .replace("%description%", accom_template["description"])
+        .replace("%repeatURL%", `"add%3Frepeat=${accom_template["ID"]}""`)
         .replace("undefined", "N/A")
 
+        // Process Measurement Data
         let measurement_data = "-"
-        if (accomplishment["measurement"] != null) {
-            measurement_data = `${data["fields"]["measurement_quantity"]} ${data["fields"]["measurement"]}`;
+        if (accom_template["measurement"] != null) {
+            measurement_data = `${data["fields"]["measurement_quantity"]}${accom_template["measurement"]}`;
         }
         else if (data["fields"]["measurement_quantity"] != null && data["fields"]["measurement_quantity"] != 0) {
-            measurement_data = `${data["fields"]["measurement_quantity"]}x`;
+            measurement_data = `${parseInt(data["fields"]["measurement_quantity"])}x`;
         }
         templateDump = templateDump.replace("%measurement%", measurement_data);
         
         target_container.append(templateDump);
 
-        /* Delete Messages */
+
+        // Add Delete Accomplishment prompt to the generated entry
         var deleteURL = "{{HOST}}/accomplishments/delete/id="
-        document.getElementById(`delete-accomplishment-btn-${data["pk"]}`).addEventListener(
-            "click", (event) => {
-                let accomp_id = event.currentTarget.getAttribute("data-accomp-id");
-                if (confirm(`Are you sure you want to delete this entry?\n(This cannot be undone!)`)) {
-                    $.get( `${deleteURL}${accomp_id}`, function() {})
-                    .done(function(response) {
-                        createAlert("Accomplishment has been removed.", key="", type="warning");
-                        createAccomplishmentsTable(length=15, start=currentIndex, search=searchBar.value);
-                    })
-                    .fail(function(err) {
-                        createAlert(xhr.responseText, key="", type="danger");
-                    })
-                }
-            });
+        document.getElementById(`delete-accomplishment-btn-${data["pk"]}`).addEventListener("click", (event) => {
+            let accomp_id = event.currentTarget.getAttribute("data-accomp-id");
+            if (confirm(`Are you sure you want to delete this entry?\n(This cannot be undone!)`)) {
+                $.get( `${deleteURL}${accomp_id}`, function() {})
+                .done(function(response) {
+                    createAlert("Accomplishment has been removed.", key="", type="warning");
+                    createAccomplishmentsTable(length=15, start=currentIndex, search=searchBar.value);
+                })
+                .fail(function(err) {
+                    createAlert(xhr.responseText, key="", type="danger");
+                })
+            }
+        });
 
-        $(`#edit-milestone-${data["pk"]}`).click(function(event) {
-            selectedMilestone = $(this).val();
 
-            $.ajax({ 
-                type: 'POST', url: `{{HOST}}/accomplishments/milestone/get/id=${$(this).val()}`, data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'},
-                success: function(milestone_data) {
-                    openPopup();
+        $(`#edit-accomp-${data["pk"]}`).click(function(event) {
+            selectedAccomplishment = $(this).val();
+            currentAJAXURL = editAccompURL;
+
+            let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+
+            let accompData = null
+            
+            $.when( basicAJAX(type="POST", url=`${getAccompURL}${$(this).val()}`, data=AJAXData) )
+            .done(function( accompData ) {
+                if (accompData != null){
+                    openPopup("edit-accomp-popup");
 
                     // Fill the fields with the obtained data
                     var fields = ['measurement', "measurement_quantity", "date_from_day", "date_from_month",
                         "date_from_year", "date_to_day", "date_to_month", "date_to_year"]
                     
                     fields.forEach(function(field) {
-                        $(`#id_${field}`).val(milestone_data[field]);
+                        $(`#id_${field}`).val(accompData[field]);
                     });
+
+                    $('#edit-accomp-name').text(accompData["name"]);
+                    document.getElementById('edit-accomp-icon').className = `bi bi-${accompData["icon"]}`;
+
+                    $('#edit-accomp-created').text(new Date(accompData["created"]).toLocaleDateString(language, {
+                        weekday: "short", year: "numeric",
+                        month: "short", day: "numeric",}));
 
                     $(`#id_measurement`).prop( "disabled", true )
                     // If the user has not Measurement type but a quantity specified, use x (amount of times)
-                    if (milestone_data['measurement'] == null) {
+                    if (accompData['measurement'] == null) {
                         $(`#id_measurement`).val("x");
                     }
-                },
-                error: function(xhr, errmsg, err) {
-                    console.log(xhr)
-                    closePopup();
                 }
             });
         });
     }
+    //
 
-    $("#previous-button").click(function(event) {
-        createAccomplishmentsTable(15, currentIndex-15, searchBar.value, searchSelector);
-    });
+    // "Previous" button = offset search by -15; "Next" button = offset search by +15;
+    $("#previous-button").click(function(event) { createAccomplishmentsTable(15, currentIndex-15, searchBar.value, searchSelector); });
+    $("#next-button").click(function(event) { createAccomplishmentsTable(15, currentIndex+15, searchBar.value, searchSelector); });
 
-    $("#next-button").click(function(event) {
-        createAccomplishmentsTable(15, currentIndex+15, searchBar.value, searchSelector);
-    });
+    // Automatically run after a short period,
+    // and only make a query if the user made an input since then.
+    var previousSearch = ""
+    function updateSearch() {
+        if (previousSearch != searchBar.value){
+            previousSearch = searchBar.value;
+            searchText = new RegExp(`(${searchBar.value})`,'gi');
+            createAccomplishmentsTable(15, currentIndex, searchBar.value, searchSelector);
+        }
+        setTimeout(function() { updateSearch() }, 300);
+    }
+    updateSearch()
 
+    // Run search immediately if they pressed enter (filter-form) or changed the filter selector (filter-selector)
     $("#filter-form").submit(function(event) {
         event.preventDefault();
         searchText = new RegExp(`(${searchBar.value})`,'gi');
@@ -239,53 +274,107 @@
         createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
     });
 
-    function openPopup(){
+    // Generic Abort button for all popups
+    $(".btn-abort-edit").click(function(event) { closePopup();});
+    $(".btn-abort-create").click(function(event) { closePopup();});
 
-        // Defined in site/site_js.html
-        screenTransition.style.transitionDuration = "0s";
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
 
-        popupWindow.style.display = "block";
-        main.style.pointerEvents = "none";
-        header.style.pointerEvents = "none";
-    }
-
-    function closePopup(){
-
-        screenTransition.style.backgroundColor = "rgba(0, 0, 0, 0)";
-
-        popupWindow.style.display = "none";
-        main.style.pointerEvents = "initial";
-        header.style.pointerEvents = "initial";
-    }
-
-    $("#btn-abort").click(function(event) {
-        closePopup();
-    });
 
     $("#btn-apply-changes").click(function(event) {
-        let form_data = $("#edit-milestone-form");
+        let form_data = $("#edit-accomp-form");
 
-        $.ajax({ 
-            type: 'POST', url: `{{HOST}}/accomplishments/milestone/edit/id=${selectedMilestone}`, 
-            data: form_data.serializeArray(),
-            success: function(json) {
-                createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-                createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-            },
-            error: function(xhr, errmsg, err) {
-                console.log(xhr)
-                createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-            }
-        });
+        basicAJAX(type="POST", url=`{{HOST}}/accomplishments/milestone/edit/id=${selectedAccomplishment}`, data=form_data.serializeArray())
+        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
         closePopup();
     });
 
-    /* Unused as it results in too many requests. */
-    // $("#search-filter").on('keyup', function (event) {
-    //     searchText = new RegExp(`(${event.target.value})`,'gi');
-    //     createAccomplishmentsTable(15, currentIndex, event.target.value)
-    // });
+
+    /* Duplicate Check */
+    var nameCheckURL = "{{HOST}}/accomplishments/get/name="
+
+    var nameField = document.getElementById("lb-new-accomp-prompt")
+    var submitButton = document.getElementById("btn-create-new");
+    var repeatButton = document.getElementById("btn-repeat");
+
+    var nameAvailableText = document.getElementById("lb-name-available");
+    var nameTakenText = document.getElementById("lb-name-taken-prompt");
+    var foundAccompText = document.getElementById("found-accomp");
+
+    // Get Accomplishment names
+    let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.when( basicAJAX(type="POST", url=`{% url 'accomplishment:get_names' %}`, data=AJAXData) )
+        .done(function( accompData ) {
+            let dataList = document.getElementById("accomp-suggestions");
+            accompData["name"].forEach(function(name) {
+                console.log(name)
+                dataList.appendChild(document.createElement("option")).value = name[0]
+            });
+            console.log(dataList);
+        })
+
+    // Open Name Prompt
+    $("#add-new-button").click(function(event) {
+        event.preventDefault();
+        nameField.value = ""
+        openPopup("name-prompt-popup");
+    });
+
+    $("#btn-create-new").click(function(event) {
+        closePopup()
+        openPopup("name-prompt-popup");
+    });
+
+    $("#btn-create-new").click(function(event) {
+        closePopup()
+        openPopup("repeat-accomp-popup");
+    });
+
+    var previousName = ""
+    function nameCheckAvailable() {
+        if (nameField.value.length > 4 && previousName != nameField.value){
+            previousName = nameField.value;
+
+            $.ajax({ 
+                type: 'POST', url: `${nameCheckURL}${nameField.value}`, data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function(result) {
+                    submitButton.style.display = "none";
+                    nameAvailableText.style.display = "none";
+
+                    repeatButton.style.display = "block";
+                    repeatButton.disabled = false;
+                    nameTakenText.style.display = "block";
+                    foundAccompText.textContent = result["name"];
+                    foundAccompText.className = `bi bi-${result["icon"]} h5`;
+                },
+                error: function(xhr, errmsg, err) {
+                    submitButton.style.display = "block";
+                    submitButton.disabled = false;
+                    nameAvailableText.style.display = "block";
+
+                    repeatButton.style.display = "none";
+                    nameTakenText.style.display = "none";
+                    foundAccompText.textContent = "";
+                    foundAccompText.className = "";
+                }
+            });
+        }
+        setTimeout(function() { nameCheckAvailable() }, 1000);
+    }
+    nameCheckAvailable();
+
+    $("#lb-new-accomp-prompt").keyup(function(event) {
+        submitButton.disabled = true;
+        repeatButton.disabled = true;
+        foundAccompText.textContent = "";
+        foundAccompText.className = "";
+        nameTakenText.style.display = "none";
+        nameAvailableText.style.display = "none";
+    });
+
+
+    // Repeat Accomplishment Popup
+
 </script>
 <style>
     #btn-actions {
@@ -296,6 +385,32 @@
 
     #btn-actions:hover, #btn-actions.show {
         filter: grayscale(0);
+    }
+
+    .background-bi {
+        color: var(--bs-{{request.user.color}});
+        z-index: -1;
+        opacity: .75 !important;
+    }
+
+    .bi-edit-accomp {
+        top: -10% !important;
+        left: -10% !important;
+        font-size: 18em !important;
+        transform: rotate(-33deg) !important;
+        opacity: .75 !important;
+    }
+
+    .bi-edit-accomp:nth-child(2) {
+        top: -47% !important;
+        left: 15% !important;
+        font-size: 18em !important;
+        transform: rotate(-9deg) !important;
+        opacity: 1 !important;
+    }
+
+    .form-control.text-center::placeholder {
+        font-size: .8em !important;
     }
 </style>
 {% endblock %}
