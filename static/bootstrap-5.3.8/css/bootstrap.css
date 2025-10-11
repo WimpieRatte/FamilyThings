@@ -4373,7 +4373,7 @@ input:disabled {
   --bs-card-border-radius: var(--bs-border-radius);
   --bs-card-box-shadow: ;
   --bs-card-inner-border-radius: calc(var(--bs-border-radius) - (var(--bs-border-width)));
-  --bs-card-cap-padding-y: 0.5rem;
+ --bs-card-cap-padding-y: 0.15rem; /* --bs-card-cap-padding-y: 0.5rem;*/
   --bs-card-cap-padding-x: 1rem;
   --bs-card-cap-bg: rgba(var(--bs-body-color-rgb), 0.03);
   --bs-card-cap-color: ;
@@ -4447,7 +4447,7 @@ input:disabled {
   margin-bottom: 0;
   color: var(--bs-card-cap-color);
   background-color: var(--bs-card-cap-bg);
-  border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
+  /*border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);*/
 }
 .card-header:first-child {
   border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0;
@@ -4457,7 +4457,7 @@ input:disabled {
   padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
   color: var(--bs-card-cap-color);
   background-color: var(--bs-card-cap-bg);
-  border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);
+  /*border-top: var(--bs-card-border-width) solid var(--bs-card-border-color);*/
 }
 .card-footer:last-child {
   border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
@@ -6995,6 +6995,20 @@ input:disabled {
   fill: currentcolor;
   transition: 0.2s ease-in-out transform;
 }
+
+/* FamilyThings: Additional parameters for Bootstrap Icons*/
+.bi-space::before {
+    margin-right: 10px;
+}
+
+.bi-small::before {
+    font-size: 0.5em;
+    vertical-align: middle !important;
+    margin-top: -0.25em;
+    margin-left: 0.5em;
+    margin-right: 15px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .icon-link > .bi {
     transition: none;
@@ -7372,7 +7386,7 @@ input:disabled {
 
 /* FamilyThings: added no-ptr */
 .no-ptr-evt {
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 /* FamilyThings: added w-fit */

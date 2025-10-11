@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from core.models import CustomUser
+import zoneinfo
 
 
 class CalendarEntry(models.Model):
@@ -24,8 +25,15 @@ class CalendarEntry(models.Model):
         related_name="custom_user_calendar_entries"
     )
     created_on = models.DateTimeField(
-        default=timezone.now
+        default=timezone.now,
+        editable=False
     )
+
+    def serialized(self):
+        return {
+            'ID': self.id, 'date': self.date.astimezone(zoneinfo.ZoneInfo("Europe/Paris")),
+            'title': self.title, 'description': self.description, 'type': '',
+        }
 
     class Meta:
         verbose_name = "Calendar Entry"

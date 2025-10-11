@@ -1,13 +1,167 @@
 {% extends "site/site_base.html" %}
+{% load static %}
 {% block title %}Calendar -{% endblock %}
 {% block popups %}{% endblock %}
 {% block content %}
-<div id="accomplishments-overview" class="container-sm pb-4 w-100">
+<div id="calendar" class="container-sm pb-4" style="width: 90%;">
     {% include 'site/heading_section.html' with label="Calendar" id="calendar" %}
-    <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
-        <div id="accomplishments-wrapper" class="container rounded py-2">
-            {{entries}}
+    <div id="calendar-section" class="h-25 mh-25 d-flex justify-content-between py-4">
+        <div>
+            <div id="calendar-wrapper" class="w-fit rounded bg-dark rounded p-2 overflow-visible position-relative" style="height: fit-content; scale: 115%; transform-origin: left top;">
+                <form action="#" class="row">
+                    <div id="rome-calendar"></div>
+                </form>
+                <div id="new-accomplishment-wrapper" class="w-auto mt-3 position-absolute top-100 start-50 translate-middle-x">
+                    <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" data-tooltip-context="Add New">
+                        <h4 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
+                        <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-1"></i></h4>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2 p-2 bg-dark overflow-auto" style="height: fit-content; max-height: 500px !important; width: 65%;">
+            <div id="calendar-date" class="bg-primary rounded-2 p-1 m-0" style="width: 35% !important;">-</div>
+            <div id="accordion" class="accordion accordion fs-sm pt-2">
+            </div>
         </div>
     </div>
 </div>
+<style>
+    .card-header.birthday {
+        background-color: var(--bs-success) !important;
+    }
+
+    .card-header.birthday span::before {
+        content: "\f8e9";
+    }
+
+    .btn[aria-expanded=true] .bi-caret-down-fill:not(.birthday) {
+        opacity: 0.3 !important;
+    }
+
+    .btn[aria-expanded=true] .bi-caret-down-fill::before:not(.birthday) {
+        content: "\F238" !important;
+    }
+</style>
+<link href="{% static 'rome/rome.css'%}" rel="stylesheet">
+<script src="{% static 'rome/rome.js'%}"></script>
+<script>
+    /* Calendar powered by Rome */
+    let current_date = new Date();
+    var calendar = rome(document.getElementById('rome-calendar'), 
+    { 
+        "time": false,
+        "styles": {
+            "back": "rd-back",
+            "container": "rd-container bg-body-tertiary rounded rounded-4 text-center p-2 d-block h-100",
+            "date": "rd-date",
+            "dayBody": "rd-days-body bg-dark d-block rounded rounded-3",
+            "dayBodyElem": "rd-day-body", /*"rd-day-body",*/
+            "dayConcealed": "rd-day-concealed",
+            "dayDisabled": "rd-day-disabled",
+            "dayHead": "rd-days-head",
+            "dayHeadElem": "rd-day-head",
+            "dayRow": "rd-days-row",
+            "dayTable": "pt-1 d-block",
+            "month": "rd-month font-monospace",
+            "next": "rd-next",
+            "positioned": "rd-container-attachment",
+            "selectedDay": "rd-day-selected",
+            "selectedTime": "rd-time-selected",
+            "time": "rd-time",
+            "timeList": "rd-time-list",
+            "timeOption": "rd-time-option"
+        },
+        "weekStart": current_date.getDay()
+    });
+
+    var calendarEntries = []
+
+    let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.when( basicAJAX(type="POST", url=`{% url 'calendar:get' %}`, data=AJAXData) )
+        .done(function( accompData ) {
+            calendarEntries = accompData["entries"]
+
+            // Convert all date strings to native JS Date objects
+            calendarEntries.forEach(function(entry) {
+                entry["date"] = new Date(entry["date"])
+            });
+        })
+
+    $(".rd-next").click(function(event) { setTimeout(function() {resetDayButtons();}, 1)});
+    $(".rd-back").click(function(event) { setTimeout(function() {resetDayButtons();}, 1)});
+
+    function resetDayButtons(event){
+        let buttons = document.querySelectorAll(".rd-day-body");
+        let dateToCheck = calendar.getDate();
+
+        buttons.forEach(function(button) {
+            entry = calendarEntries.filter((element) => 
+            element["date"].getDate() == Number(button.textContent)
+            && element["date"].getMonth() == dateToCheck.getMonth()
+            && element["date"].getYear() == dateToCheck.getYear());
+
+            if (entry.length > 0) {
+                button.className = button.className += " position-relative";
+                button.innerHTML = `${button.innerHTML}<span class="position-absolute translate-middle badge rounded-circle bg-success fw-normal fs-sm no-ptr-evt" style="font-size: 0.7em; top: 10%; left: 90%">${entry.length}</span>`;
+            }
+        });
+
+
+        $(".rd-day-body").click(function(event) {
+            // Execute with small delay to give the calendar system time to react to the selected date
+            setTimeout(function() {updateDate(event)}, 10);
+        });
+    }
+    setTimeout(function() {resetDayButtons(); updateDate()}, 1000)
+
+    function updateDate(event){
+        let dateToCheck = calendar.getDate();
+        let entries = null;
+
+        $("#calendar-date").text(dateToCheck.toLocaleDateString('default', { weekday: "long", year: "numeric", month: "long", day: "numeric", }));
+
+        entries = calendarEntries.filter((element) => 
+        element["date"].getDate() == dateToCheck.getDate()
+        && element["date"].getMonth() == dateToCheck.getMonth()
+        && element["date"].getYear() == dateToCheck.getYear());
+
+        // Put entries on screen
+        $("#accordion").text("No entries.");
+
+        if (entries.length > 0) {
+            $("#accordion").text(''); // Clear so that there's space for the list
+            entries.forEach(function(entry) {
+                $("#accordion").append(`<div id="card${entry["ID"]}" class="card"></div>`);
+
+                let extraClasses = "";
+                if (entry["description"] && entry["description"].length > 0){ extraClasses = " bi bi-caret-down-fill bi-space" }
+                    else { extraClasses = " bi bi-circle-fill bi-space bi-small" }
+
+                setTimeout(function() {
+                    $(`#card${entry["ID"]}`).append(`
+                        <div class="card-header card-footer ${entry["type"]}" id="heading${entry["ID"]}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link dropdown-item py-2" data-bs-toggle="collapse" data-bs-target="#calendarEntry${entry["ID"]}" aria-controls="collapseOne">
+                            <span class="bi ${extraClasses}">${entry["title"]}</span>
+                            </button>
+                        </h5>
+                        </div>`
+                    );
+
+                    if (entry["description"] && entry["description"].length > 0) {
+                        $(`#card${entry["ID"]}`).append(`
+                            <div id="calendarEntry${entry["ID"]}" class="collapse" aria-labelledby="heading${entry["ID"]}" data-bs-parent="#accordion">
+                            <div class="card-body">
+                                ${entry["description"]}
+                            </div>
+                            </div>`
+                        );
+                    }
+                }, 1);
+            });
+            $("#accordion").append('</div>')
+        }
+    }
+</script>
 {% endblock %}

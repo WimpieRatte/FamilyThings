@@ -1,5 +1,5 @@
 import zoneinfo
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import CalendarEntry
@@ -8,8 +8,9 @@ from core.session import update_session, create_alert, get_locale_text
 from core.models.custom_user import CustomUser
 
 
+
 def page_calendar(request, lang_code: str = ""):
-    """An overview of an User's Accomplishments."""
+    """."""
     update_session(request=request, lang_code=lang_code)
 
     if not request.user.is_authenticated:
@@ -22,7 +23,30 @@ def page_calendar(request, lang_code: str = ""):
         {
             'entries': list(CalendarEntry.objects.filter(
                 custom_user_id=request.user
-            ).values_list())
+            ).values())
         })
 
     return render_if_logged_in(request, target)
+
+
+def get(request, lang_code: str = ""):
+    """."""
+    query = CalendarEntry.objects.filter(custom_user_id=request.user)
+
+    entries: list = []
+    for entry in query:
+        entries += [entry.serialized()]
+
+    # Add own birthday
+    if (request.user.birthday):
+        birthday = request.user.birthday
+        next_birthday = timezone.datetime(year=timezone.datetime.now().year, month=birthday.month, day=birthday.day)
+        age: int = next_birthday.year - birthday.year
+        entries += [{
+            'ID': -100, 'title': f'Your {age}th Birthday',
+            'date': timezone.datetime(year=timezone.datetime.now().year, month=birthday.month, day=birthday.day),
+            'icon': 'cake', 'type': 'birthday', 'description': 'Make sure to celebrate it plenty!'}]
+
+    return JsonResponse({
+        'entries': entries
+    })
