@@ -13,8 +13,6 @@ class UserSettingsForm(forms.Form):
     )
     language = forms.ChoiceField(
         label="Language", choices=LANGUAGES, required=True)
-    tz = forms.ChoiceField(
-        label="Time Zone", choices=TIMEZONES, required=True)
     cursor = forms.BooleanField(
         label="Use Custom Cursor", required=False)
     color = forms.ChoiceField(

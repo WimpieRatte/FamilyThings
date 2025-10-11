@@ -212,9 +212,9 @@ def user_settings_page(request, lang_code: str = ""):
         }
     )
 
-    if request.POST:
+    if request.POST or request.FILES:
         form = UserSettingsForm(data=request.POST, files=request.FILES)
-
+        print("This works")
         if form.is_valid():
             user.first_name = form.cleaned_data.get("first_name")
             user.last_name = form.cleaned_data.get("last_name")
@@ -247,6 +247,8 @@ def user_settings_page(request, lang_code: str = ""):
             user.save()
             create_alert(request=request, ID="settings-updated", type="success",
                 text="Your settings have been saved.")
+        else:
+            print(form.errors)
 
         return redirect("core:user_profile")
 

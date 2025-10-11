@@ -24,4 +24,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("finance/",          # Finance
          include("finance.urls", namespace='finance')),
+    path("calendar/",          # Finance
+         include("ft_calendar.urls", namespace='calendar')),
 ]
