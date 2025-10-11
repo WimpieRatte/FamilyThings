@@ -48,7 +48,7 @@ function createAccomplishmentsTable(length = 15, start = 1, search = "", selecto
 createAccomplishmentsTable()
 
 /* Dynamically create Accomplishment entries */
-const tableEntryTemplate = `{% include "accomplishment/temp_accomp_entry.html" %}`
+const tableEntryTemplate = `{% include "temp_accomp_entry.html" %}`
 
 function createTableEntry(target_container, data, index, highlight = "", selector = "name") {
     // Get the date
@@ -85,6 +85,7 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
         .replace("%description%", accom_template["description"])
         .replace("%repeatURL%", `"add%3Frepeat=${accom_template["ID"]}""`)
         .replace("undefined", "N/A")
+        .replace("%content%", JSON.stringify(accom_template))
 
     // Process Measurement Data
     let measurement_data = "-"
@@ -115,14 +116,19 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
         }
     });
 
+    $(`#repeat-accomp-${data["pk"]}`).click(function (event) {
+        let _data = $(this).val().replaceAll(`'`, `"`).replaceAll(`None`, `null`).replaceAll(`False`, `false`)
+        accomplishmentStorage = JSON.parse(_data)
+        closePopup();
+        openPopup("repeat-accomp-popup");
+        prepareRepeat()
+    });
 
     $(`#edit-accomp-${data["pk"]}`).click(function (event) {
         selectedAccomplishment = $(this).val();
         currentAJAXURL = editAccompURL;
 
         let AJAXData = { csrfmiddlewaretoken: '{{ csrf_token }}' };
-
-        let accompData = null
 
         $.when(basicAJAX(type = "POST", url = `${getAccompURL}${$(this).val()}`, data = AJAXData))
             .done(function (accompData) {

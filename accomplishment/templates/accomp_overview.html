@@ -1,10 +1,10 @@
 {% extends "site/site_base.html" %}
 {% block title %}Accomplishments -{% endblock %}
 {% block popups %}
-    {% include 'accomplishment/accomp_popup_name_prompt.html' %}
-    {% include 'accomplishment/accomp_popup_edit_accomp.html' %}
-    {% include 'accomplishment/accomp_popup_repeat_accomp.html' %}
-    {% include 'accomplishment/accomp_popup_edit_template.html' %}
+    {% include 'accomp_popup_name_prompt.html' %}
+    {% include 'accomp_popup_edit_accomp.html' %}
+    {% include 'accomp_popup_repeat_accomp.html' %}
+    {% include 'accomp_popup_edit_template.html' %}
 {% endblock %}
 {% block content %}
 <div id="accomplishments-overview" class="container-sm pb-4 w-100">
@@ -83,9 +83,10 @@
     }
 </style>
 <script>
-    var getAccompURL = "{{HOST}}/accomplishments/entry/get/id="
-    var editAccompURL = "{{HOST}}/accomplishments/entry/edit/id="
-    var repeatAccompURL = "{{HOST}}/accomplishments/entry/repeat"
+    var getAccompURL = "{{HOST}}/accomplishments/entry/get/id=";
+    var editAccompURL = "{{HOST}}/accomplishments/entry/edit/id=";
+    var repeatAccompURL = "{{HOST}}/accomplishments/entry/repeat";
+    var nameCheckURL = "{{HOST}}/accomplishments/get/name=";
     var currentAJAXURL = editAccompURL;
 
     var selectedAccomplishment = "" //Stores the ID of the Accomplishment/Template that is being edited.
@@ -98,10 +99,20 @@
         prepareRepeat()
     }
 
-    {% include 'accomplishment/js_accomp_search_table.js' %}
-    {% include 'accomplishment/js_accomp_edit_accomp_prompt.js' %}
-    {% include 'accomplishment/js_accomp_repeat_accomp_prompt.js' %}
-    {% include 'accomplishment/js_accomp_name_prompt.js' %}
+    $("#nav-tooltip-home").click(function(event) {
+        event.preventDefault();
+        openPopup("edit-template-popup");
+    });
+
+
+    {% include 'js_accomp_search_table.js' %}
+    {% include 'js_accomp_edit_accomp_prompt.js' %}
+    {% include 'js_accomp_repeat_accomp_prompt.js' %}
+    {% include 'js_accomp_name_prompt.js' %}
+
+    //WIP
+    {% include 'js_accomp_edit_template_prompt.js' %}
+    {% include 'js_accomp_new_accomp_prompt.js' %}
 </script>
 <style>
     #btn-actions {

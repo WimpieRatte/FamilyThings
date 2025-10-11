@@ -3,7 +3,7 @@
     <div class="rounded bg-dark px-5 d-block pb-4 position-relative">
         <span class="bi bi-repeat-1 background-bi bi-edit-accomp p-0 m-0 position-absolute"></span>
         <div id="edit-accomp-wrapper" class="px-5 py-2">
-            {% include 'accomplishment/temp_accomp_info.html' %}
+            {% include 'temp_accomp_info.html' %}
             <form id="repeat-accomp-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5">
                 {% csrf_token %}
                 <input type="hidden" id="id_ID" name="ID" value="-1">

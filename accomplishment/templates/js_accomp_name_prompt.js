@@ -1,6 +1,4 @@
 /* Duplicate Check */
-var nameCheckURL = "{{HOST}}/accomplishments/get/name="
-
 var nameField = document.getElementById("lb-new-accomp-prompt")
 var submitButton = document.getElementById("btn-create-new");
 var repeatButton = document.getElementById("btn-repeat");

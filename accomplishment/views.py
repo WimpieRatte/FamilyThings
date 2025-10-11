@@ -23,7 +23,7 @@ def page_overview(request, lang_code: str = ""):
                     created_by=request.user.id).order_by('created').values()[:10]
 
     target: HttpResponse = render(
-        request, "accomplishment/accomp_overview.html",
+        request, "accomp_overview.html",
         {
             'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=recent_additions))),
             'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan'],
@@ -51,7 +51,7 @@ def page_new_accomplishment(request, lang_code: str = "", ID: int = -1):
         })
 
     return render(
-        request, "accomplishment/accomp_add_new.html",
+        request, "accomp_add_new.html",
         {
             "form": form,
             "icons": constants.ICONS,
@@ -100,7 +100,7 @@ def page_edit_user_accomplishment(request, lang_code: str = "", ID: int = -1):
         })
 
         return render(
-            request, "accomplishment/accomp_edit_milestone.html", {"form": form})
+            request, "accomp_edit_milestone.html", {"form": form})
 
 
 def page_edit_accomplishment_details(request, lang_code: str = "", ID: int = -1):
@@ -133,6 +133,6 @@ def page_edit_accomplishment_details(request, lang_code: str = "", ID: int = -1)
         form = AccomplishmentForm(data=accomp_data)
 
         return render(
-            request, "accomplishment/accomp_edit_details.html", {
+            request, "accomp_edit_details.html", {
                 "form": form, "icons": constants.ICONS,
                 "initial": accomp_data})
