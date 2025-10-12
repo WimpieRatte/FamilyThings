@@ -27,8 +27,7 @@ class FamilyInvite(models.Model):
         max_length=1000,
         null=False,
         blank=False,
-        unique=True,
-        default=get_random_string(length=40)
+        unique=True
     )
     created = models.DateTimeField(
         auto_now_add=True,
