@@ -2,10 +2,10 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils import timezone
 from core.models import Family, FamilyUser
 from core.forms import UserFinalizeForm
-
 from core.session import get_locale_text
+
 from accomplishment.models import Accomplishment
-from messenger.models import Message
+from messenger.models import Message, FamilyChat
 
 
 def create_family(request):
@@ -24,6 +24,7 @@ def create_family(request):
                     family_id=new_family,
                     is_manager=True,
                     join_date=timezone.now())
+                FamilyChat.objects.create(family_id=new_family)
                 return JsonResponse(data={
                     'alert-message': get_locale_text(
                         request=request, ID="family-create-success",

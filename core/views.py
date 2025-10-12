@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.conf import settings
+from django.db import transaction
 from django.urls import reverse
 
 from core.session import update_session
@@ -18,6 +19,7 @@ from .constants import COLORS
 
 from accomplishment.models import Accomplishment, FamilyUserAccomplishment
 from messenger.models import FamilyChat, Message
+from ft_calendar.models import CalendarEntry
 
 
 def render_if_logged_in(request, target: HttpResponse):
@@ -44,10 +46,16 @@ def home(request, lang_code: str = ""):
 
 
 PASSWORD_PATTERN = r"^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
+
+@transaction.atomic
 def user_register(request):
     form: UserRegisterForm = UserRegisterForm()
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return render(
+            request, "core/user_register.html",
+            {'form': form})
+    else:
         form = UserRegisterForm(data=request.POST)
 
         # get posted fields:
@@ -86,26 +94,15 @@ def user_register(request):
                     password=password,
                 )
 
-                new_accomp, created= Accomplishment.objects.get_or_create(
-                    name="First Step",
-                    description="Create an Account",
-                    icon="person-arms-up",
-                    accomplishment_type_id=None,
-                    measurement_type_id=None
-                )
-                FamilyUserAccomplishment.objects.create(
-                    created_by=new_user,
-                    accomplishment_id=new_accomp,
-                    measurement_quantity=1
+                calendar_entry = CalendarEntry.objects.create(
+                    title="First Step",
+                    description="Created your FamilyThings account",
+                    custom_user_id=new_user
                 )
 
                 create_alert(request=request, ID="account-created", type="success",
                         text="Account has been successfully created. You may login now.")
                 return redirect("core:user_login")
-        else:
-            return render(
-                request, "core/user_register.html",
-                {'form': form})
 
 
 def user_final_step(request, lang_code: str = ""):
@@ -214,7 +211,6 @@ def user_settings_page(request, lang_code: str = ""):
 
     if request.POST or request.FILES:
         form = UserSettingsForm(data=request.POST, files=request.FILES)
-        print("This works")
         if form.is_valid():
             user.first_name = form.cleaned_data.get("first_name")
             user.last_name = form.cleaned_data.get("last_name")
