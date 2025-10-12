@@ -33,6 +33,8 @@ core_urls = [
     path("family/create", requests.create_family, name="create_family"),
     path("family/join", requests.join_family, name="join_family"),
     path("family/check_invite", requests.check_invite, name="check_invite"),
+    path("family/create_invite", requests.create_invite, name="create_invite"),
+    path("family/remove_member", requests.remove_from_family, name="remove_member"),
 
     # Messenger (AJAX)
     path("message/delete/id=<uuid:id>", requests.delete_message,

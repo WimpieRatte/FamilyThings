@@ -1,6 +1,8 @@
 import random
 import string
+from django.utils.crypto import get_random_string
 from django.db import models
+
 from .family import Family
 from .custom_user import CustomUser
 
@@ -25,7 +27,8 @@ class FamilyInvite(models.Model):
         max_length=1000,
         null=False,
         blank=False,
-        default=''.join(random.choices(string.ascii_letters + string.digits, k=40))
+        unique=True,
+        default=get_random_string(length=40)
     )
     created = models.DateTimeField(
         auto_now_add=True,

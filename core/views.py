@@ -35,7 +35,7 @@ def render_if_logged_in(request, target: HttpResponse):
         fam_user = FamilyUser.objects.filter(
             custom_user_id=request.user)[request.session["current_family"]]
         return target
-    except (FamilyUser.DoesNotExist):
+    except (FamilyUser.DoesNotExist, IndexError):
         return redirect("core:user_final_step")
 
 
@@ -273,7 +273,7 @@ def user_settings_page(request, lang_code: str = ""):
 def manage_family_page(request, lang_code: str = ""):
     """."""
     update_session(request=request, lang_code=lang_code)
-    family: Family = Family.objects.get(id=request.session['family_info']['ID'])
+    family: Family = Family.objects.get(id=request.session['family_info']['family_ID'])
     return render(request, "core/manage_family.html", {
         'family': family.serialized(),
         'members': list(FamilyUser.objects.filter(family_id=family.id)),

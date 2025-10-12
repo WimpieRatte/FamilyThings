@@ -28,7 +28,7 @@ class FamilyUser(models.Model):
 
     def serialized(self):
         """."""
-        return {'ID': str(self.family_id.id), 'name': self.family_id.name, 'is_manager': self.is_manager,
+        return {'family_ID': str(self.family_id.id), 'ID': str(self.custom_user_id.id), 'name': self.family_id.name, 'is_manager': self.is_manager,
                 'username': self.custom_user_id.username, 'full_name': self.custom_user_id.full_name(),
                 'joined': self.join_date.strftime("%Y/%m/%d"), 'icon': self.custom_user_id.icon.name, 'color': self.custom_user_id.color}
 

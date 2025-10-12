@@ -1,3 +1,4 @@
+from django.utils.crypto import get_random_string
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils import timezone
@@ -84,4 +85,39 @@ def join_family(request):
             default_text="Welcome to FamilyThings, %PLACEHOLDER%!",
             insert=request.user.full_name()),
         'alert-type': 'success'
+        })
+
+
+@transaction.atomic
+def create_invite(request):
+    family: Family = FamilyUser.objects.filter(
+            custom_user_id=request.user)[request.session["current_family"]].family_id
+
+    old_invite: FamilyInvite = FamilyInvite.objects.get(family_id=family)
+    old_invite.delete()
+
+    new_invite: FamilyInvite = FamilyInvite.objects.create(
+        family_id=family,
+        generated_by=request.user,
+        token=get_random_string(length=40)
+    )
+
+    return JsonResponse(data={
+        'alert-message': get_locale_text(
+            request=request, ID="new-invite-created",
+            default_text="New invite has been created."),
+        'alert-type': 'warning',
+        'new-token': new_invite.token
+        })
+
+
+@transaction.atomic
+def remove_from_family(request):
+    print(request.POST)
+    target: FamilyUser = FamilyUser.objects.get(family_id=request.POST["family_id"], custom_user_id=request.POST["user_id"])
+    target.delete()
+
+    return JsonResponse(data={
+        'alert-message': 'User has been removed from family.',
+        'alert-type': 'warning'
         })

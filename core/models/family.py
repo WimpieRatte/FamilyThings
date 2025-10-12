@@ -23,7 +23,7 @@ class Family(models.Model):
         return self.name + " " + str(self.id)[:8]
 
     def serialized(self):
-        return {'members': list([]), 'owner': self.created_by.username}
+        return {'ID': str(self.id), 'owner': self.created_by.username}
 
     class Meta:
         verbose_name = "Family"
