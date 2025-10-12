@@ -28,8 +28,8 @@
               {% if request.user.is_superuser %}
                 {% include 'header/dropdown_item.html' with href='admin:index' id="admin" icon='sliders' label='Admin Page' new_tab='True' %}
               {% endif %}
-              {% if family.is_manager %}
-                {% include 'header/dropdown_item.html' with id="family-settings" icon='person-arms-up' label='Family Management' %}
+              {% if request.session.family_info.is_manager %}
+                {% include 'header/dropdown_item.html' with href='core:manage_family' id="family-settings" icon='person-arms-up' label='Family Management' %}
               {% endif %}
               {% include 'header/dropdown_item.html' with href='core:request_logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
               {% if request.session.families|length > 1 %}

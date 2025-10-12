@@ -1,9 +1,10 @@
-from django.shortcuts import redirect
-from django.http import JsonResponse, HttpResponseBadRequest
-from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.shortcuts import redirect
+from django.utils import timezone
 from core.models.custom_user import CustomUser
 from core.session import create_alert, get_locale_text, JsonResponseAlert
+
 
 
 def process_login(request, lang_code: str = ""):
@@ -22,7 +23,7 @@ def process_login(request, lang_code: str = ""):
             # Overwrite the session to include the user's language setting
             request.session["lang_code"] = auth_user.lang_code
 
-            # Create this JSONResponce so that the JavaScript part of the Log In page proceeds
+            # Create this JSONResponse so that the JavaScript part of the Log In page proceeds
             return JsonResponse(
                 data={
                     'alert-message': get_locale_text(

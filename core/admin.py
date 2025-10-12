@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, FamilyUser, Family
+from .models import CustomUser, FamilyUser, Family, FamilyInvite
 
 
 # Register your models here.
@@ -11,6 +11,10 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Family)
 class FamilyAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(FamilyInvite)
+class FamilyInviteAdmin(admin.ModelAdmin):
     pass
 
 

@@ -15,6 +15,8 @@ core_urls = [
     path("register/final_step/", views.user_final_step, name="user_final_step"),
     path("profile/", views.user_profile_page, name="user_profile"),
     path("settings/", views.user_settings_page, name="user_settings"),
+    path("family/", views.manage_family_page, name="manage_family"),
+
     path("forgot_password/", views.forgot_password, name="forgot_password"),
     path("password_reset_sent/<str:reset_id>/", views.password_reset_sent, name="password_reset_sent"),
     path("reset_password/<str:reset_id>/", views.reset_password, name="reset_password"),
@@ -29,6 +31,8 @@ core_urls = [
 
     # Family (AJAX)
     path("family/create", requests.create_family, name="create_family"),
+    path("family/join", requests.join_family, name="join_family"),
+    path("family/check_invite", requests.check_invite, name="check_invite"),
 
     # Messenger (AJAX)
     path("message/delete/id=<uuid:id>", requests.delete_message,

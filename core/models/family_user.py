@@ -26,9 +26,11 @@ class FamilyUser(models.Model):
     )
     is_manager = models.BooleanField(default=False)
 
-    def json_data(self):
+    def serialized(self):
         """."""
-        return {'name': self.family_id.name, 'is_manager': self.is_manager}
+        return {'ID': str(self.family_id.id), 'name': self.family_id.name, 'is_manager': self.is_manager,
+                'username': self.custom_user_id.username, 'full_name': self.custom_user_id.full_name(),
+                'joined': self.join_date.strftime("%Y/%m/%d"), 'icon': self.custom_user_id.icon.name, 'color': self.custom_user_id.color}
 
     class Meta:
         verbose_name = "Family User"

@@ -1,18 +1,18 @@
 import re
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.conf import settings
 from django.db import transaction
+from django.http import HttpResponse
 from django.urls import reverse
+from django.utils import timezone
+from django.shortcuts import render, redirect
 
 from core.session import update_session
 from core.models.password_reset import PasswordReset
-from django.contrib.auth.models import AnonymousUser
-from django.http import HttpResponse
-from django.utils import timezone
-from django.shortcuts import render, redirect
-from .models import CustomUser, FamilyUser
+from .models import CustomUser, Family, FamilyUser, FamilyInvite
 from .forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
 from .session import update_session, create_alert, get_locale_text
 from .constants import COLORS
@@ -46,6 +46,7 @@ def home(request, lang_code: str = ""):
 
 
 PASSWORD_PATTERN = r"^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
+
 
 @transaction.atomic
 def user_register(request):
@@ -172,7 +173,7 @@ def user_profile_page(request, lang_code: str = ""):
                 pass
 
         return render(request, "core/user_profile.html", {
-            'family': fam_user.json_data(),
+            'family': fam_user.serialized(),
             'family_activity': accomplishments,
             'chat': list(messages)
         })
@@ -267,6 +268,17 @@ def user_settings_page(request, lang_code: str = ""):
         },
     )
     return render_if_logged_in(request=request, target=target)
+
+
+def manage_family_page(request, lang_code: str = ""):
+    """."""
+    update_session(request=request, lang_code=lang_code)
+    family: Family = Family.objects.get(id=request.session['family_info']['ID'])
+    return render(request, "core/manage_family.html", {
+        'family': family.serialized(),
+        'members': list(FamilyUser.objects.filter(family_id=family.id)),
+        'invite': FamilyInvite.objects.get(generated_by=request.user).token
+    })
 
 
 def user_login_page(request, lang_code: str = ""):

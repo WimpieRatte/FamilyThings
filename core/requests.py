@@ -1,15 +1,16 @@
+from django.db import transaction
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils import timezone
-from core.models import Family, FamilyUser
+
+from core.models import Family, FamilyUser, FamilyInvite
 from core.forms import UserFinalizeForm
 from core.session import get_locale_text
-
 from accomplishment.models import Accomplishment
 from messenger.models import Message, FamilyChat
 
 
 def create_family(request):
-    """Obtain a JSON with a user's recent Accomplishments"""
+    """"""
     if not request.user.is_authenticated:
         return HttpResponseBadRequest()
     else:
@@ -54,3 +55,33 @@ def delete_message(request, id):
             data={'alert-message': "", 'alert-type': 'success'})
     except (Message.DoesNotExist):
         return HttpResponseBadRequest()
+
+
+def check_invite(request):
+    try:
+        invite: FamilyInvite = FamilyInvite.objects.get(token=request.POST["token"])
+        return JsonResponse(data={})
+    except (FamilyInvite.DoesNotExist):
+        return HttpResponseBadRequest()
+
+
+@transaction.atomic
+def join_family(request):
+    """"""
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest()
+    print(request.POST["token"])
+    family: Family = FamilyInvite.objects.get(token=request.POST["token"]).family_id
+
+    FamilyUser.objects.create(
+        family_id=family,
+        custom_user_id=request.user,
+        is_manager=False
+    )
+    return JsonResponse(data={
+        'alert-message': get_locale_text(
+            request=request, ID="family-create-success",
+            default_text="Welcome to FamilyThings, %PLACEHOLDER%!",
+            insert=request.user.full_name()),
+        'alert-type': 'success'
+        })
