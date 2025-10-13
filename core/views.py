@@ -52,6 +52,11 @@ PASSWORD_PATTERN = r"^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
 @transaction.atomic
 @update_user_session(require_login=False)
 def user_register(request):
+
+    # Redirect the user to the Overview if they're already logged in
+    if request.user.is_authenticated:
+        return redirect("core:user_profile")
+
     form: UserRegisterForm = UserRegisterForm()
 
     if request.method != "POST":
@@ -113,7 +118,7 @@ def user_register(request):
                 return redirect("core:user_login")
 
 
-@update_user_session()
+@update_user_session(require_family=False)
 def user_final_step(request):
     """."""
     form: UserFinalizeForm = UserFinalizeForm(

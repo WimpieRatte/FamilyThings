@@ -14,7 +14,8 @@ def list_get(source_list: list, index: int, default):
         return default
 
 
-def update_user_session(require_login: bool = True, *args, **kwargs):
+def update_user_session(require_login: bool = True, require_family: bool = True, *args, **kwargs):
+    """Decorator to update the session as well as restrict access if they're not logged in."""
 
     def decorator(func, *args, **kwargs):
         @wraps(func)
@@ -30,11 +31,12 @@ def update_user_session(require_login: bool = True, *args, **kwargs):
                                 text="For this action, you need to login first.")
                     return redirect("core:user_login")
 
-                try:
-                    FamilyUser.objects.filter(
-                        custom_user_id=request.user)[request.session["current_family"]]
-                except (FamilyUser.DoesNotExist, IndexError):
-                    return redirect("core:user_final_step")
+                if require_family:
+                    try:
+                        FamilyUser.objects.filter(
+                            custom_user_id=request.user)[request.session["current_family"]]
+                    except (FamilyUser.DoesNotExist, IndexError):
+                        return redirect("core:user_final_step")
 
             if cache_last_visited_page:
                 request.session["last_visited_page"] = request.get_full_path()
