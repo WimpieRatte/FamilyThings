@@ -22,6 +22,7 @@ from messenger.models import FamilyChat, Message
 from ft_calendar.models import CalendarEntry
 
 
+# TODO: Switch to the new 'update_user_session' everywhere, then remove this.
 def render_if_logged_in(request, target: HttpResponse):
     """Check if the User is logged in. Then, either proceed to the target page,
     or redirect them to the Login/Final Step page."""
@@ -246,7 +247,7 @@ def user_settings_page(request):
 
         return redirect("core:user_profile")
 
-    target: HttpResponse = render(
+    return render(
         request,
         "core/user_settings.html",
         {
@@ -264,7 +265,6 @@ def user_settings_page(request):
             ),
         },
     )
-    return render_if_logged_in(request=request, target=target)
 
 
 @update_user_session()

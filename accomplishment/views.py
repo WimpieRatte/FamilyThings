@@ -13,23 +13,16 @@ from core.models.custom_user import CustomUser
 def page_overview(request):
     """An overview of an User's Accomplishments."""
 
-    if not request.user.is_authenticated:
-        create_alert(request=request, ID="login-required", type="warning",
-            text="For this action, you need to login first.")
-        return redirect("core:user_login")
-
     recent_additions = Accomplishment.objects.filter(
                     created_by=request.user.id).order_by('created').values()[:10]
 
-    target: HttpResponse = render(
+    return render(
         request, "accomp_overview.html",
         {
             'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=recent_additions))),
             'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan'],
             'form': AccomplishmentForm()
         })
-
-    return target
 
 
 @update_user_session()
