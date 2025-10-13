@@ -93,6 +93,12 @@
         transition-delay: 0.1s;
     }
 
+    table th:first-of-type { border-top-left-radius: 5px; }
+    table th:last-of-type { border-top-right-radius: 5px; }
+
+    table tr:last-of-type td:first-of-type, table { border-bottom-left-radius: 5px !important; }
+    table tr:last-of-type td:last-of-type, table { border-bottom-right-radius: 5px !important; }
+
     @-moz-keyframes spin { 
         0% { -moz-transform: translate(-50%,-50%) rotate(0deg); }
         100% { -moz-transform: translate(-50%,-50%) rotate(360deg); } 

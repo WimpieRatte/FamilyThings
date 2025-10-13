@@ -6,11 +6,7 @@
     <div id="accomplishments-section" class="section container pb-4" style="width: 340px;">
         {% include 'site/heading_section.html' with id="todays-accomps" label="Today's Accomplishments" value=todays_accomplishments.length %}
         <div style="height: 16em;">
-            <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2">
-                <!-- {% for entry in todays_accomplishments %}
-                    {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
-                {% endfor %} -->
-            </div>
+            <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2", style="display: none;"></div>
             <div id="new-accomplishment-wrapper" class="w-auto m-auto">
                 <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
                     <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
@@ -20,11 +16,7 @@
         </div>
         {% include 'site/heading_section.html' with id="recent-activities" label='Recent Activities' %}
         <div class="containe" style="height: 15em;">
-            <div id="recent-accomplishments-container" class="flex-column bg-dark rounded p-1">
-                <!-- {% for entry in recent_accomplishments %}
-                    {% include 'home/user_accomplishment_item.html' with title=entry.name icon=entry.icon date=entry.created %}
-                {% endfor %} -->
-            </div>
+            <div id="recent-accomplishments-container" class="flex-column bg-dark rounded p-1" style="display: none;"></div>
         </div>
     </div>
     <div style="width: 430px;">
@@ -46,7 +38,6 @@
                 </div>
             </div>
         </div>
-        <!-- {% include 'site/heading_section.html' with label='Write Message'%} -->
         <div id="message-box-wrapper" class="container rounded bg-dark rounded p-2 fs-sm" style="width: 430px; height: 10em;">
             <form id="message-form" method="post">
                 {% csrf_token %}
@@ -65,10 +56,6 @@
                 {% for entry in family_activity %}
                     {% include 'home/family_accomplishment_item.html' with title=entry.name icon=entry.icon color=entry.color date=entry.date%}
                 {% endfor %}
-                <!-- {% include 'home/family_accomplishment_item.html' with title='Went for a Walk' icon='android' color='purple' %}
-                {% include 'home/family_accomplishment_item.html' with title='Did the Dishes' icon='android' color='purple'%}
-                {% include 'home/family_accomplishment_item.html' with title='Brushed their Teeth' icon='apple' color='green'%}
-                {% include 'home/family_accomplishment_item.html' with title='Cleaned up their Room' icon='android' color='purple'%} -->
             </div>
         </div>
         {% include 'site/heading_section.html' with id="calendar" label='Calendar'%}
@@ -121,6 +108,8 @@
     .done(function(response) {
         Object.entries(response.result).forEach(function(entry) {
             let data = entry[1]; //The key (0) is blank while (1) is the content
+
+            recentAccContainer.show();
             /* Apply the accomplishment */
             addAccomplishmentEntry(recentAccContainer, data)
         });
@@ -133,6 +122,8 @@
     .done(function(response) {
         Object.entries(response.result).forEach(function(entry) {
             let data = entry[1]; //The key (0) is blank while (1) is the content
+
+            todaysAccContainer.show();
             /* Apply the accomplishment */
             addAccomplishmentEntry(todaysAccContainer, data)
         });

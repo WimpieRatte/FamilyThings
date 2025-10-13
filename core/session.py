@@ -14,18 +14,21 @@ def update_session(request, lang_code: str = "", custom_cursor: bool = True,
         request.session["last_visited_page"] = request.get_full_path()
 
     #  Handling being in multiple Families at once
+    #  This is fallback to prevent an IndexError
     if (request.session.get("current_family", -1) == -1):
         request.session["current_family"] = 0
 
     if request.user.is_authenticated:
-        # A list with all the family names
-        request.session["families"] = list(FamilyUser.objects.filter(
-            custom_user_id=request.user).order_by('join_date').reverse().values_list("family_id__name").reverse())
+        # First, get all Families tied to the user
+        family_queue = FamilyUser.objects.filter(
+            custom_user_id=request.user).order_by('join_date')
 
-        # A dict with all the relevant info about the family you're currently switched to
-        # Name, Manager role
-        request.session["family_info"] = FamilyUser.objects.filter(
-            custom_user_id=request.user).order_by('join_date')[request.session["current_family"]].json_data()
+        if len(family_queue) > 0:
+            # Then, create a list with all the family names
+            request.session["families"] = list(family_queue.values_list("family_id__name"))
+            # Also grab a dict with all the relevant info about the family you're
+            # currently switched to
+            request.session["family_info"] = family_queue[request.session["current_family"]].serialized()
 
     #  Apply a language code based on either the existing value,
     #  an User's own setting, or lastly, the browser's.

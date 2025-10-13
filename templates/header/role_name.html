@@ -1,8 +1,10 @@
 {% if superuser %}
-<span id="role-admin" class="role-name text-danger-emphasis">Admin</span>
+    <span id="role-admin" class="role-name text-danger-emphasis">Admin</span>
 {% endif %}
-{% if manager %}
-<span id="role-manager" class="role-name text-info-emphasis">Manager</span>
+{% if owner and name and owner == name %}
+    <span id="role-owner" class="role-name text-warning-emphasis">Owner</span>
+{% elif manager %}
+    <span id="role-manager" class="role-name text-info-emphasis">Manager</span>
 {% else %}
-<span id="role-user" class="role-name text-success-emphasis">Member</span>
+    <span id="role-user" class="role-name text-success-emphasis">Member</span>
 {% endif %}

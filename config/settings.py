@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     "finance",
     "report",
     "chore",
-    "messenger"
+    "messenger",
+    "ft_calendar"
 ]
 
 MIDDLEWARE = [
