@@ -14,14 +14,27 @@ def list_get(source_list: list, index: int, default):
         return default
 
 
-def update_user_session(func, *args, **kwargs):
-    @wraps(func)
-    def function_wrapper(*args, **kwargs):
-        try:
-            print("wrapped.", kwargs)
+def update_user_session(require_login: bool = True, *args, **kwargs):
+
+    def decorator(func, *args, **kwargs):
+        @wraps(func)
+        def inner(*args, **kwargs):
             request = args[0]
             lang_code: str = kwargs.get("lang_code", "")
-            cache_last_visited_page: str = kwargs.get("cache_last_visited_page", True)
+            cache_last_visited_page: bool = kwargs.get("cache_last_visited_page", True)
+            print(require_login)
+
+            if require_login:
+                if not request.user.is_authenticated:
+                    create_alert(request=request, ID="login-required", type="warning",
+                                text="For this action, you need to login first.")
+                    return redirect("core:user_login")
+
+                try:
+                    FamilyUser.objects.filter(
+                        custom_user_id=request.user)[request.session["current_family"]]
+                except (FamilyUser.DoesNotExist, IndexError):
+                    return redirect("core:user_final_step")
 
             if cache_last_visited_page:
                 request.session["last_visited_page"] = request.get_full_path()
@@ -63,9 +76,10 @@ def update_user_session(func, *args, **kwargs):
                 request.session['use_custom_cursor'] = True
 
             return func(*args)
-        except Exception as e:
-            print(e)
-    return function_wrapper
+
+        return inner
+
+    return decorator
 
 
 # TODO: Switch to the new 'update_user_session' everywhere, then remove this.

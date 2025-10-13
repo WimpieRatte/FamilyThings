@@ -39,7 +39,7 @@ def render_if_logged_in(request, target: HttpResponse):
         return redirect("core:user_final_step")
 
 
-@update_user_session
+@update_user_session(require_login=False)
 def home(request):
     """The Home page."""
     return render(request, "home/home.html", {})
@@ -49,7 +49,7 @@ PASSWORD_PATTERN = r"^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
 
 
 @transaction.atomic
-@update_user_session
+@update_user_session(require_login=False)
 def user_register(request):
     form: UserRegisterForm = UserRegisterForm()
 
@@ -112,7 +112,7 @@ def user_register(request):
                 return redirect("core:user_login")
 
 
-@update_user_session
+@update_user_session()
 def user_final_step(request):
     """."""
     form: UserFinalizeForm = UserFinalizeForm(
@@ -120,13 +120,9 @@ def user_final_step(request):
     return render(request, "core/user_final_step.html", {'form': form})
 
 
-@update_user_session
+@update_user_session()
 def user_profile_page(request):
     """The User's overview section."""
-    if not request.user.is_authenticated:
-        create_alert(request=request, ID="login-required", type="warning",
-                     text="For this action, you need to login first.")
-        return redirect("core:user_login")
     try:
         fam_user = FamilyUser.objects.filter(
             custom_user_id=request.user)[request.session["current_family"]]
@@ -187,14 +183,9 @@ def user_profile_page(request):
         return redirect("core:user_final_step")
 
 
-@update_user_session
+@update_user_session()
 def user_settings_page(request):
     """The User's settings page."""
-    if isinstance(request.user, AnonymousUser):
-        create_alert(request=request, ID="login-required", type="warning",
-                     text="For this action, you need to login first.")
-        return redirect("core:user_login")
-
     user: CustomUser = request.user
 
     #  We need to check for the birthday to prevent an AttributeError
@@ -276,7 +267,7 @@ def user_settings_page(request):
     return render_if_logged_in(request=request, target=target)
 
 
-@update_user_session
+@update_user_session()
 def manage_family_page(request):
     """."""
     family: Family = Family.objects.get(
@@ -297,7 +288,7 @@ def manage_family_page(request):
     })
 
 
-@update_user_session
+@update_user_session(require_login=False)
 def user_login_page(request):
     """Create the Login view and/or attempt to authenticate the User."""
 

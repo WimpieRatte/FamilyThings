@@ -5,12 +5,11 @@ from django.utils import timezone
 from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType, MeasurementType
 from .forms.accomplishment import AccomplishmentForm
 from . import constants
-from core.views import render_if_logged_in
 from core.session import update_user_session, create_alert, get_locale_text
 from core.models.custom_user import CustomUser
 
 
-@update_user_session
+@update_user_session()
 def page_overview(request):
     """An overview of an User's Accomplishments."""
 
@@ -30,10 +29,10 @@ def page_overview(request):
             'form': AccomplishmentForm()
         })
 
-    return render_if_logged_in(request, target)
+    return target
 
 
-@update_user_session
+@update_user_session()
 def page_new_accomplishment(request, ID: int = -1, cache_last_visited_page = False):
     """."""
     form: AccomplishmentForm = AccomplishmentForm()
@@ -66,7 +65,7 @@ def datetime_from_field(form: AccomplishmentForm, field: str = "",
         tzinfo=zoneinfo.ZoneInfo(tz))
 
 
-@update_user_session
+@update_user_session()
 def page_edit_user_accomplishment(request, ID: int = -1, cache_last_visited_page=False):
     """."""
     form: AccomplishmentForm = AccomplishmentForm()
@@ -99,7 +98,7 @@ def page_edit_user_accomplishment(request, ID: int = -1, cache_last_visited_page
             request, "accomp_edit_milestone.html", {"form": form})
 
 
-@update_user_session
+@update_user_session()
 def page_edit_accomplishment_details(request, ID: int = -1, cache_last_visited_page = False):
     """."""
     form: AccomplishmentForm = AccomplishmentForm()

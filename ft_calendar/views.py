@@ -8,7 +8,7 @@ from core.session import update_user_session, create_alert, get_locale_text
 from core.models.custom_user import CustomUser
 
 
-@update_user_session
+@update_user_session()
 def page_calendar(request, lang_code: str = ""):
     """."""
     if not request.user.is_authenticated:
