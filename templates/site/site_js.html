@@ -76,8 +76,8 @@
 
                 let context = $(this).attr('data-tooltip-context')
                 let content = $(this).attr('data-tooltip-content')
-                tooltip.textContent = context;
-                if (content){tooltip.textContent += `\r\n${content}`;}
+                tooltip.innerHTML = context;
+                if (content){tooltip.innerHTML += `\r\n${content}`;}
             }
             else {
                 tooltip.style.display = "none";

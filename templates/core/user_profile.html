@@ -78,20 +78,29 @@
     $(".rd-next").hide();
     $(".rd-back").hide();
 
-    let buttons = document.querySelectorAll(".rd-day-body");
-    let dateToCheck = calendar.getDate();
+    setTimeout(function() {
+        let buttons = document.querySelectorAll(".rd-day-body");
+        let dateToCheck = calendar.getDate();
 
-    buttons.forEach(function(button) {
-        entries = calendarEntries.filter((element) => 
-        Number(button.textContent) == Number(button.textContent)
-        && current_date.getMonth() == dateToCheck.getMonth()
-        && current_date.getYear() == dateToCheck.getYear());
-        console.log(Number(button.textContent), entries)
+        buttons.forEach(function(button) {
+            entries = calendarEntries.filter((element) =>
+            Number(button.textContent/10) >= element["date"].getDate()
+            && dateToCheck.getMonth() == element["date"].getMonth()
+            && dateToCheck.getYear() == element["date"].getYear());
 
-        button.dataset.tooltipContext = "test";
-        button.className += " tooltip-source"
-    })
+            if (entries.length > 0){
+                console.log(entries);
+                button.className += " tooltip-source"
 
+                button.dataset.tooltipContext = "<ul class='p-0 ps-3 m-0'>"
+                entries.forEach(function(entry) {
+                    button.dataset.tooltipContext += `<li>${entry["title"]}</li>`;
+                });
+                button.dataset.tooltipContext += "</ul>"
+            }
+        })
+        updateTooltips();
+    }, 1000)
 
     const recentAccContainer = $("#recent-accomplishments-container")
     const todaysAccContainer = $("#todays-accomplishments-container")

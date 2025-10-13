@@ -62,4 +62,4 @@ function resetDayButtons(event){
         setTimeout(function() {updateDate(event)}, 10);
     });
 }
-setTimeout(function() {resetDayButtons(); updateDate()}, 1000)
+setTimeout(function() {resetDayButtons();}, 1000)
