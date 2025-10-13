@@ -13,10 +13,14 @@ class FamilyChat(models.Model):
     family_id = models.ForeignKey(
         Family,
         on_delete=models.CASCADE,
-        related_name="family_family_chats"
+        null=False,
+        blank=False,
+        editable=False,
+        related_name="family_family_chats",
     )
     created_on = models.DateTimeField(
-        default=timezone.now
+        default=timezone.now,
+        editable=False
     )
 
     def __str__(self):

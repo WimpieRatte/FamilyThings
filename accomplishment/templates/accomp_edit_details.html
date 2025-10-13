@@ -20,8 +20,8 @@
                     <div id="measurement-section" class="d-flex gap-2">
                         {% include 'site/form_field.html' with id="" field=form.measurement %}
                     </div>
-                </div>
-                {% include 'accomplishment/temp_accomp_icon_selection.html' with icons=icons initial=initial %}
+                </div>s
+                {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial %}
                 <div class="d-flex gap-2 py-4 m-auto" style="width: fit-content;">
                     <button id="btn-apply-changes" class="btn btn-primary border-primary" type="submit">Submit Change</button>
                     <a href="{% url 'accomplishment:overview' %}"><button id="btn-abort" class="btn btn-danger" type="button">Abort</button></a>

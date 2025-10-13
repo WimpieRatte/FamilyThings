@@ -1,8 +1,10 @@
 import json
 import zoneinfo
+from django.contrib.auth.decorators import login_required
+from django.core.serializers import serialize
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.utils import timezone
-from django.core.serializers import serialize
+from django.views.decorators.http import require_http_methods
 from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType, MeasurementType
 from .forms.accomplishment import AccomplishmentForm
 from core.models.family import Family
@@ -98,7 +100,7 @@ def get_entries(request, amount: int = 5, start: int = 0, selector: str = "name"
     output = json.loads(serialize("json", list(output)))
 
     for i, entry in enumerate(cache):
-        output[i]["fields"]['accomplishment'] = entry.accomplishment_id.dict()
+        output[i]["fields"]['accomplishment'] = entry.accomplishment_id.serialized()
 
     return JsonResponse(
         data={
@@ -116,12 +118,7 @@ def get_by_name(request, name: str):
 
     try:
         result: Accomplishment = Accomplishment.objects.get(name__iexact=name)
-        return JsonResponse(
-            data={
-                'name': result.name,
-                'description': result.description,
-                'icon': result.icon
-                })
+        return JsonResponse(data=result.serialized())
     except (Accomplishment.DoesNotExist):
         return HttpResponseNotFound()
 
@@ -147,7 +144,7 @@ def get_accomp_by_id(request, ID):
     from_date_tz = accom.from_date.astimezone(zoneinfo.ZoneInfo("Europe/Paris"))
     to_date_tz = accom.to_date.astimezone(zoneinfo.ZoneInfo("Europe/Paris"))
 
-    accom_details = accom.accomplishment_id.dict()
+    accom_details = accom.accomplishment_id.serialized()
     accom_details.update({
         'created': accom.created,
         'measurement_quantity': accom.measurement_quantity,
@@ -188,7 +185,6 @@ def edit_accomp(request, ID):
                 default_text="All changes have been successfully applied."))
     except (FamilyUserAccomplishment.DoesNotExist):
         return HttpResponseBadRequest()
-
 
 
 def submit_accomplishment(request):
@@ -273,3 +269,48 @@ def delete_accomplishment(request, ID):
             data={'alert-message': "", 'alert-type': 'success'})
     except (FamilyUserAccomplishment.DoesNotExist):
         return HttpResponseBadRequest()
+
+
+
+def require_login(request, func):
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest(
+            get_locale_text(
+                request=request, ID="login-required",
+                default_text="For this action, you need to login first."))
+    return func
+
+
+
+@require_http_methods(["POST"])
+def repeat_accomplishment(request):
+
+    family_user: FamilyUser = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
+    if family_user is None:
+        return HttpResponseBadRequest(
+            get_locale_text(
+                request=request, ID="not-in-a-family",
+                default_text="You aren't part of a Family."))
+
+    quantity = request.POST.get("measurement_quantity", "")
+
+    if (quantity == ""):
+        quantity = 0
+
+    FamilyUserAccomplishment.objects.get_or_create(
+        family_user_id=family_user,
+        accomplishment_id=Accomplishment.objects.get(id=request.POST["ID"]),
+        created_by=request.user,
+        measurement_quantity=float(quantity),
+        from_date=timezone.now(),
+        to_date=timezone.now()
+    )
+
+    return JsonResponseAlert(
+        request=request, message="Accomplishment successfully created!",
+        type="success")
+
+    return HttpResponseBadRequest(
+        get_locale_text(
+            request=request, ID="accomplishment-create-failed",
+            default_text="Accomplishment couldn't be submitted."))

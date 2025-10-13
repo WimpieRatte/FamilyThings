@@ -7,7 +7,7 @@
           {% include 'header/nav_item.html' with id='profile' icon='person-arms-up' label='Profile' color="#ec739cff" href='core:user_profile' tooltip='Brief overview about you and your Family.' %}
           {% include 'header/nav_item.html' with id='accomplishments' icon='award' label='Accomplishments' color="#d99d51" href='accomplishment:overview' tooltip='See and manage all of your Accomplishments.' %}
           {% include 'header/nav_item.html' with id='finance' icon='piggy-bank' label='Finance' color="#ddc67f" href='finance:import_transactions' tooltip='Keep your finances in check.' %}
-          {% include 'header/nav_item.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='core:user_profile' tooltip='An overview of upcoming events, holidays, etc.' %}
+          {% include 'header/nav_item.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='calendar:calendar' tooltip='An overview of upcoming events, holidays, etc.' %}
         {% endif %}
         {% include 'header/nav_item.html' with id='home' icon='house-door' label='Home' color="#5ccaff" href='core:home' %}
       </ul>
@@ -28,8 +28,8 @@
               {% if request.user.is_superuser %}
                 {% include 'header/dropdown_item.html' with href='admin:index' id="admin" icon='sliders' label='Admin Page' new_tab='True' %}
               {% endif %}
-              {% if family.is_manager %}
-                {% include 'header/dropdown_item.html' with id="family-settings" icon='person-arms-up' label='Family Management' %}
+              {% if request.session.family_info.is_manager %}
+                {% include 'header/dropdown_item.html' with href='core:manage_family' id="family-settings" icon='person-arms-up' label='Family Management' %}
               {% endif %}
               {% include 'header/dropdown_item.html' with href='core:request_logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
               {% if request.session.families|length > 1 %}

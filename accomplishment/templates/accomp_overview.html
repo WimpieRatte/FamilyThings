@@ -1,0 +1,154 @@
+{% extends "site/site_base.html" %}
+{% block title %}Accomplishments -{% endblock %}
+{% block popups %}
+    {% include 'accomp_popup_name_prompt.html' %}
+    {% include 'accomp_popup_edit_accomp.html' %}
+    {% include 'accomp_popup_repeat_accomp.html' %}
+    {% include 'accomp_popup_edit_template.html' %}
+{% endblock %}
+{% block content %}
+<div id="accomplishments-overview" class="container-sm pb-4 w-100">
+    {% include 'site/heading_section.html' with label="Accomplishments" id="accomplishments" %}
+    <div id="accomplishments" class="container rounded bg-dark p-2 h-25 mh-25">
+        <div id="accomplishments-wrapper" class="container rounded py-2">
+            <div class="d-flex justify-content-between flex-wrap p-3">
+                <div style="width: 65%">
+                    <div class="d-flex flex-wrap justify-content-between pb-2">
+                        {% include 'site/heading_small.html' with label="All Activity" id="all-activity" %}
+                        <form id="filter-form">
+                            <div class="d-flex pe-3">
+                                <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter Accomplishments..." aria-label="Search">
+                                <select id="filter-selector" class="form-select fs-sm">
+                                    <option selected value="name">Name</option>
+                                    <option value="uncategorized">Name (w/o Category)</option>
+                                    <option value="achievement">Name (Sp. Achievement)</option>
+                                    <option value="category">Category</option>
+                                </select>
+                            </div>
+                            <button id="" type="submit" class="d-none"></button>
+                        </form>
+                    </div>
+                    <div class="position-relative pe-3" style="height: 34em;">
+                        <table id="accomplishments-table" class="table table-striped bg-opacity-50" style="table-layout: fixed;">
+                            <thead class="w-100 fs-sm">
+                                <tr class="">
+                                    <th class="p-1" style="width: 3%;" scope="col">#</th>
+                                    <th class="p-1" id="id_name" style="width: 27%;" scope="col">Name</th>
+                                    <th class="p-1" id="lb-measurement" style="width: 18%;" scope="col">Measurement</th>
+                                    <th class="p-1" id="lb-category" style="width: 20%;" scope="col">Category</th>
+                                    <th class="p-1" id="lb-created-on" style="width: 20%;" scope="col">Created on</th>
+                                    <th class="p-1" style="width: 12%;" scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="accomplishments-table-body" class="fs-sm">
+                                
+                            </tbody>
+                        </table>
+                        <div id="table-buttons" class="w-100 pe-3 d-flex justify-content-between position-absolute bottom-0 start-50 translate-middle-x">
+                            <button id="previous-button" type="button" class="bi bi-caret-left-fill h4 d-block"></button>
+                            <div class="font-monospace"><span id="lb-entries">Showing Entries</span> <span id="range-start"></span>-<span id="range-end"></span> (<span id="lb-entries2">found</span> <span id="range-total"></span> <span id="lb-entries3">total</span>)</div>
+                            <button id="next-button" type="button" class="bi bi-caret-right-fill h4 d-block"></button>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 35%">
+                    {% include 'site/heading_small.html' with title="Had any recent Accomplishments?" id="any-recent-accomps" class='text-center pt-1' %}
+                    <div id="new-accomplishment-wrapper" class="w-auto m-auto pb-4">
+                        <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" data-tooltip-context="Add New">
+                            <h4 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
+                            <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-1"></i></h4>
+                        </a>
+                    </div>
+                    {% include 'site/heading_small.html' with title="Recent Additions (Click to repeat)" id="recent-additions" class='text-center pt-1' %}
+                    <div class="d-flex justify-content-center flex-wrap gap-1" style="width: fit-content;">
+                        {% for entry in recent_additions %}
+                            <a data-data="{{entry.serialized}}" onclick="openRepeat(this)" value={{entry.id}} class="link-underline link-underline-opacity-0 tooltip-source" data-tooltip-context="Repeat" data-tooltip-content='"{{entry.name}}"'>
+                                {% with color=colors|random %}
+                                <div class="rounded-2 p-1" style="color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});">{{entry.name}} <span class="bi bi-repeat"></span></div>
+                                {% endwith %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    #next-button:disabled,
+    #previous-button:disabled {
+        filter: grayscale(.5);
+        color: var(--bs-gray-700);
+        border-color: var(--bs-gray-700) !important;
+    }
+</style>
+<script>
+    var getAccompURL = "{{HOST}}/accomplishments/entry/get/id=";
+    var editAccompURL = "{{HOST}}/accomplishments/entry/edit/id=";
+    var repeatAccompURL = "{{HOST}}/accomplishments/entry/repeat";
+    var nameCheckURL = "{{HOST}}/accomplishments/get/name=";
+    var currentAJAXURL = editAccompURL;
+
+    var selectedAccomplishment = "" //Stores the ID of the Accomplishment/Template that is being edited.
+
+    function openRepeat(data) {
+        let _data = data.getAttribute("data-data").replaceAll(`'`, `"`).replaceAll(`None`, `null`).replaceAll(`False`, `false`)
+        accomplishmentStorage = JSON.parse(_data)
+        closePopup();
+        openPopup("repeat-accomp-popup");
+        prepareRepeat()
+    }
+
+    $("#nav-tooltip-home").click(function(event) {
+        event.preventDefault();
+        openPopup("edit-template-popup");
+    });
+
+
+    {% include 'js_accomp_search_table.js' %}
+    {% include 'js_accomp_edit_accomp_prompt.js' %}
+    {% include 'js_accomp_repeat_accomp_prompt.js' %}
+    {% include 'js_accomp_name_prompt.js' %}
+
+    //WIP
+    {% include 'js_accomp_edit_template_prompt.js' %}
+    {% include 'js_accomp_new_accomp_prompt.js' %}
+</script>
+<style>
+    #btn-actions {
+        filter: grayscale(1);
+        transition-property: filter;
+        transition-duration: .25s;
+    }
+
+    #btn-actions:hover, #btn-actions.show {
+        filter: grayscale(0);
+    }
+
+    .background-bi {
+        color: var(--bs-{{request.user.color}});
+        z-index: -1;
+        opacity: .75 !important;
+    }
+
+    .bi-edit-accomp {
+        top: -10% !important;
+        left: -10% !important;
+        font-size: 18em !important;
+        transform: rotate(-33deg) !important;
+        opacity: .75 !important;
+    }
+
+    .bi-edit-accomp:nth-child(2) {
+        top: -47% !important;
+        left: 15% !important;
+        font-size: 18em !important;
+        transform: rotate(-9deg) !important;
+        opacity: 1 !important;
+    }
+
+    .form-control.text-center::placeholder {
+        font-size: .8em !important;
+    }
+</style>
+{% endblock %}

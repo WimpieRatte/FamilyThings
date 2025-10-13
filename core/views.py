@@ -1,23 +1,25 @@
 import re
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.conf import settings
+from django.db import transaction
+from django.http import HttpResponse
 from django.urls import reverse
+from django.utils import timezone
+from django.shortcuts import render, redirect
 
 from core.session import update_session
 from core.models.password_reset import PasswordReset
-from django.contrib.auth.models import AnonymousUser
-from django.http import HttpResponse
-from django.utils import timezone
-from django.shortcuts import render, redirect
-from .models import CustomUser, FamilyUser
+from .models import CustomUser, Family, FamilyUser, FamilyInvite
 from .forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
 from .session import update_session, create_alert, get_locale_text
 from .constants import COLORS
 
 from accomplishment.models import Accomplishment, FamilyUserAccomplishment
 from messenger.models import FamilyChat, Message
+from ft_calendar.models import CalendarEntry
 
 
 def render_if_logged_in(request, target: HttpResponse):
@@ -33,7 +35,7 @@ def render_if_logged_in(request, target: HttpResponse):
         fam_user = FamilyUser.objects.filter(
             custom_user_id=request.user)[request.session["current_family"]]
         return target
-    except (FamilyUser.DoesNotExist):
+    except (FamilyUser.DoesNotExist, IndexError):
         return redirect("core:user_final_step")
 
 
@@ -44,10 +46,17 @@ def home(request, lang_code: str = ""):
 
 
 PASSWORD_PATTERN = r"^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
+
+
+@transaction.atomic
 def user_register(request):
     form: UserRegisterForm = UserRegisterForm()
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return render(
+            request, "core/user_register.html",
+            {'form': form})
+    else:
         form = UserRegisterForm(data=request.POST)
 
         # get posted fields:
@@ -86,26 +95,15 @@ def user_register(request):
                     password=password,
                 )
 
-                new_accomp, created= Accomplishment.objects.get_or_create(
-                    name="First Step",
-                    description="Create an Account",
-                    icon="person-arms-up",
-                    accomplishment_type_id=None,
-                    measurement_type_id=None
-                )
-                FamilyUserAccomplishment.objects.create(
-                    created_by=new_user,
-                    accomplishment_id=new_accomp,
-                    measurement_quantity=1
+                calendar_entry = CalendarEntry.objects.create(
+                    title="First Step",
+                    description="Created your FamilyThings account",
+                    custom_user_id=new_user
                 )
 
                 create_alert(request=request, ID="account-created", type="success",
                         text="Account has been successfully created. You may login now.")
                 return redirect("core:user_login")
-        else:
-            return render(
-                request, "core/user_register.html",
-                {'form': form})
 
 
 def user_final_step(request, lang_code: str = ""):
@@ -165,7 +163,7 @@ def user_profile_page(request, lang_code: str = ""):
                 # the Accomplishment details.
                 create_date = user_accomp.created
 
-                user_accomp = user_accomp.accomplishment_id.dict()
+                user_accomp = user_accomp.accomplishment_id.serialized()
                 user_accomp["cleared_by"] = user.custom_user_id.full_name()
                 user_accomp["color"] = user.custom_user_id.color
                 user_accomp["icon"] = user.custom_user_id.icon
@@ -175,7 +173,7 @@ def user_profile_page(request, lang_code: str = ""):
                 pass
 
         return render(request, "core/user_profile.html", {
-            'family': fam_user.json_data(),
+            'family': fam_user.serialized(),
             'family_activity': accomplishments,
             'chat': list(messages)
         })
@@ -212,9 +210,8 @@ def user_settings_page(request, lang_code: str = ""):
         }
     )
 
-    if request.POST:
+    if request.POST or request.FILES:
         form = UserSettingsForm(data=request.POST, files=request.FILES)
-
         if form.is_valid():
             user.first_name = form.cleaned_data.get("first_name")
             user.last_name = form.cleaned_data.get("last_name")
@@ -247,6 +244,8 @@ def user_settings_page(request, lang_code: str = ""):
             user.save()
             create_alert(request=request, ID="settings-updated", type="success",
                 text="Your settings have been saved.")
+        else:
+            print(form.errors)
 
         return redirect("core:user_profile")
 
@@ -269,6 +268,17 @@ def user_settings_page(request, lang_code: str = ""):
         },
     )
     return render_if_logged_in(request=request, target=target)
+
+
+def manage_family_page(request, lang_code: str = ""):
+    """."""
+    update_session(request=request, lang_code=lang_code)
+    family: Family = Family.objects.get(id=request.session['family_info']['family_ID'])
+    return render(request, "core/manage_family.html", {
+        'family': family.serialized(),
+        'members': list(FamilyUser.objects.filter(family_id=family.id)),
+        'invite': FamilyInvite.objects.get(generated_by=request.user).token
+    })
 
 
 def user_login_page(request, lang_code: str = ""):
