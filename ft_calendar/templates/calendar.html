@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <div class="rounded-2 p-2 bg-dark overflow-auto" style="height: fit-content; max-height: 500px !important; width: 65%;">
+        <div class="rounded-2 p-4 bg-dark overflow-auto" style="height: 450px !important; max-height: 450px !important; width: 65%;">
             <div id="calendar-date" class="bg-primary rounded-2 p-1 m-0" style="width: 35% !important;">-</div>
             <div id="accordion" class="accordion accordion fs-sm pt-2">
             </div>
@@ -45,36 +45,8 @@
 </style>
 <link href="{% static 'rome/rome.css'%}" rel="stylesheet">
 <script src="{% static 'rome/rome.js'%}"></script>
+<script>{% include 'js_calendar_rome.js' %}</script>
 <script>
-    /* Calendar powered by Rome */
-    let current_date = new Date();
-    var calendar = rome(document.getElementById('rome-calendar'), 
-    { 
-        "time": false,
-        "styles": {
-            "back": "rd-back",
-            "container": "rd-container bg-body-tertiary rounded rounded-4 text-center p-2 d-block h-100",
-            "date": "rd-date",
-            "dayBody": "rd-days-body bg-dark d-block rounded rounded-3",
-            "dayBodyElem": "rd-day-body", /*"rd-day-body",*/
-            "dayConcealed": "rd-day-concealed",
-            "dayDisabled": "rd-day-disabled",
-            "dayHead": "rd-days-head",
-            "dayHeadElem": "rd-day-head",
-            "dayRow": "rd-days-row",
-            "dayTable": "pt-1 d-block",
-            "month": "rd-month font-monospace",
-            "next": "rd-next",
-            "positioned": "rd-container-attachment",
-            "selectedDay": "rd-day-selected",
-            "selectedTime": "rd-time-selected",
-            "time": "rd-time",
-            "timeList": "rd-time-list",
-            "timeOption": "rd-time-option"
-        },
-        "weekStart": current_date.getDay()
-    });
-
     var calendarEntries = []
 
     let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
@@ -127,7 +99,7 @@
         && element["date"].getYear() == dateToCheck.getYear());
 
         // Put entries on screen
-        $("#accordion").text("No entries.");
+        $("#accordion").text(''); // Clear so that there's space for the list
 
         if (entries.length > 0) {
             $("#accordion").text(''); // Clear so that there's space for the list
@@ -135,8 +107,8 @@
                 $("#accordion").append(`<div id="card${entry["ID"]}" class="card"></div>`);
 
                 let extraClasses = "";
-                if (entry["description"] && entry["description"].length > 0){ extraClasses = " bi bi-caret-down-fill bi-space" }
-                    else { extraClasses = " bi bi-circle-fill bi-space bi-small" }
+                if (entry["description"] && entry["description"].length > 0){ extraClasses = " bi-caret-down-fill bi-space" }
+                    else { extraClasses = " bi-circle-fill bi-space bi-small" }
 
                 setTimeout(function() {
                     $(`#card${entry["ID"]}`).append(`
@@ -161,6 +133,17 @@
                 }, 1);
             });
             $("#accordion").append('</div>')
+        }
+        else {
+            $("#accordion").append(`
+            <div id="card" class="card">
+                <div class="card-header card-footer" id="">
+                <h5 class="mb-0">
+                    <button class="btn btn-link link-underline link-underline-opacity-0 text-body-emphasis py-2">
+                        <span class="bi bi bi-circle-fill bi-space bi-small">No entries.</span>
+                    </button>
+                </h5>
+            </div>`);
         }
     }
 </script>

@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.utils import timezone
 
 from .family import Family
 from .custom_user import CustomUser
@@ -22,7 +23,7 @@ class FamilyUser(models.Model):
         related_name="custom_user_family_users"
     )
     join_date = models.DateTimeField(
-        auto_now_add=True
+        default=timezone.now
     )
     is_manager = models.BooleanField(default=False)
 

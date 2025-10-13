@@ -10,14 +10,14 @@ from django.urls import reverse
 from django.utils import timezone
 from django.shortcuts import render, redirect
 
-from core.session import update_session
+from core.session import update_user_session
 from core.models.password_reset import PasswordReset
 from .models import CustomUser, Family, FamilyUser, FamilyInvite
 from .forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
-from .session import update_session, create_alert, get_locale_text
+from .session import update_session, create_alert
 from .constants import COLORS
 
-from accomplishment.models import Accomplishment, FamilyUserAccomplishment
+from accomplishment.models import FamilyUserAccomplishment
 from messenger.models import FamilyChat, Message
 from ft_calendar.models import CalendarEntry
 
@@ -28,20 +28,20 @@ def render_if_logged_in(request, target: HttpResponse):
 
     if not request.user.is_authenticated:
         create_alert(request=request, ID="login-required", type="warning",
-            text="For this action, you need to login first.")
+                     text="For this action, you need to login first.")
         return redirect("core:user_login")
 
     try:
-        fam_user = FamilyUser.objects.filter(
+        FamilyUser.objects.filter(
             custom_user_id=request.user)[request.session["current_family"]]
         return target
     except (FamilyUser.DoesNotExist, IndexError):
         return redirect("core:user_final_step")
 
 
-def home(request, lang_code: str = ""):
+@update_user_session
+def home(request):
     """The Home page."""
-    update_session(request=request, lang_code=lang_code)
     return render(request, "home/home.html", {})
 
 
@@ -49,6 +49,7 @@ PASSWORD_PATTERN = r"^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
 
 
 @transaction.atomic
+@update_user_session
 def user_register(request):
     form: UserRegisterForm = UserRegisterForm()
 
@@ -72,16 +73,19 @@ def user_register(request):
             if CustomUser.objects.filter(username=username).exists():
                 user_data_has_error = True
                 create_alert(request=request, ID="user-exists", type="error",
-                    text="This Username is already taken.")
+                             text="This Username is already taken.")
             if CustomUser.objects.filter(email=email).exists():
                 user_data_has_error = True
-                create_alert(request=request, ID="email-used", type="error",
+                create_alert(
+                    request=request, ID="email-used", type="error",
                     text="There is already an account tied to this email.")
 
             if not re.match(PASSWORD_PATTERN, password):
                 user_data_has_error = True
-                create_alert(request=request, ID="password-invalid", type="error",
-                    text="Password must be at least 8 characters long, include one uppercase letter, and one special character.")
+                create_alert(
+                    request=request, ID="password-invalid", type="error",
+                    text="Password must be at least 8 characters long, include\
+                         one uppercase letter, and one special character.")
 
             if user_data_has_error:
                 return redirect("core:user_register")
@@ -95,32 +99,33 @@ def user_register(request):
                     password=password,
                 )
 
-                calendar_entry = CalendarEntry.objects.create(
+                CalendarEntry.objects.create(
                     title="First Step",
                     description="Created your FamilyThings account",
                     custom_user_id=new_user
                 )
 
-                create_alert(request=request, ID="account-created", type="success",
-                        text="Account has been successfully created. You may login now.")
+                create_alert(
+                    request=request, ID="account-created", type="success",
+                    text="Account has been successfully created. \
+                        You may login now.")
                 return redirect("core:user_login")
 
 
-def user_final_step(request, lang_code: str = ""):
+@update_user_session
+def user_final_step(request):
     """."""
-    update_session(request=request, lang_code=lang_code)
     form: UserFinalizeForm = UserFinalizeForm(
         initial={'family_name': f"{request.user.full_name()}'s Family"})
     return render(request, "core/user_final_step.html", {'form': form})
 
 
-def user_profile_page(request, lang_code: str = ""):
+@update_user_session
+def user_profile_page(request):
     """The User's overview section."""
-    update_session(request=request, lang_code=lang_code)
-
     if not request.user.is_authenticated:
         create_alert(request=request, ID="login-required", type="warning",
-            text="For this action, you need to login first.")
+                     text="For this action, you need to login first.")
         return redirect("core:user_login")
     try:
         fam_user = FamilyUser.objects.filter(
@@ -137,7 +142,7 @@ def user_profile_page(request, lang_code: str = ""):
                     family_chat_id=chat[0])
                 request.POST = None
                 redirect("core:user_profile")
-            except:
+            except (Exception):
                 pass
 
         messages = []
@@ -182,13 +187,12 @@ def user_profile_page(request, lang_code: str = ""):
         return redirect("core:user_final_step")
 
 
-def user_settings_page(request, lang_code: str = ""):
+@update_user_session
+def user_settings_page(request):
     """The User's settings page."""
-    update_session(request=request, lang_code=lang_code)
-
     if isinstance(request.user, AnonymousUser):
         create_alert(request=request, ID="login-required", type="warning",
-            text="For this action, you need to login first.")
+                     text="For this action, you need to login first.")
         return redirect("core:user_login")
 
     user: CustomUser = request.user
@@ -196,7 +200,8 @@ def user_settings_page(request, lang_code: str = ""):
     #  We need to check for the birthday to prevent an AttributeError
     birthday = ""
     if user.birthday is not None:
-        birthday = f"{user.birthday.year}-{user.birthday.day}-{user.birthday.month}"
+        birthday = f"{user.birthday.year}-{user.birthday.day}-\
+            {user.birthday.month}"
 
     form: UserSettingsForm = UserSettingsForm(
         #  Autofill form based on existing user settings
@@ -242,8 +247,9 @@ def user_settings_page(request, lang_code: str = ""):
                 custom_cursor=user.cursor,
             )
             user.save()
-            create_alert(request=request, ID="settings-updated", type="success",
-                text="Your settings have been saved.")
+            create_alert(request=request, ID="settings-updated", 
+                         type="success",
+                         text="Your settings have been saved.")
         else:
             print(form.errors)
 
@@ -270,20 +276,30 @@ def user_settings_page(request, lang_code: str = ""):
     return render_if_logged_in(request=request, target=target)
 
 
-def manage_family_page(request, lang_code: str = ""):
+@update_user_session
+def manage_family_page(request):
     """."""
-    update_session(request=request, lang_code=lang_code)
-    family: Family = Family.objects.get(id=request.session['family_info']['family_ID'])
-    return render(request, "core/manage_family.html", {
+    family: Family = Family.objects.get(
+        id=request.session['family_info']['family_ID'])
+    invite: str = "N/A"
+    all_invites: list = []
+
+    try:
+        invite = FamilyInvite.objects.get(generated_by=request.user).token
+    except (FamilyInvite.DoesNotExist):
+        pass
+
+    return render(request, "core/user_manage_family.html", {
         'family': family.serialized(),
-        'members': list(FamilyUser.objects.filter(family_id=family.id)),
-        'invite': FamilyInvite.objects.get(generated_by=request.user).token
+        'members': list(FamilyUser.objects.filter(
+            family_id=family.id).order_by("join_date")),
+        'invite': invite, 'all_invites': all_invites,
     })
 
 
-def user_login_page(request, lang_code: str = ""):
+@update_user_session
+def user_login_page(request):
     """Create the Login view and/or attempt to authenticate the User."""
-    update_session(request=request, lang_code=lang_code)
 
     # Redirect the user to the Overview if they're already logged in
     if request.user.is_authenticated:

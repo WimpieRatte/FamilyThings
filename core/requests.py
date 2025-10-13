@@ -113,11 +113,28 @@ def create_invite(request):
 
 @transaction.atomic
 def remove_from_family(request):
-    print(request.POST)
+
     target: FamilyUser = FamilyUser.objects.get(family_id=request.POST["family_id"], custom_user_id=request.POST["user_id"])
     target.delete()
 
     return JsonResponse(data={
         'alert-message': 'User has been removed from family.',
+        'alert-type': 'warning'
+        })
+
+
+@transaction.atomic
+def toggle_manager_role(request):
+
+    target: FamilyUser = FamilyUser.objects.get(family_id=request.POST["family_id"], custom_user_id=request.POST["user_id"])
+
+    if target.is_manager:
+        target.is_manager = False
+    else:
+        target.is_manager = True
+    target.save()
+
+    return JsonResponse(data={
+        'alert-message': 'User has been promoted to Manager.',
         'alert-type': 'warning'
         })
