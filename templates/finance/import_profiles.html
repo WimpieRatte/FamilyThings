@@ -21,13 +21,13 @@
                     name="import_profile_selector"
                     tooltip="Select the import profile to edit."
                     hx-get="{% url 'finance:import_profile_controls' %}"
-                    hx-trigger="change"
+                    hx-trigger="load, change"
                     hx-target="#import_profile_controls">
-                {% if not profiles %}
-                    <option selected>Create New</option>
-                {% endif %}
+                {% comment %} Always ahve the "Create New" entry on top: {% endcomment %}
+                <option value="-1">Create New</option>
+                {% comment %} Then load the profiles from the database: {% endcomment %}
                 {% for profile in profiles %}
-                    {% if selected_profile_id == profile.id %}
+                    {% if selected_import_profile == profile.id %}
                         <option selected value="{{ profile.id }}">{{ profile.name }}</option>
                     {% else %}
                         <option value="{{ profile.id }}" >{{ profile.name }}</option>
@@ -44,25 +44,8 @@
     <br>
 
     {% comment %} Mapping Area: {% endcomment %}
-    <div id="import_profile_mapping_container" class="container rounded bg-dark p-2 h-25 mh-25">
-        <label class="form-label">
-            Customise Mapping
-        </label>
-
-        <table class="table">
-            <thead>
-                <tr>
-                <th scope="col">File Header</th>
-                <th scope="col">Destination Column</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                <td>Mark</td>
-                <td>Mark</td>
-                </tr>
-            </tbody>
-        </table>
+    <div id="import_profile_mapping_area">
+        {% include 'finance/partials/import_profile_mappings.html' %}
     </div>
 </div>
 {% endblock %}

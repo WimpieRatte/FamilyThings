@@ -9,29 +9,65 @@
             <textarea class="form-control" id="txtDescription" rows="3" placeholder="Enter description here...">{{ profile.description|default:"" }}</textarea>
         </div>
     </div>
-    <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary" value="{{ profile.id }}" id="btnSaveProfileMapping">Save</button>
+    <div class="d-flex justify-content-center gap-2">
+        <button type="submit" class="btn btn-success" value="{{ profile.id }}" id="btnSaveProfile">Save</button>
+        <button type="submit" class="btn btn-danger" value="{{ profile.id }}" id="btnDeleteProfile">Delete</button>
     </div>
 </div>
 
 <script>
-  // Check if button pressed
-  $('#btnSaveProfileMapping').click(function(e) {
+  // Save Profile Mapping
+  $('#btnSaveProfile').click(function(e) {
 
     e.preventDefault();  // Prevent default form submission behavior
+
+    // Check if Name field has been filled out before saving
+    if ($("#txtName").val() == "") {
+      alert("Please enter a name first.");
+      return false;
+    }
+
     $.ajax({  // do a hidden postback to the url(view) below
       type: 'POST',
       url: '{% url 'finance:save_import_profile' %}',  //which URL mapping to redirect to
       data: {
-        profile_id: $(this).val(),  // get value of button that triggered the event
+        profile_id: $('#btnSaveProfile').val(),  // get current value set on the button
         profile_name: $("#txtName").val(),
         profile_description: $("#txtDescription").val(),
         csrfmiddlewaretoken: '{{ csrf_token }}',
         action: 'post'
       },
       success: function(json) {
-        document.getElementById("btnSaveProfileMapping").value = json.profile_id;
+        document.getElementById("btnSaveProfile").value = json.profile_id;
+        document.getElementById("btnDeleteProfile").value = json.profile_id;
         alert('Saved!');
+        window.location.href = "{% url 'finance:import_profiles' %}?selected_import_profile=" + json.profile_id;  // redirect after save
+      },
+      error: function(xhr, errmsg, err) {
+        console.log(errmsg);
+      }
+    });
+  })
+
+  // Delete Profile Mapping
+  $('#btnDeleteProfile').click(function(e) {
+
+    e.preventDefault();  // Prevent default form submission behavior
+
+    if (!confirm('Are you sure you want to delete this import profile?')) {
+      return;  // Exit if user cancels
+    }
+
+    $.ajax({  // do a hidden postback to the url(view) below
+      type: 'POST',
+      url: '{% url 'finance:delete_import_profile' %}',  //which URL mapping to redirect to
+      data: {
+        profile_id: $(this).val(),  // get value of button that triggered the event
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        action: 'post'
+      },
+      success: function(json) {
+        alert('Deleted!');
         window.location.href = "{% url 'finance:import_profiles' %}";  // redirect after save
       },
       error: function(xhr, errmsg, err) {

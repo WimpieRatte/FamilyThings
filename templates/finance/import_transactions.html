@@ -16,7 +16,7 @@
                         tooltip="If this is a file format you haven't imported before, please first create a new import profile accordingly."
                         onchange="change(this.value)">
                     {% if not profiles %}
-                        <option selected>Create New</option>
+                        <option>Create New</option>
                     {% endif %}
                     {% for profile in profiles %}
                         <option value="{{ profile.id }}">{{ profile.name }}</option>
@@ -24,7 +24,11 @@
                 </select>
             </div>
             <div class="col-auto">
-                <a class="btn btn-primary" id="btnEditProfiles" href="{% url 'finance:import_profiles' %}">Edit Profiles</a>
+                {% if profiles %}
+                    <a class="btn btn-primary" id="btnEditProfiles" href="{% url 'finance:import_profiles' %}?selected_import_profile={{profiles.0.id}}">Edit Profiles</a>
+                {% else %}
+                    <a class="btn btn-primary" id="btnEditProfiles" href="{% url 'finance:import_profiles' %}">Edit Profiles</a>
+                {% endif %}
             </div>
         </div>
         <br>
@@ -46,7 +50,7 @@
 <script>
 
     function change(val){
-        document.getElementById("btnEditProfiles").href = "{% url 'finance:import_profiles' %}?import_profile_selector=" + val;
+        document.getElementById("btnEditProfiles").href = "{% url 'finance:import_profiles' %}?selected_import_profile=" + val;
     }
 
 </script>

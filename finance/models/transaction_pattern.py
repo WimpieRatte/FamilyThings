@@ -1,7 +1,7 @@
 from django.db import models
 
 class TransactionPattern(models.Model):
-    id = models.BigIntegerField(primary_key=True, editable=False)
+    id = models.AutoField(primary_key=True)
     name_regex = models.CharField(max_length=1000)
     description_regex = models.CharField(max_length=1000)
     reference_regex = models.CharField(max_length=1000)
