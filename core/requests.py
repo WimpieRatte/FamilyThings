@@ -93,8 +93,12 @@ def create_invite(request):
     family: Family = FamilyUser.objects.filter(
             custom_user_id=request.user)[request.session["current_family"]].family_id
 
-    old_invite: FamilyInvite = FamilyInvite.objects.get(family_id=family)
-    old_invite.delete()
+    # Try deleting the old invite
+    try:
+        old_invite: FamilyInvite = FamilyInvite.objects.get(family_id=family)
+        old_invite.delete()
+    except (FamilyInvite.DoesNotExist):
+        pass
 
     new_invite: FamilyInvite = FamilyInvite.objects.create(
         family_id=family,

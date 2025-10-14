@@ -16,14 +16,12 @@ def list_get(source_list: list, index: int, default):
 
 def update_user_session(require_login: bool = True, require_family: bool = True, *args, **kwargs):
     """Decorator to update the session as well as restrict access if they're not logged in."""
-
     def decorator(func, *args, **kwargs):
         @wraps(func)
         def inner(*args, **kwargs):
             request = args[0]
             lang_code: str = kwargs.get("lang_code", "")
             cache_last_visited_page: bool = kwargs.get("cache_last_visited_page", True)
-            print(require_login)
 
             if require_login:
                 if not request.user.is_authenticated:
@@ -77,7 +75,7 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
             else:
                 request.session['use_custom_cursor'] = True
 
-            return func(*args)
+            return func(*args, **kwargs)
 
         return inner
 

@@ -71,6 +71,8 @@
 <link href="{% static 'rome/rome.css'%}" rel="stylesheet">
 <script src="{% static 'rome/rome.js'%}"></script>
 <script>
+    var calendarURL = "{% url 'calendar:calendar' %}"
+
     // Set up calendar and make the day buttons tooltop triggers
     function updateDate(){}
 
@@ -84,7 +86,7 @@
 
         buttons.forEach(function(button) {
             entries = calendarEntries.filter((element) =>
-            Number(button.textContent/10) >= element["date"].getDate()
+            button.dataset.value == element["date"].getDate()
             && dateToCheck.getMonth() == element["date"].getMonth()
             && dateToCheck.getYear() == element["date"].getYear());
 
@@ -97,6 +99,7 @@
                     button.dataset.tooltipContext += `<li>${entry["title"]}</li>`;
                 });
                 button.dataset.tooltipContext += "</ul>"
+                button.innerHTML = `<a href="${calendarURL}start=${Number(button.children[0].textContent)}" class="link-underline link-underline-opacity-0">${button.innerHTML}</a>`;
             }
         })
         updateTooltips();
@@ -181,7 +184,7 @@
 </script>
 <style>
     .rd-day-selected {
-        background-color: var(--bs-{{request.user.color}}) !important; /*#f67280;*/
+        background: 0 !important; /*#var(--bs-{{request.user.color}}) !important;*/
     }
 
     .message:hover > .badge {

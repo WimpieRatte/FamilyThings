@@ -9,19 +9,21 @@ from core.models.custom_user import CustomUser
 
 
 @update_user_session()
-def page_calendar(request, lang_code: str = ""):
-    """."""
+def page_calendar(request, start: int = timezone.now().day):
+    """Return the Calendar overview page."""
+    print(start)
     return render(
         request, "calendar.html",
         {
             'entries': list(CalendarEntry.objects.filter(
                 custom_user_id=request.user
-            ).values())
+            ).values()),
+            'day': start
         })
 
 
-def get(request, lang_code: str = ""):
-    """."""
+def get(request):
+    """Return all CalendarEntries tied to a User."""
     query = CalendarEntry.objects.filter(custom_user_id=request.user)
 
     entries: list = []
