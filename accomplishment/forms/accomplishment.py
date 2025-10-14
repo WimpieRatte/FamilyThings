@@ -12,7 +12,7 @@ class AccomplishmentForm(forms.Form):
     icon = forms.CharField(
         label="", max_length=40, required=True, widget=forms.HiddenInput())
     measurement = forms.CharField(max_length=3,
-        label="Type", required=False)
+        label="Abbreviaiton", required=False)
     measurement_quantity = forms.DecimalField(
         label="Value", required=False, min_value=0, widget=forms.NumberInput())
     date_from = forms.DateField(label="From", required=False, initial=timezone.now, widget=forms.SelectDateWidget())

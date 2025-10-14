@@ -2,7 +2,7 @@
 {% load tz %}
 {% timezone "Europe/Paris" %}
 <!doctype html>
-<html lang="en" data-bs-theme="dark" {% include 'site/site_bg_img.html' with image=request.user.background_image %}>
+<html lang="en" {% include 'site/site_bg_img.html' with image=request.user.background_image %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,7 @@
   {% include 'site/site_style_imports.html' %}
   {% include 'site/site_style.html' %}
   <style>
-    {% include 'site/site_style_overrides.html' with color=request.user.color cursor=request.session.use_custom_cursor %}
+    {% include 'site/site_style_overrides.css' with color=request.user.color cursor=request.session.use_custom_cursor %}
   </style>
   {% block append_to_head %}{% endblock %}
 </head>

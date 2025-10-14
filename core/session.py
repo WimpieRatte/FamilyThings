@@ -16,14 +16,12 @@ def list_get(source_list: list, index: int, default):
 
 def update_user_session(require_login: bool = True, require_family: bool = True, *args, **kwargs):
     """Decorator to update the session as well as restrict access if they're not logged in."""
-
     def decorator(func, *args, **kwargs):
         @wraps(func)
         def inner(*args, **kwargs):
             request = args[0]
             lang_code: str = kwargs.get("lang_code", "")
             cache_last_visited_page: bool = kwargs.get("cache_last_visited_page", True)
-            print(require_login)
 
             if require_login:
                 if not request.user.is_authenticated:
@@ -34,7 +32,8 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
                 if require_family:
                     try:
                         FamilyUser.objects.filter(
-                            custom_user_id=request.user)[request.session["current_family"]]
+                            custom_user_id=request.user,
+                            deactivated=False)[request.session["current_family"]]
                     except (FamilyUser.DoesNotExist, IndexError):
                         return redirect("core:user_final_step")
 
@@ -49,7 +48,8 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
             if request.user.is_authenticated:
                 # First, get all Families tied to the user
                 family_queue = FamilyUser.objects.filter(
-                    custom_user_id=request.user).order_by('join_date')
+                    custom_user_id=request.user,
+                    deactivated=False).order_by('join_date')
 
                 if len(family_queue) > 0:
                     # Then, create a list with all the family names
@@ -57,6 +57,7 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
                     # Also grab a dict with all the relevant info about the family you're
                     # currently switched to
                     request.session["family_info"] = family_queue[request.session["current_family"]].serialized()
+                    print(request.session["family_info"])
 
             #  Apply a language code based on either the existing value,
             #  an User's own setting, or lastly, the browser's.
@@ -77,7 +78,7 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
             else:
                 request.session['use_custom_cursor'] = True
 
-            return func(*args)
+            return func(*args, **kwargs)
 
         return inner
 

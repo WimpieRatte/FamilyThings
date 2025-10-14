@@ -26,6 +26,7 @@ class FamilyUser(models.Model):
         default=timezone.now
     )
     is_manager = models.BooleanField(default=False)
+    deactivated = models.BooleanField(default=False)
 
     def serialized(self):
         """Return a JSONSerializable representation of the FamilyUser."""

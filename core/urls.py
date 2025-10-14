@@ -39,7 +39,8 @@ core_urls = [
 
     # Messenger (AJAX)
     path("message/delete/id=<uuid:id>", requests.delete_message,
-         name="delete_message")
+         name="delete_message"),
+    path("get_messages/", requests.get_messages, name="get_messages"),
 ]
 
 urlpatterns = [

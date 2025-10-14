@@ -25,7 +25,7 @@
                     <span id="lb-invite-hint">Already got a Family Invite? Add the code here.</span><br>
                 </div>
                 <div class="d-block m-auto text-center" style="width: fit-content;">
-                    {% include 'site/form_field.html' with id="" field=form.invite_code %}
+                    {% include 'site/form_field.html' with id="invite-code" field=form.invite_code %}
                 </div>
             </div>
             <div id="optional-fields" class="bg-body-tertiary rounded p-2 pb-3 mt-3">
@@ -47,4 +47,7 @@
         </div>
     </div>
 </div>
+<script>
+    {% include 'core/js_check_invite.js' %}
+</script>
 {% endblock %}

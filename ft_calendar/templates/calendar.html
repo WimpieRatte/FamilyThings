@@ -50,7 +50,14 @@
     $(".rd-next").click(function(event) { setTimeout(function() {resetDayButtons();}, 1)});
     $(".rd-back").click(function(event) { setTimeout(function() {resetDayButtons();}, 1)});
 
-    setTimeout(function() {updateDate()}, 1000)
+    setTimeout(function() {
+        let dateOffset = new Date()
+        dateOffset.setDate(Number("{{day}}"))
+        calendar.setValue(dateOffset)
+        updateDate()}, 
+    10)
+
+    setTimeout(function() {updateDate()}, 502)
 
     function updateDate(event){
         let dateToCheck = calendar.getDate();

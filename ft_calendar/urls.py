@@ -6,6 +6,6 @@ app_name = "calendar"
 
 urlpatterns = [
      # path(<URL>, <view>, <name>)
-     path("", views.page_calendar, name="calendar"),
+     re_path(r"^(?:start=(?P<start>[0-9]+)/)?$", views.page_calendar, name="calendar"),
      path("get", views.get, name="get"),
 ]

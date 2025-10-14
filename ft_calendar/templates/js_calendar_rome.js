@@ -45,14 +45,16 @@ function resetDayButtons(event){
     let dateToCheck = calendar.getDate();
 
     buttons.forEach(function(button) {
+        button.dataset.value = Number(button.textContent);
+
         entry = calendarEntries.filter((element) => 
-        element["date"].getDate() == Number(button.textContent)
+        element["date"].getDate() == button.dataset.value
         && element["date"].getMonth() == dateToCheck.getMonth()
         && element["date"].getYear() == dateToCheck.getYear());
 
         if (entry.length > 0) {
             button.className = button.className += " position-relative";
-            button.innerHTML = `${button.innerHTML}<span class="position-absolute translate-middle badge rounded-circle bg-success fw-normal fs-sm no-ptr-evt" style="font-size: 0.7em; top: 10%; left: 90%">${entry.length}</span>`;
+            button.innerHTML = `<span class="no-ptr-evt text-primary">${button.innerHTML}</span><span class="position-absolute translate-middle badge rounded-circle bg-success fw-normal fs-sm no-ptr-evt" style="font-size: 0.7em; top: 10%; left: 90%">${entry.length}</span>`;
         }
     });
 
@@ -62,4 +64,4 @@ function resetDayButtons(event){
         setTimeout(function() {updateDate(event)}, 10);
     });
 }
-setTimeout(function() {resetDayButtons();}, 1000)
+setTimeout(function() {resetDayButtons();}, 500)
