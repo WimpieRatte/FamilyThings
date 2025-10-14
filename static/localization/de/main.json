@@ -110,5 +110,7 @@
     "role-admin": "Administrator",
     "id_language": ["Englisch", "Deutsch"],
     "id_color": ["Blau", "Indigo", "Purpur", "Rosa", "Rot", "Orange", "Gelb", "Grün", "Türkis", "Aquamarin"],
-    "filter-selector": ["Name", "Name (o. Kategorie)", "Name (Besondere)", "Kategorie"]
+    "filter-selector": ["Name", "Name (o. Kategorie)", "Name (Besondere)", "Kategorie"],
+    "home-accomp1": "Erstellen Sie Ihre eigenen Erfolge!",
+    "home-accomp2": "Verbessern Sie Ihren täglichen Arbeitsablauf mit einem intuitiven Tool, das Sie bei der Erstellung, Verwaltung und kontinuierlichen Verbesserung Ihrer Erfolge unterstützt. Verschaffen Sie sich auf einen Blick einen klaren, umfassenden Überblick und verfolgen Sie Ihre Fortschritte ganz einfach für eine intelligentere Planung und messbare Ergebnisse."
 }
