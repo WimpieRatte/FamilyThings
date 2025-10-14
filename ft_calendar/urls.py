@@ -8,4 +8,5 @@ urlpatterns = [
      # path(<URL>, <view>, <name>)
      re_path(r"^(?:start=(?P<start>[0-9]+)/)?$", views.page_calendar, name="calendar"),
      path("get", views.get, name="get"),
+     path("create-event/", views.create_calendar_entry, name="create_event"),
 ]
