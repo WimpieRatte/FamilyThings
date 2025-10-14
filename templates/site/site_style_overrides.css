@@ -9,6 +9,10 @@
     {% endif %}
 }
 
+.text-primary {
+    color: var(--bs-{{color}}-subtle) !important;
+}
+
 .border-primary, .btn-primary {border-color: var(--bs-{{color}}) !important;}
 
 {% if cursor %}

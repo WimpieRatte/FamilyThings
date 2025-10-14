@@ -54,7 +54,7 @@ function resetDayButtons(event){
 
         if (entry.length > 0) {
             button.className = button.className += " position-relative";
-            button.innerHTML = `<span class="no-ptr-evt">${button.innerHTML}</span><span class="position-absolute translate-middle badge rounded-circle bg-success fw-normal fs-sm no-ptr-evt" style="font-size: 0.7em; top: 10%; left: 90%">${entry.length}</span>`;
+            button.innerHTML = `<span class="no-ptr-evt text-primary">${button.innerHTML}</span><span class="position-absolute translate-middle badge rounded-circle bg-success fw-normal fs-sm no-ptr-evt" style="font-size: 0.7em; top: 10%; left: 90%">${entry.length}</span>`;
         }
     });
 
