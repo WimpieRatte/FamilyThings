@@ -1,0 +1,89 @@
+<div id="import_profile_mapping_container" class="container rounded bg-dark p-2 h-25 mh-25">
+    <label class="form-label">
+        Customise Mapping
+    </label>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">File Header</th>
+                <th scope="col">Destination Column</th>
+                <th scope="col" class="d-flex justify-content-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% comment %} Existing Rows {% endcomment %}
+            {% for mapping in mappings %}
+            <tr>
+                <td>{{ mapping.from_file_header }}</td>
+                <td>{{ mapping.to_transaction_header }}</td>
+                <td class="align-middle">
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="submit" class="btn btn-success" value="{{ mapping.id }}" id="btnSaveProfileMapping">Save</button>
+                        <button type="submit" class="btn btn-danger" value="{{ mapping.id }}" id="btnDeleteProfileMapping">Delete</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+
+            {% comment %} New Rows {% endcomment %}
+            <tr>
+                <td>
+                    <div class="form-floating">
+                        <input type="email" id="txtNewFromFileHeader" class="form-control" placeholder="New File Header"/>
+                        <label for="txtNewFromFileHeader" class="form-label">File Header</label>
+                    </div>
+                </td>
+                <td class="align-middle">
+                    <select name="cbo_destination_column" id="cbo_destination_column" class="form-select">
+                        <option value="">Select a destination column</option>
+                        {% for value, label in destination_columns %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td class="align-middle">
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-success" value="-1" id="btnAddProfileMapping">Add</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+  // Save Profile Mapping
+  $('#btnAddProfileMapping').click(function(e) {
+
+    e.preventDefault();  // Prevent default form submission behavior
+
+    // Check if Name field has been filled out before saving
+    if ($("#txtNewFromFileHeader").val() == "" || $("#cbo_destination_column").val() == "") {
+      alert("Please specify both the new file header and destination column.");
+      return false;
+    }
+
+    $.ajax({  // do a hidden postback to the url(view) below
+      type: 'POST',
+      url: '{% url 'finance:save_import_profile_mapping' %}',  //which URL mapping to redirect to
+      data: {
+        mapping_id: $(this).val(),  // get value of button that triggered the event
+        profile_id: "{{ profile.id }}",
+        from_file_header: $("#txtNewFromFileHeader").val(),
+        to_transaction_header: $("#cbo_destination_column").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        action: 'post'
+      },
+      success: function(json) {
+        // document.getElementById("btnAddProfileMapping").value = json.profile_id;
+        alert('Saved!');
+        window.location.href = "{% url 'finance:import_profiles' %}";  // redirect after save
+      },
+      error: function(xhr, errmsg, err) {
+        console.log(errmsg);
+      }
+    });
+  })
+</script>

@@ -3,10 +3,7 @@ from .currency import Currency
 
 
 class ExchangeRate(models.Model):
-    id = models.BigIntegerField(
-        primary_key=True,
-        unique=True
-    )
+    id = models.AutoField(primary_key=True)
     currency_from = models.ForeignKey(
         Currency,
         on_delete=models.CASCADE,

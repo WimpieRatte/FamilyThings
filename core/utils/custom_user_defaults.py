@@ -1,4 +1,4 @@
-from core.models.custom_user import CustomUser
+from core.models import CustomUser
 
 def get_first_custom_user():
     """Return the first available CustomUser's ID in the database or ``None`` if no users exist."""
