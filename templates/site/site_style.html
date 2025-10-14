@@ -99,6 +99,16 @@
     table tr:last-of-type td:first-of-type, table { border-bottom-left-radius: 5px !important; }
     table tr:last-of-type td:last-of-type, table { border-bottom-right-radius: 5px !important; }
 
+    #btn-actions {
+        filter: grayscale(.7);
+        transition-property: filter;
+        transition-duration: .25s;
+    }
+
+    #btn-actions:hover, #btn-actions.show {
+        filter: grayscale(0);
+    }
+
     @-moz-keyframes spin { 
         0% { -moz-transform: translate(-50%,-50%) rotate(0deg); }
         100% { -moz-transform: translate(-50%,-50%) rotate(360deg); } 

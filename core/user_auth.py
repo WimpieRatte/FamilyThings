@@ -7,7 +7,7 @@ from core.session import create_alert, get_locale_text, JsonResponseAlert
 
 
 
-def process_login(request, lang_code: str = ""):
+def process_login(request):
     """Create the Login view and/or attempt to authenticate the User."""
     if request.POST:
         username = request.POST["username"]
@@ -38,6 +38,7 @@ def process_login(request, lang_code: str = ""):
                         default_text="Username and password don't match up with an existing account."))
     else:
         return HttpResponseBadRequest()
+
 
 def process_logout(request):
     create_alert(request=request, ID="logout-success", type="warning",

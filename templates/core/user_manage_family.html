@@ -5,7 +5,7 @@
 <script>
     function removeUser(btn) {
         if (confirm(`Are you sure you want to this?`)) {
-            event.preventDefault(); // Prevents the button from creating the default HTTPRequest
+            btn.disabled = true;
             
             $.ajax({ 
                 type: 'POST', url: '{% url "core:remove_member" %}',
@@ -20,6 +20,29 @@
                 error: function(xhr, errmsg, err) {
                     createAlert(xhr.responseText, key="", type="danger");
                     event.target.disabled = false;
+                    btn.disabled = false;
+                }
+            });
+        }
+    }
+    function toggleManagerRole(btn) {
+        if (confirm(`Are you sure you want to this?`)) {
+            btn.disabled = true;
+            
+            $.ajax({ 
+                type: 'POST', url: '{% url "core:toggle_manager_role" %}',
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+                    family_id: '{{family.ID}}', user_id: btn.value
+                },
+                success: function(json) {
+                    createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
+                    console.log(json);
+                    location.reload();
+                },
+                error: function(xhr, errmsg, err) {
+                    createAlert(xhr.responseText, key="", type="danger");
+                    event.target.disabled = false;
+                    btn.disabled = false;
                 }
             });
         }
@@ -35,11 +58,11 @@
                     <thead class="w-100 fs-sm">
                         <tr class="">
                             <th class="p-1" style="width: 5%;" scope="col">#</th>
-                            <th class="p-1" id="id_" style="width: 28%;" scope="col">Display Name</th>
-                            <th class="p-1" id="id_" style="width: 18%;" scope="col">Username</th>
-                            <th class="p-1" id="lb-" style="width: 14%;" scope="col">Role</th>
-                            <th class="p-1" id="lb-" style="width: 17%;" scope="col">Joined</th>
-                            <th class="p-1" id="lb-" style="width: 13%;" scope="col"></th>
+                            <th class="p-1" id="lb-displayname" style="width: 28%;" scope="col">Display Name</th>
+                            <th class="p-1" id="lb-username" style="width: 18%;" scope="col">Username</th>
+                            <th class="p-1" id="lb-role" style="width: 14%;" scope="col">Role</th>
+                            <th class="p-1" id="lb-member-joined" style="width: 17%;" scope="col">Joined</th>
+                            <th class="p-1" id="" style="width: 13%;" scope="col"></th>
                         </tr>
                     </thead>
                     <tbody id="accomplishments-table-body" class="fs-sm">
@@ -52,15 +75,28 @@
                                 <td class="p-1">{{info.username}}</td>
                                 <td class="p-1">{% include 'header/role_name.html' with manager=info.is_manager owner=family.owner name=info.username %}</td>
                                 <td class="p-1">{{info.joined}}</td>
-                                {% if info.username != request.user.username %}
-                                    <div class="dropdown">
-                                        <td class="p-0"><button id="btn-actions" value="{{info.ID}}" type="button" data-bs-toggle="dropdown" class="dropdown-toggle btn btn-primary d-block m-auto mt-auto p-1 fs-sm" style="margin-top: 0.1em !important;">Actions</button>
-                                        <ul class="dropend dropdown-menu fs-sm">
-                                            <li><button id="promote-user" value="{{info.ID}}" class="dropdown-item" type="button"><span class="bi bi-journal-check"></span> <span id="lb-">Set as Family Manager</span></button></li>
-                                            <li id="remove-user" value='{{info.ID}}' onclick="removeUser(this)"><a class="dropdown-item text-danger"><span class="bi bi-x-circle"></span> <span id="lb-">Remove from Family</span></a></li>
-                                        </ul>
-                                        </td>
-                                    </div>
+                                {% if request.user.username != info.username %}
+                                    {% if family.owner == request.user.username or request.session.family_info.is_manager and info.username != family.owner and not info.is_manager %}
+                                        <div class="dropdown">
+                                            <td class="p-0"><button id="btn-actions" value="{{info.ID}}" type="button" data-bs-toggle="dropdown" class="dropdown-toggle btn btn-primary d-block m-auto mt-auto p-1 fs-sm" style="margin-top: 0.1em !important;">Actions</button>
+                                            <ul class="dropend dropdown-menu fs-sm">
+                                                {% if family.owner == request.user.username %}
+                                                <li id="promote-user" value="{{info.ID}}" onclick="this.onclick=null; toggleManagerRole(this); this.disabled=true;" class="dropdown-item"> 
+                                                    {% if info.is_manager %}
+                                                        <span id="lb-set-as-member" class="text-success-emphasis">Set as Member</span>
+                                                    {% else %}
+                                                        <span id="lb-set-as-manager" class="text-info-emphasis">Set as Family Manager</span>
+                                                    {% endif %}
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                {% endif %}
+                                                <li id="remove-user" value='{{info.ID}}' onclick="this.onclick=null; removeUser(this); this.disabled=true;" class="dropdown-item text-danger"><span class="bi bi-x-circle"></span> <span id="lb-rm-from-family">Remove from Family</span></li>
+                                            </ul>  
+                                            </td>
+                                        </div>
+                                    {% else %}
+                                        <td class="p-1"></td>
+                                    {% endif %}
                                 {% else %}
                                     <td class="p-1"></td>
                                 {% endif %}
@@ -71,7 +107,7 @@
                 </table>
             </div>
             <div class="w-50 px-3">
-                {% include 'site/heading_small.html' with id="invite" title='Invite' %}
+                {% include 'site/heading_small.html' with id="invites" title='Invites' %}
                 <div class="bg-dark rounded-2 py-3 text-center">
                     <p id="lb-invite-code" class="p-1 m-0">Your Invite Code:</p>
                     <p id="invite-code" class="p-1 m-0">{{invite}}</p>
@@ -101,13 +137,6 @@
                     event.target.disabled = false;
                 }
             });
-        }
-    });
-
-    $("#promote-user").click(function(event) {
-        if (confirm(`Are you sure you want to this?`)) {
-            event.preventDefault(); // Prevents the button from creating the default HTTPRequest
-            console.log($(this).val())
         }
     });
 </script>

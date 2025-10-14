@@ -115,16 +115,6 @@
     {% include 'js_accomp_new_accomp_prompt.js' %}
 </script>
 <style>
-    #btn-actions {
-        filter: grayscale(1);
-        transition-property: filter;
-        transition-duration: .25s;
-    }
-
-    #btn-actions:hover, #btn-actions.show {
-        filter: grayscale(0);
-    }
-
     .background-bi {
         color: var(--bs-{{request.user.color}});
         z-index: -1;

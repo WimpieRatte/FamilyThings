@@ -5,24 +5,18 @@ from django.utils import timezone
 from .models import Accomplishment, FamilyUserAccomplishment, AccomplishmentType, MeasurementType
 from .forms.accomplishment import AccomplishmentForm
 from . import constants
-from core.views import render_if_logged_in
-from core.session import update_session, create_alert, get_locale_text
+from core.session import update_user_session, create_alert, get_locale_text
 from core.models.custom_user import CustomUser
 
 
-def page_overview(request, lang_code: str = ""):
+@update_user_session()
+def page_overview(request):
     """An overview of an User's Accomplishments."""
-    update_session(request=request, lang_code=lang_code)
-
-    if not request.user.is_authenticated:
-        create_alert(request=request, ID="login-required", type="warning",
-            text="For this action, you need to login first.")
-        return redirect("core:user_login")
 
     recent_additions = Accomplishment.objects.filter(
                     created_by=request.user.id).order_by('created').values()[:10]
 
-    target: HttpResponse = render(
+    return render(
         request, "accomp_overview.html",
         {
             'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=recent_additions))),
@@ -30,14 +24,10 @@ def page_overview(request, lang_code: str = ""):
             'form': AccomplishmentForm()
         })
 
-    return render_if_logged_in(request, target)
 
-
-def page_new_accomplishment(request, lang_code: str = "", ID: int = -1):
+@update_user_session()
+def page_new_accomplishment(request, ID: int = -1, cache_last_visited_page = False):
     """."""
-    update_session(request=request, lang_code=lang_code,
-                   cache_last_visited_page=False)
-
     form: AccomplishmentForm = AccomplishmentForm()
 
     if ID != -1:
@@ -68,11 +58,9 @@ def datetime_from_field(form: AccomplishmentForm, field: str = "",
         tzinfo=zoneinfo.ZoneInfo(tz))
 
 
-def page_edit_user_accomplishment(request, lang_code: str = "", ID: int = -1):
+@update_user_session()
+def page_edit_user_accomplishment(request, ID: int = -1, cache_last_visited_page=False):
     """."""
-    update_session(request=request, lang_code=lang_code,
-                   cache_last_visited_page=False)
-
     form: AccomplishmentForm = AccomplishmentForm()
 
     if ID != -1:
@@ -103,11 +91,9 @@ def page_edit_user_accomplishment(request, lang_code: str = "", ID: int = -1):
             request, "accomp_edit_milestone.html", {"form": form})
 
 
-def page_edit_accomplishment_details(request, lang_code: str = "", ID: int = -1):
+@update_user_session()
+def page_edit_accomplishment_details(request, ID: int = -1, cache_last_visited_page = False):
     """."""
-    update_session(request=request, lang_code=lang_code,
-                   cache_last_visited_page=False)
-
     form: AccomplishmentForm = AccomplishmentForm()
 
     if ID != -1:

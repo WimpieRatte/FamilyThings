@@ -4,29 +4,20 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import CalendarEntry
 from core.views import render_if_logged_in
-from core.session import update_session, create_alert, get_locale_text
+from core.session import update_user_session, create_alert, get_locale_text
 from core.models.custom_user import CustomUser
 
 
-
+@update_user_session()
 def page_calendar(request, lang_code: str = ""):
     """."""
-    update_session(request=request, lang_code=lang_code)
-
-    if not request.user.is_authenticated:
-        create_alert(request=request, ID="login-required", type="warning",
-            text="For this action, you need to login first.")
-        return redirect("core:user_login")
-
-    target: HttpResponse = render(
+    return render(
         request, "calendar.html",
         {
             'entries': list(CalendarEntry.objects.filter(
                 custom_user_id=request.user
             ).values())
         })
-
-    return render_if_logged_in(request, target)
 
 
 def get(request, lang_code: str = ""):

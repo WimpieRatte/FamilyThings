@@ -21,7 +21,7 @@
             {% else %}
               <small id="dropdown-item-role" class="dropdown-item no-ptr-evt">
                 {% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.session.family_info.is_manager %}<br>
-                {{ request.session.family_info.name }}
+                {{ request.session.family_info.family_name }}
               </small>
               <li><hr class="dropdown-divider"></li>
               {% include 'header/dropdown_item.html' with href='core:user_settings' id="user-settings" icon='gear' label='Settings' %}
