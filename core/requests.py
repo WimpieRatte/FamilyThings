@@ -1,6 +1,7 @@
 from django.utils.crypto import get_random_string
 from django.db import transaction
 from django.http import JsonResponse, HttpResponseBadRequest
+from django.shortcuts import render
 from django.utils import timezone
 
 from core.models import Family, FamilyUser, FamilyInvite
@@ -67,18 +68,31 @@ def check_invite(request):
 
 
 @transaction.atomic
-def join_family(request):
+def join_family(request, token: str = ""):
     """"""
     if not request.user.is_authenticated:
         return HttpResponseBadRequest()
-    print(request.POST["token"])
-    family: Family = FamilyInvite.objects.get(token=request.POST["token"]).family_id
 
-    FamilyUser.objects.create(
+    #  Fallback to the token specified in the POST, if it's not
+    #  passed on in the backend.
+    if token == "":
+        token = request.POST["token"]
+
+    print("checking token", token)
+
+    family: Family = FamilyInvite.objects.get(token=token).family_id
+
+    new_user, newly_created = FamilyUser.objects.get_or_create(
         family_id=family,
         custom_user_id=request.user,
         is_manager=False
     )
+
+    # Reactivate the user if they already existed
+    if not newly_created:
+        new_user.deactivated = False
+        new_user.save()
+
     return JsonResponse(data={
         'alert-message': get_locale_text(
             request=request, ID="family-create-success",
@@ -118,8 +132,11 @@ def create_invite(request):
 @transaction.atomic
 def remove_from_family(request):
 
-    target: FamilyUser = FamilyUser.objects.get(family_id=request.POST["family_id"], custom_user_id=request.POST["user_id"])
-    target.delete()
+    target: FamilyUser = FamilyUser.objects.get(
+        family_id=request.POST["family_id"],
+        custom_user_id=request.POST["user_id"])
+    target.deactivated = True
+    target.save()
 
     return JsonResponse(data={
         'alert-message': 'User has been removed from family.',
@@ -141,4 +158,20 @@ def toggle_manager_role(request):
     return JsonResponse(data={
         'alert-message': 'User has been promoted to Manager.',
         'alert-type': 'warning'
+        })
+
+
+def get_messages(request):
+    fam_user = FamilyUser.objects.filter(
+            custom_user_id=request.user)[request.session["current_family"]]
+    chat = FamilyChat.objects.filter(family_id=fam_user.family_id)
+    messages = []
+    if len(chat) > 0:
+        messages = Message.objects.filter(
+            family_chat_id=chat[0],
+            deleted=False).order_by(
+            "created_on").reverse()[:10]
+
+    return render(request, "core/temp_user_chat.html", {
+            'chat': list(messages)
         })

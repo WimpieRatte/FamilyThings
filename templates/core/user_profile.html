@@ -1,11 +1,17 @@
 {% extends "site/site_base.html" %}
 {% load static %}
+
 {% block title %}Profile -{% endblock %}
+
+{% block append_to_head %}
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container-lg d-md-flex justify-content-evenly" style="max-height: 1800px">
     <div id="accomplishments-section" class="section container pb-4" style="width: 340px;">
         {% include 'site/heading_section.html' with id="todays-accomps" label="Today's Accomplishments" value=todays_accomplishments.length %}
-        <div style="height: 16em;">
+        <div style="height: 17em;">
             <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2", style="display: none;"></div>
             <div id="new-accomplishment-wrapper" class="w-auto m-auto">
                 <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
@@ -21,19 +27,11 @@
     </div>
     <div style="width: 430px;">
         {% include 'site/heading_section.html' with id="message-wall" label='Message Wall'%}
-        <div id="messager-section" class="pb-3 w-100" style="height: 24em;">
+        <div id="messager-section" class="pb-3 w-100" style="height: 25em;">
             <div id="message-wall-wrapper" class="container rounded bg-dark rounded p-2 mb-2 h-100 fs-sm overflow-y-scroll" style="overflow-x: visible !important;">
                 <div id="message-wall" class="container rounded bg-light-subtle" style="min-height: 100%;">
                     <div id="message-list" class="p-1">
-                    {% for message in chat %}
-                        {% if not message.deleted %}
-                            {% if message.custom_user_id.full_name == request.user.full_name %}
-                                {% include 'home/message_item.html' with sender=message.custom_user_id message=message class='text-end' can_delete=family.is_manager %}
-                            {% else %}
-                                {% include 'home/message_item.html' with sender=message.custom_user_id message=message class='text-start' can_delete=family.is_manager %}
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
+                        {% include 'core/temp_user_chat.html' with chat=chat %}
                     </div>
                 </div>
             </div>
@@ -50,7 +48,7 @@
         </div>
     </div>
     <div id="feed-section" class="section container-sm pb-4" style="width: 340px;">
-        <div id="family-feed" style="height: 17em;">
+        <div id="family-feed" style="height: 18em;">
             {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
             <div class="flex-column bg-dark rounded p-1 mh-25">
                 {% for entry in family_activity %}
@@ -181,6 +179,25 @@
     document.querySelectorAll(".message-content").forEach(function(element) {
         element.outerHTML = element.outerHTML.replace(/(\*{2}(.*?)\*{2})/g, "<strong>$2</strong>").replace(/(\*(.*?)\*)/g, "<i>$2</i>")
     });
+
+
+
+    // Replace with function that puts more rendering load to the Frontend
+    /*const messageList = document.getElementById("message-list");
+
+    function updateChat() {
+        setTimeout(function() {
+            $.get( "{% url 'core:get_messages' %}", function() {})
+            .done(function(response) {
+                //Make chat blank
+                messageList.textContent = "";
+                messageList.innerHTML = response;
+            })
+            .fail(function(err) {console.log(err);})
+            updateChat()
+        }, 5000)
+    }
+    updateChat()*/
 </script>
 <style>
     .rd-day-selected {

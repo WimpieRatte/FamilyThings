@@ -1,4 +1,5 @@
 import re
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMessage
@@ -11,11 +12,11 @@ from django.utils import timezone
 from django.shortcuts import render, redirect
 
 from core.session import update_user_session
-from core.models.password_reset import PasswordReset
-from .models import CustomUser, Family, FamilyUser, FamilyInvite
-from .forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
-from .session import update_session, create_alert
 from .constants import COLORS
+from .models import CustomUser, Family, FamilyUser, FamilyInvite, PasswordReset
+from .forms import UserSettingsForm, UserRegisterForm, UserFinalizeForm
+from .requests import join_family
+from .session import update_session, create_alert
 
 from accomplishment.models import FamilyUserAccomplishment
 from messenger.models import FamilyChat, Message
@@ -105,6 +106,14 @@ def user_register(request):
                     password=password,
                 )
 
+                if form.data.get("invite_code", "") != "":
+                    # It is required for the user to be logged in before
+                    # attempting to use the invite
+                    login(request, new_user)
+                    join_family(request, token=form.data.get("invite_code"))
+
+                    logout(request)
+
                 CalendarEntry.objects.create(
                     title="First Step",
                     description="Created your FamilyThings account",
@@ -130,9 +139,10 @@ def user_final_step(request):
 def user_profile_page(request):
     """The User's overview section."""
     try:
-        fam_user = FamilyUser.objects.filter(
-            custom_user_id=request.user)[request.session["current_family"]]
-        chat = FamilyChat.objects.filter(family_id=fam_user.family_id)
+        fam_user = FamilyUser.objects.get(
+            custom_user_id=request.user,
+            family_id=request.session["family_info"]["family_ID"])
+        chat = FamilyChat.objects.filter(family_id=request.session["family_info"]["family_ID"])
 
         # Messenger
         # TODO: Move the Message creation to its own section
@@ -156,7 +166,7 @@ def user_profile_page(request):
 
         #  Family Activities
         fam_users = FamilyUser.objects.filter(
-            family_id=fam_user.family_id).exclude(
+            family_id=request.session["family_info"]["family_ID"]).exclude(
                 custom_user_id=request.user)
 
         accomplishments = []
@@ -288,7 +298,7 @@ def manage_family_page(request):
     return render(request, "core/user_manage_family.html", {
         'family': family.serialized(),
         'members': list(FamilyUser.objects.filter(
-            family_id=family.id).order_by("join_date")),
+            family_id=family.id, deactivated=False).order_by("join_date")),
         'invite': invite, 'all_invites': all_invites,
     })
 

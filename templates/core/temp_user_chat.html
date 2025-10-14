@@ -1,0 +1,9 @@
+{% for message in chat %}
+    {% if not message.deleted %}
+        {% if message.custom_user_id.full_name == request.user.full_name %}
+            {% include 'home/message_item.html' with sender=message.custom_user_id message=message class='text-end' can_delete=family.is_manager %}
+        {% else %}
+            {% include 'home/message_item.html' with sender=message.custom_user_id message=message class='text-start' can_delete=family.is_manager %}
+        {% endif %}
+    {% endif %}
+{% endfor %}

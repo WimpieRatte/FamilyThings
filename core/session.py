@@ -32,7 +32,8 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
                 if require_family:
                     try:
                         FamilyUser.objects.filter(
-                            custom_user_id=request.user)[request.session["current_family"]]
+                            custom_user_id=request.user,
+                            deactivated=False)[request.session["current_family"]]
                     except (FamilyUser.DoesNotExist, IndexError):
                         return redirect("core:user_final_step")
 
@@ -47,7 +48,8 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
             if request.user.is_authenticated:
                 # First, get all Families tied to the user
                 family_queue = FamilyUser.objects.filter(
-                    custom_user_id=request.user).order_by('join_date')
+                    custom_user_id=request.user,
+                    deactivated=False).order_by('join_date')
 
                 if len(family_queue) > 0:
                     # Then, create a list with all the family names
@@ -55,6 +57,7 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
                     # Also grab a dict with all the relevant info about the family you're
                     # currently switched to
                     request.session["family_info"] = family_queue[request.session["current_family"]].serialized()
+                    print(request.session["family_info"])
 
             #  Apply a language code based on either the existing value,
             #  an User's own setting, or lastly, the browser's.

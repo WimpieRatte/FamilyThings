@@ -50,36 +50,12 @@
         disableLoadingScreen();
     });
 
-    var nameField = document.getElementById("id_invite_code");
-    var inviteButton = document.getElementById("btn-apply");
+    //"inviteField" is already defined in this imported section of code
+    {% include 'core/js_check_invite.js' %}
+
+    //Overwrite the invite button
+    inviteButton = document.getElementById("btn-apply");
     inviteButton.disabled = true;
-
-    var currentToken = ""
-
-    var previousInput = ""
-    function tokenCheckValid() {
-        if (nameField.value.length > 0 && previousInput != nameField.value){
-            previousInput = nameField.value;
-
-            $.ajax({ 
-                type: 'POST', url: `{% url 'core:check_invite' %}`, data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                    token: nameField.value
-                },
-                success: function(result) {
-                    nameField.disabled = true;
-                    nameField.className = nameField.className += " bg-success"
-                    inviteButton.disabled = false;
-                    currentToken = nameField.value;
-                },
-                error: function(xhr, errmsg, err) {
-
-                }
-            });
-        }
-        setTimeout(function() { tokenCheckValid() }, 1000);
-    }
-    tokenCheckValid();
 
     $("#btn-apply").click(function(event) {
         event.preventDefault(); // Prevents the button from creating the default HTTPRequest
