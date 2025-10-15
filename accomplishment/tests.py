@@ -7,4 +7,3 @@ class AccomplishmentTests(TestCase):
         url = reverse("accomplishment:get")
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 400)
-

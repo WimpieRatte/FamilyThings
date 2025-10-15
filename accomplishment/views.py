@@ -26,9 +26,12 @@ def page_overview(request):
 
 
 @update_user_session()
-def page_new_accomplishment(request, ID: int = -1, cache_last_visited_page = False):
+def page_new_accomplishment(request, ID: int = -1, name: str = ""):
     """."""
     form: AccomplishmentForm = AccomplishmentForm()
+
+    if name != "":
+        form = AccomplishmentForm(initial={'name': name})
 
     if ID != -1:
         accom: Accomplishment = Accomplishment.objects.get(id=ID)

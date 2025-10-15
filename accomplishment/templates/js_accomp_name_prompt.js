@@ -88,8 +88,10 @@ function nameCheckAvailable() {
                 foundAccompText.textContent = "";
                 foundAccompText.className = "";
 
-                selectedAccomplishment = null
-                accomplishmentStorage = null
+                selectedAccomplishment = null;
+                accomplishmentStorage = null;
+                console.log(document.getElementById("create-link"))
+                document.getElementById("create-link").href = `{% url 'accomplishment:add_new' %}/text='${nameField.value}'`
             }
         });
     }

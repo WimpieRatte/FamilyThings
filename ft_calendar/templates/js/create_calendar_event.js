@@ -37,7 +37,7 @@ $(saveBtn).click(function(event) {
         const description = descField.value.trim();
         const date = dateField.value;
 
-        if (!title || !date || !description) {
+        if (!title || !date) {
             successMsg.style.display = "none";
             errorMsg.style.display = "block";
             return
@@ -59,23 +59,11 @@ $(saveBtn).click(function(event) {
         },
         success: function(json) {
             disableLoadingScreen();
-            closePopup();
+            //closePopup();
             createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-            setTimeout(function() {window.location.replace('{{request.session.last_visited_page}}');}, 2000);
-
             setTimeout(function() {
-                var count = 200;
-                var defaults = {origin: { y: 0.65 }};
-
-                function fire(particleRatio, opts) {
-                    confetti({...defaults, ...opts, particleCount: Math.floor(count * particleRatio)});
-                }
-                fire(0.25, { spread: 26, startVelocity: 55});
-                fire(0.2, {spread: 60,});
-                fire(0.35, {spread: 100, decay: 0.91, scalar: 0.8});
-                fire(0.1, {spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2});
-                fire(0.1, {spread: 120, startVelocity: 45});
-            }, 10);
+                window.location.replace('{{request.session.last_visited_page}}');}, 
+                1000);
         },
         error: function(xhr, errmsg, err) {
             event.target.disabled = false;

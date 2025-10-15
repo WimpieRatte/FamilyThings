@@ -20,7 +20,7 @@
             <div class="d-flex gap-2 justify-content-center pt-1" style="width: 600px;">
                 <button id="btn-repeat" class="btn btn-primary border-primary bi bi-repeat" type="button"
                     style="display: none;">Repeat</button>
-                <a href="{% url 'accomplishment:add_new' %}"><button disabled id="btn-create-new"
+                <a id="create-link" href="{% url 'accomplishment:add_new' %}"><button disabled id="btn-create-new"
                         class="btn btn-primary border-primary" type="button">Create New</button></a>
                 <button id="btn-abort" class="btn-abort-edit btn btn-danger" type="button">Abort</button>
             </div>
