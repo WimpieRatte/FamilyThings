@@ -1,0 +1,23 @@
+            <tr>
+                <td>
+                    <input type="email" id="txtNewFromFileHeader" class="form-control" placeholder="New File Header" value="{{ mapping.from_file_header }}"/>
+                </td>
+                <td class="align-middle">
+                    <select name="cbo_destination_column" id="cbo_destination_column" class="form-select">
+                        <option value="">Select a destination column</option>
+                        {% for value, label in destination_columns %}
+                            {% if label == mapping.to_transaction_header %}
+                                <option selected value="{{ value }}">{{ label }}</option>
+                            {% else %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+                <td class="align-middle">
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="submit" class="btn btn-success" value="{{ mapping.id }}" id="btnSaveProfileMapping">Save</button>
+                        <button type="submit" class="btn btn-danger" value="{{ mapping.id }}" id="btnDeleteProfileMapping">Delete</button>
+                    </div>
+                </td>
+            </tr>
