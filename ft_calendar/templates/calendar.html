@@ -1,7 +1,9 @@
 {% extends "site/site_base.html" %}
 {% load static %}
 {% block title %}Calendar -{% endblock %}
-{% block popups %}{% endblock %}
+{% block popups %}
+    {% include 'new_calendar_event_popup.html' %}
+{% endblock %}
 {% block content %}
 <div id="calendar" class="container-sm pb-4" style="width: 90%;">
     {% include 'site/heading_section.html' with label="Calendar" id="calendar" %}
@@ -47,6 +49,7 @@
 <script src="{% static 'rome/rome.js'%}"></script>
 <script>
     {% include 'js_calendar_rome.js' %}
+    {% include 'js/create_calendar_event.js' %}
     $(".rd-next").click(function(event) { setTimeout(function() {resetDayButtons();}, 1)});
     $(".rd-back").click(function(event) { setTimeout(function() {resetDayButtons();}, 1)});
 
