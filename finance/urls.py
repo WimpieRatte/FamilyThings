@@ -11,4 +11,5 @@ urlpatterns = [
 	path('save_import_profile', views.save_import_profile, name='save_import_profile'),
 	path('delete_import_profile', views.delete_import_profile, name='delete_import_profile'),
  	path('save_import_profile_mapping', views.save_import_profile_mapping, name='save_import_profile_mapping'),
+  	path('delete_import_profile_mapping/<int:pk>', views.delete_import_profile_mapping, name='delete_import_profile_mapping'),
 ]

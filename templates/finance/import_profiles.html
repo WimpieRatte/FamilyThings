@@ -3,6 +3,11 @@
 
 {% block append_to_head %}
 <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+<style>
+    body {
+        overflow-y: auto; /* allow standard page scrolling */
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -15,6 +20,7 @@
             <label for="import-profile-selector" class="form-label">
                 Select Import Profile
             </label>
+            <br>
             <select class="form-select"
                     aria-label="Select Import Profile"
                     id="import-profile-selector"
@@ -35,17 +41,17 @@
                 {% endfor %}
             </select>
         </div>
-        <br>
-        <div id="import_profile_controls">
+    </div>
+
+    <br>
+    <div id="import_profile_details_container">
+        <div id="import_profile_controls" class="container rounded bg-dark p-2 h-25 mh-25">
             {% include 'finance/partials/import_profile_controls.html' %}
         </div>
-    <br>
-    </div>
-    <br>
-
-    {% comment %} Mapping Area: {% endcomment %}
-    <div id="import_profile_mapping_area">
-        {% include 'finance/partials/import_profile_mappings.html' %}
+        <br>
+        <div id="import_profile_mapping_area">
+            {% include 'finance/partials/import_profile_mappings.html' %}
+        </div>
     </div>
 </div>
 {% endblock %}
