@@ -22,15 +22,15 @@ $.when( basicAJAX(type="POST", url=`{% url 'accomplishment:get_names' %}`, data=
 // Open Name Prompt
 $("#add-new-button").click(function(event) {
     event.preventDefault();
-    nameField.value = ""
+    resetNamePrompt();
     openPopup("name-prompt-popup");
 });
 
-$("#btn-create-new").click(function(event) {
+/*$("#btn-create-new").click(function(event) {
     nameField.value = ""
     closePopup()
     openPopup("name-prompt-popup");
-});
+});*/
 
 function resetNamePrompt() {
     accomplishmentStorage = null
@@ -58,8 +58,8 @@ $("#name-prompt-popup #btn-repeat").click(function(event) {
 });
 
 var previousName = ""
-function nameCheckAvailable() {
-    if (nameField.value.length > 0 && previousName != nameField.value){
+function nameCheckAvailable(enforceCheck = false) {
+    if ((nameField.value.length > 0 && previousName != nameField.value) || enforceCheck){
         previousName = nameField.value;
 
         $.ajax({ 
@@ -90,12 +90,14 @@ function nameCheckAvailable() {
 
                 selectedAccomplishment = null;
                 accomplishmentStorage = null;
-                console.log(document.getElementById("create-link"))
-                document.getElementById("create-link").href = `{% url 'accomplishment:add_new' %}/text='${nameField.value}'`
+                //console.log(document.getElementById("create-link"))
+                //document.getElementById("create-link").href = `{% url 'accomplishment:add_new' %}/text='${nameField.value}'`
             }
         });
     }
-    setTimeout(function() { nameCheckAvailable() }, 1000);
+    if (!enforceCheck){
+        setTimeout(function() { nameCheckAvailable() }, 1000);
+    }
 }
 nameCheckAvailable();
 
@@ -107,3 +109,12 @@ $("#lb-new-accomp-prompt").keyup(function(event) {
     nameTakenText.style.display = "none";
     nameAvailableText.style.display = "none";
 });
+
+
+document.getElementById("lb-new-accomp-prompt").addEventListener("keydown", function(event) {
+    if(event.key === 'Enter') {
+        nameCheckAvailable(enforceCheck = true); 
+        submitButton.click();
+        repeatButton.click();
+    }
+})

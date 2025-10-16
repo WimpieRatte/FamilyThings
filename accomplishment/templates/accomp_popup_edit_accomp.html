@@ -4,7 +4,7 @@
     <span class="bi bi-journal-text background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
     <span class="bi bi-pen background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
     <div id="edit-accomp-wrapper" class="px-5 py-2">
-        {% include 'temp_accomp_info.html' %}
+        {% include 'temp_accomp_info.html' with show_date=True %}
         <form id="edit-accomp-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5">
             {% csrf_token %}
             <div id="measurement-settings">

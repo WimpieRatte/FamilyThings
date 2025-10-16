@@ -21,7 +21,10 @@ def page_overview(request):
         {
             'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=recent_additions))),
             'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan'],
-            'form': AccomplishmentForm()
+            'icons': constants.ICONS,
+            'categories': constants.CATEGORIES,
+            'measurements': constants.MEASUREMENTS,
+            'form': AccomplishmentForm(),
         })
 
 

@@ -143,7 +143,7 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
                         $(`#id_${field}`).val(accompData[field]);
                     });
 
-                    $('#edit-accomp-name').text(accompData["name"]);
+                    $('#edit-accomp-popup #edit-accomp-name').text(accompData["name"]);
                     document.getElementById('edit-accomp-icon').className = `bi bi-${accompData["icon"]}`;
 
                     $('#edit-accomp-created').text(new Date(accompData["created"]).toLocaleDateString(language, {

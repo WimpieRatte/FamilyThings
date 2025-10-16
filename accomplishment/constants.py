@@ -18,3 +18,14 @@ ICONS = [
     # Big Achievements
     "mortarboard", "award", "trophy", "cake", "dash", "dash"
 ]
+
+CATEGORIES = [
+    "Family", "Health", "Fitness", "Hobbies", "School", "Work", "Education"
+]
+
+MEASUREMENTS = [
+    ("x", "Times"), ("mtr", "Meters"), ("km", "Kilometers"),
+    ("cm", "Centimeters"), ("ltr", "Liters"), ("ml", "Mililiters"),
+    ("mi", "Miles"), ("g", "Grams"), ("kg", "Kilograms"),
+    ("s", "Seconds"), ("m", "Minutes"), ("h", "Hours")
+]

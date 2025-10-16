@@ -1,7 +1,8 @@
 {% extends "site/site_base.html" %}
-{% block title %}Accomplishments -{% endblock %}
+{% block title %}Accomplishments - {% endblock %}
 {% block popups %}
     {% include 'accomp_popup_name_prompt.html' %}
+    {% include 'accomp_popup_new_accomp.html' with icons=icons %}
     {% include 'accomp_popup_edit_accomp.html' %}
     {% include 'accomp_popup_repeat_accomp.html' %}
     {% include 'accomp_popup_edit_template.html' %}
@@ -62,7 +63,7 @@
                     {% include 'site/heading_small.html' with title="Recent Additions (Click to repeat)" id="recent-additions" class='text-center pt-1' %}
                     <div class="d-flex justify-content-center flex-wrap gap-1" style="width: fit-content;">
                         {% for entry in recent_additions %}
-                            <a data-data="{{entry.serialized}}" onclick="openRepeat(this)" value={{entry.id}} class="link-underline link-underline-opacity-0 tooltip-source" data-tooltip-context="Repeat" data-tooltip-content='"{{entry.name}}"'>
+                            <a data-accomp-data="{{entry.serialized}}" onclick="openRepeat(this)" value={{entry.id}} class="link-underline link-underline-opacity-0 tooltip-source" data-tooltip-context="Repeat" data-tooltip-content='"{{entry.name}}"'>
                                 {% with color=colors|random %}
                                 <div class="rounded-2 p-1" style="color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});">{{entry.name}} <span class="bi bi-repeat"></span></div>
                                 {% endwith %}
@@ -92,7 +93,7 @@
     var selectedAccomplishment = "" //Stores the ID of the Accomplishment/Template that is being edited.
 
     function openRepeat(data) {
-        let _data = data.getAttribute("data-data").replaceAll(`'`, `"`).replaceAll(`None`, `null`).replaceAll(`False`, `false`)
+        let _data = data.getAttribute("data-accomp-data").replaceAll(`'`, `"`).replaceAll(`None`, `null`).replaceAll(`False`, `false`).replaceAll(`True`, `true`);
         accomplishmentStorage = JSON.parse(_data)
         closePopup();
         openPopup("repeat-accomp-popup");
@@ -114,7 +115,4 @@
     {% include 'js_accomp_edit_template_prompt.js' %}
     {% include 'js_accomp_new_accomp_prompt.js' %}
 </script>
-<style>
-    
-</style>
 {% endblock %}

@@ -9,6 +9,15 @@
     {% endif %}
 }
 
+
+.bg-primary-subtle {
+    {% if color %}
+        background-color: color-mix(in srgb, var(--bs-{{color}}) 30%, #ffffff00) !important;
+    {% else %}
+        background-color: color-mix(in srgb, var(--bs-blue) 30%, #ffffff00) !important;
+    {% endif %}
+}
+
 .text-primary {
     color: var(--bs-{{color}}-subtle) !important;
 }
