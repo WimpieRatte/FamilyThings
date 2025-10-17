@@ -1,0 +1,32 @@
+<div class="row">
+    <div class="col-12">
+        <h1 class="chart-title">{{ chart_title }}</h1>
+
+        <div class="chart-container">
+            <!-- Chart will be rendered here -->
+            <div id="pie-chart"></div>
+        </div>
+
+        {% if chart_description %}
+        <div class="alert alert-info">
+            {{ chart_description }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Chart Data passed from Django -->
+{{ chart_json|json_script:"chart-data" }}
+
+<script>
+    // Get chart data from Django
+    const chartData = JSON.parse(document.getElementById('chart-data').textContent);
+
+    // Render the pie chart
+    Plotly.newPlot('pie-chart', chartData.data, chartData.layout, chartData.config);
+
+    // Optional: Add responsiveness
+    window.addEventListener('resize', function() {
+        Plotly.Plots.resize(document.getElementById('pie-chart'));
+    });
+</script>
