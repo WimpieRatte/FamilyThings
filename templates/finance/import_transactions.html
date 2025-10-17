@@ -1,4 +1,12 @@
 {% extends "site/site_base.html" %}
+{% block append_to_head %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            overflow-y: auto; /* allow standard page scrolling */
+        }
+    </style>
+{% endblock %}
 {% block title %}Finance: Import Transactions{% endblock %}
 {% block content %}
 <div id="accomplishments-overview" class="container-sm pb-4 w-100">
@@ -43,8 +51,15 @@
                 </button>
             </div>
         </div>
-
     </div>
+
+    <br>
+    {% include 'finance/partials/imported_transactions.html' %}
+    <div id="imported_transactions_container" class="container rounded bg-dark p-2 h-25 mh-25">
+
+        <br>
+    </div>
+    <br>
 </div>
 
 <script>
