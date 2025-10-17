@@ -117,15 +117,16 @@ def get_by_name(request, name: str):
         return HttpResponseBadRequest()
 
     try:
-        result: Accomplishment = Accomplishment.objects.get(name__iexact=name)
+        result: Accomplishment = Accomplishment.objects.get(
+            created_by=request.user,
+            name__iexact=name)
         return JsonResponse(data=result.serialized())
     except (Accomplishment.DoesNotExist):
         return HttpResponseNotFound()
 
 
 def get_names(request):
-    """Return details about an Accomplishment if the name matches,
-    otherwise return Http404"""
+    """"""
     if not request.user.is_authenticated:
         return HttpResponseBadRequest()
 
@@ -269,7 +270,6 @@ def delete_accomplishment(request, ID):
             data={'alert-message': "", 'alert-type': 'success'})
     except (FamilyUserAccomplishment.DoesNotExist):
         return HttpResponseBadRequest()
-
 
 
 def require_login(request, func):

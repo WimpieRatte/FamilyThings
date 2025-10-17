@@ -128,6 +128,19 @@
                             for (let i = 0; i < children.length; i++) {
                                 children[i].textContent = text[i]}
                             break;
+                        case "datalist":
+                            element.innerHTML = ""
+                            console.log(text[0])
+                            if (typeof text[0] == "string") {
+                                text.forEach(function(option) {
+                                    element.insertAdjacentHTML( 'beforeend', `<option value="${option}"></option>`)});
+                            }
+                            else {
+                                text.forEach(function(option) {
+                                    element.insertAdjacentHTML( 'beforeend', `<option value="${option[0]}">${option[0]} (${option[1]})</option>`)
+                                });
+                            }
+                            break;
                         default:
                             element.textContent = text; break;
                     }

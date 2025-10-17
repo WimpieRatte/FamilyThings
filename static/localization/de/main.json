@@ -36,8 +36,9 @@
     "lb-cursor": "Besonderes Cursor-Design",
     "lb-description": "Beschreibung",
     "lb-accomplishment_type": "Kategorie",
-    "lb-is_achievement": "Besondere Auszeichnung",
-    "lb-measurement": "Wert",
+    "lb-is_achievement": "Auszeichnung",
+    "lb-value": "Wert",
+    "lb-measurement": "Mess.",
     "lb-category": "Kategorie",
     "lb-created-on": "Erstellt am",
     "lb-entries": "Zeige Einträge",
@@ -111,6 +112,9 @@
     "id_language": ["Englisch", "Deutsch"],
     "id_color": ["Blau", "Indigo", "Purpur", "Rosa", "Rot", "Orange", "Gelb", "Grün", "Türkis", "Aquamarin"],
     "filter-selector": ["Name", "Name (o. Kategorie)", "Name (Besondere)", "Kategorie"],
+    "type-suggestions": ["Familie", "Gesundheit", "Fitness", "Hobbys", "Schule", "Arbeit", "Bildung"],
+    "measurement-suggestions": [["x", "Mal"], ["m", "Meter"], ["km", "Kilometer"], ["cm", "Zentimeter"],
+    ["l", "Liter"], ["ml", "Mililiter"], ["g", "Gramm"], ["kg", "Kilogramm"], ["s", "Sekunden"], ["m", "Minuten"], ["std", "Stunden"]],
     "home-accomp1": "Erstellen Sie Ihre eigenen Erfolge!",
     "home-accomp2": "Verbessern Sie Ihren täglichen Arbeitsablauf mit einem intuitiven Tool, das Sie bei der Erstellung, Verwaltung und kontinuierlichen Verbesserung Ihrer Erfolge unterstützt. Verschaffen Sie sich auf einen Blick einen klaren, umfassenden Überblick und verfolgen Sie Ihre Fortschritte ganz einfach für eine intelligentere Planung und messbare Ergebnisse."
 }

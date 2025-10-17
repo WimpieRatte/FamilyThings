@@ -15,6 +15,7 @@
 
 /* Modified colors and added font-colors to better match those alternative bg colors*/
   --bs-blue: #4b85d9;
+  --bs-blue-subtle: color-mix(in hsl, #4b85d9, #ffffff75);
   --bs-blue-font: #dee2e6;
   --bs-pink: #fd77ba;
   --bs-pink-font: #212529;
@@ -3020,6 +3021,11 @@ textarea.form-control-lg {
   background-color: var(--bs-btn-disabled-bg);
   border-color: var(--bs-btn-disabled-border-color);
   opacity: var(--bs-btn-disabled-opacity);
+
+  /* FamilyThings, more properties */
+  filter: grayscale(.5);
+  color: var(--bs-gray-700);
+  border-color: var(--bs-gray-700) !important;
 }
 
 .btn-primary {

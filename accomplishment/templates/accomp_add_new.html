@@ -47,30 +47,6 @@
         </div>
     </div>
 </div>
-<style>
-    .active {
-        color: rgb(41, 151, 219) !important;
-        background-color: var(--bs-dark) !important;
-    }
-
-    .d-flex > p + input {
-        margin-left: 1em;
-    }
-
-    /* Achievement Button Styling */
-    #id_is_achievement {
-        --bs-form-check-bg-image: url({% static 'icons/task/award.svg' %});
-    }
-    #id_is_achievement:checked {
-        background-color: #e2cf20;
-        border-color: #e2cf20;
-        --bs-form-check-bg-image: url({% static 'icons/task/award-fill.svg' %});
-    }
-    #id_is_achievement:focus {
-        border-color: #e2cf20;
-        box-shadow: 0 0 0 0.25rem rgba(250, 228, 26, 0.25);
-    }
-</style>
 <script>
     const duplicateAccomplishmentPrompt = document.getElementById("duplicate-accomplishment-prompt");
     var duplicateAccomplishment = new Object()

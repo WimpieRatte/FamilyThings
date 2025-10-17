@@ -91,6 +91,7 @@
         transition-property: opacity;
         transition-duration: 0.7s;
         transition-delay: 0.1s;
+        z-index: 3000 !important;
     }
 
     table th:first-of-type { border-top-left-radius: 5px; }
@@ -139,6 +140,32 @@
     }
     @keyframes pop{
         33%  {transform: scale(1.2) rotate(15deg);}
+    }
+
+    .background-bi {
+        color: var(--bs-{{request.user.color}});
+        z-index: -1;
+        opacity: .75 !important;
+    }
+
+    .bi-edit-accomp {
+        top: -10% !important;
+        left: -10% !important;
+        font-size: 18em !important;
+        transform: rotate(-33deg) !important;
+        opacity: .75 !important;
+    }
+
+    .bi-edit-accomp:nth-child(2) {
+        top: -47% !important;
+        left: 15% !important;
+        font-size: 18em !important;
+        transform: rotate(-9deg) !important;
+        opacity: 1 !important;
+    }
+
+    .form-control.text-center::placeholder {
+        font-size: .8em !important;
     }
 
     /* // Large devices (desktops, 992px and up) */

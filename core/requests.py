@@ -84,8 +84,7 @@ def join_family(request, token: str = ""):
 
     new_user, newly_created = FamilyUser.objects.get_or_create(
         family_id=family,
-        custom_user_id=request.user,
-        is_manager=False
+        custom_user_id=request.user
     )
 
     # Reactivate the user if they already existed

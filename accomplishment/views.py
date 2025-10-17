@@ -21,14 +21,20 @@ def page_overview(request):
         {
             'recent_additions': list(reversed(Accomplishment.objects.filter(id__in=recent_additions))),
             'colors': ['red', 'blue', 'green', 'orange', 'purple', 'cyan'],
-            'form': AccomplishmentForm()
+            'icons': constants.ICONS,
+            'categories': constants.CATEGORIES,
+            'measurements': constants.MEASUREMENTS,
+            'form': AccomplishmentForm(),
         })
 
 
 @update_user_session()
-def page_new_accomplishment(request, ID: int = -1, cache_last_visited_page = False):
+def page_new_accomplishment(request, ID: int = -1, name: str = ""):
     """."""
     form: AccomplishmentForm = AccomplishmentForm()
+
+    if name != "":
+        form = AccomplishmentForm(initial={'name': name})
 
     if ID != -1:
         accom: Accomplishment = Accomplishment.objects.get(id=ID)

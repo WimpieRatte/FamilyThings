@@ -5,7 +5,7 @@
             {% include 'site/site_alert.html' with message=message tags=message.tags %}
         {% endfor %}
     </div>
-    <div id="screen-transition" class="position-absolute vw-100 vh-100 top-0 start-0 no-ptr-evt" style="z-index: 1055;">
+    <div id="screen-transition" class="position-absolute vw-100 vh-100 top-0 start-0 no-ptr-evt" style="z-index: 3055;">
         <img id="loading-arrow" class="m-auto d-block position-absolute top-50 start-50 no-ptr-evt" height="150" width="150" src="{% static 'icons/cursor/arrow-repeat.svg' %}" alt="">
     </div>
     <div id="tooltip" class="position-absolute p-2 rounded bg-primary bg-gradient border border-2 border-dark shadow-sm fs-sm no-ptr-evt" style="display: none; z-index: 1041; white-space: pre;"></div>

@@ -9,6 +9,7 @@ urlpatterns = [
      # path(<URL>, <view>, <name>)
      path("", views.page_overview, name="overview"),
      path("add", views.page_new_accomplishment, name="add_new"),
+     path("add/text='<str:name>'", views.page_new_accomplishment, name="add_new"),
      path("add?repeat=<int:ID>", views.page_new_accomplishment, name="add_new"),
      path("edit/<uuid:ID>", views.page_edit_user_accomplishment, name="edit"),
      path("edit/<uuid:ID>/details", views.page_edit_accomplishment_details, name="edit_details"),
