@@ -1,0 +1,102 @@
+<div id="imported_transactions_container" class="container rounded bg-dark p-2 h-25 mh-25">
+    <div class="row g-2 align-items-end">
+        <div class="row">
+            <div class="col">
+                <label for="txtNewCategoryName" class="form-label">
+                    Category Management
+                </label>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text" id="txtNewCategoryName" class="form-control" placeholder="New Category Name"/>
+                    <label for="txtNewCategoryName" class="form-label">New Category Name</label>
+                </div>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <button type="button" class="btn btn-primary" id="btnAddCategory">
+                    Add Category
+                </button>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <button type="button" class="btn btn-primary" id="btnEditCategories">
+                    Edit Categories
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <div class="row g-2 align-items-end">
+        <div class="row">
+            <div class="col">
+                <label class="form-label">
+                    Imported Transactions
+                </label>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            {% comment %}{% for col in columnHeaders %}
+                <div class="col">
+                    {{ col }}
+                </div> {% endcomment %}
+                <div class="col">Date</div>
+                <div class="col">Business Entity</div>
+                <div class="col">Amount</div>
+                <div class="col">Currency</div>
+                <div class="col">Reference</div>
+                <div class="col">Category</div>
+                {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
+            {% endfor %}{% endcomment %}
+        </div>
+        <div class="row align-items-center">
+            {% comment %} {% for row in importedTransactions %} {% endcomment %}
+                <div class="col">2023-06-19</div>
+                <div class="col">Aldi</div>
+                <div class="col">23.33</div>
+                <div class="col">EUR</div>
+                <div class="col">adsfadf</div>
+                <div class="col">
+                    <select name="" id="" class="form-select">
+                        <option value="">Food</option>
+                        <option value="">Clothes</option>
+                        <option value="">Transportation</option>
+                    </select>
+                </div>
+                {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
+            {% endfor %}{% endcomment %}
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div id="imported_transactions_container" class="container rounded bg-dark p-2 h-25 mh-25">
+    <div class="row g-2 align-items-end">
+        <div class="row">
+            <div class="col">
+                <label class="form-label">
+                    Summary by category
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" id="category-summary-chart">
+                <!-- The pie chart will be loaded here -->
+                {{ chart_html|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% comment %} <script>
+    // Fetch and load the pie chart once the DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch("{% url 'finance:plotly_pie' %}")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('category-summary-chart').innerHTML = data.html;
+            })
+            .catch(error => console.error('Error loading pie chart:', error));
+});
+</script> {% endcomment %}

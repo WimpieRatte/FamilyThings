@@ -8,7 +8,10 @@ from django.http import JsonResponse
 from core.utils import ImportProfileMappingDestinationColumns, text_to_enum_destination_column
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from django.contrib import messages
+import plotly.graph_objects as go
+import plotly.express as px
+from django.template.loader import render_to_string
+import json  # add this line near the top with the other imports
 
 # Create your views here.
 @login_required(login_url='user_login')
@@ -26,10 +29,38 @@ def import_transactions(request, lang_code: str = ""):
 	    custom_user_id=request.user)[request.session["current_family"]]
     family_id = fam_user.family_id
 
-    # Get all rows for the current family:
+    # Get all profiles for the current family:
     profiles_list = ImportProfile.objects.filter(family_id=family_id).all().prefetch_related()
+
+    # Load the chart
+    # TODO: Replace the sample below with actual data retrieval logic
+    labels = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports']
+    values = [45000, 35000, 28000, 42000, 19000]
+    fig = go.Figure(
+        data=[go.Pie(
+            labels=labels,
+            values=values,
+            hole=0.3,
+            marker_colors=px.colors.qualitative.Set3
+        )]
+    )
+    fig.update_layout(title='Distribution by Category', height=500)
+
+    chart_json = json.loads(fig.to_json())  # convert JSON string to dict
+
+    chart_html = render_to_string(
+        'reports/finance/plotly_pie_chart.html',
+        {
+            'chart_title': 'Category Distribution',
+            'chart_description': 'This chart shows the distribution of transactions across different categories.',
+            'chart_json': chart_json,
+        }
+    )
+
+    # Build context
     context = {
-        "profiles": profiles_list
+        "profiles": profiles_list,
+        "chart_html": chart_html,
     }
 
     target: HttpResponse = render(request, "finance/import_transactions.html", context=context)
@@ -221,3 +252,4 @@ def delete_import_profile_mapping(request, pk: int):
     except Exception as e:
         print(e)
         return HttpResponse("")
+

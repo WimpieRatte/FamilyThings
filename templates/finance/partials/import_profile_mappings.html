@@ -74,7 +74,7 @@
                                 hx-trigger="click"
                                 hx-target="#tr_new_row"
                                 hx-swap="beforebegin"
-                                hx-post="{% url 'finance:save_import_profile_mapping'  %}"
+                                hx-post="{% url 'finance:save_import_profile_mapping' %}"
                                 hx-vals='js:{
                                     mapping_id: -1,
                                     from_file_header: document.getElementById("txtNewFromFileHeader").value,
