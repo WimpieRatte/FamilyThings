@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from core.session import update_session, create_alert
 from core.views import render_if_logged_in
-from .models import ImportProfile, ImportProfileMapping
+from .models import ImportProfile, ImportProfileMapping, TransactionCategory
 from core.models import FamilyUser
 from django.http import JsonResponse
 from core.utils import ImportProfileMappingDestinationColumns, text_to_enum_destination_column
@@ -45,9 +45,7 @@ def import_transactions(request, lang_code: str = ""):
         )]
     )
     fig.update_layout(title='Distribution by Category', height=500)
-
     chart_json = json.loads(fig.to_json())  # convert JSON string to dict
-
     chart_html = render_to_string(
         'reports/finance/plotly_pie_chart.html',
         {
@@ -57,10 +55,14 @@ def import_transactions(request, lang_code: str = ""):
         }
     )
 
+    # Get all categories for the current family:
+    categories = TransactionCategory.objects.filter(family_id=family_id).all()
+
     # Build context
     context = {
         "profiles": profiles_list,
         "chart_html": chart_html,
+        "categories": categories
     }
 
     target: HttpResponse = render(request, "finance/import_transactions.html", context=context)
@@ -253,3 +255,50 @@ def delete_import_profile_mapping(request, pk: int):
         print(e)
         return HttpResponse("")
 
+def create_category(request):
+    """Create Category via HTMX postback"""
+    # get current family from session
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family = fam_user.family_id
+
+    category_name = request.headers.get('txtCategoryNameValue')
+    if category_name.strip() == "":
+        print(f"Empty category name!")
+        return HttpResponse("")
+    print(f"category_name={category_name}")
+    category, created = TransactionCategory.objects.get_or_create(
+                            name=category_name,
+                            family_id=family
+                        )
+
+    if not created:
+        print("Category already exists!")
+        return HttpResponse("")
+
+    # Check if we're on the "import_transactions" screen:
+    requested_from = request.headers.get('X-Current-Path', 'Unknown')
+    if requested_from == "import_transactions":
+        # we're targeting the .category_select_boxes class divs, which need new select boxes:
+        categories = TransactionCategory.objects.all()
+        context = {"categories": categories}
+        return render(request, "finance/partials/category_select_box.html", context=context)
+    elif requested_from == "edit_categories":
+        # TODO:
+        pass
+    else:
+        # TODO:
+        pass
+    return HttpResponse("")
+
+def edit_categories(request):
+    """Edit Categories"""
+    return render(request, "finance/edit_categories.html")
+
+def load_headers(request, lang_code: str = ""):
+    """Load Headers"""
+    update_session(request=request, lang_code=lang_code)
+
+    categories = TransactionCategory.objects.all()
+    context = {"categories": categories}
+    return render(request, "finance/partials/imported_transactions.html", context=context)
