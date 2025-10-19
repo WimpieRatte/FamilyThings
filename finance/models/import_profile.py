@@ -13,3 +13,10 @@ class ImportProfile(models.Model):
     class Meta:
         verbose_name = "Import Profile"
         verbose_name_plural = "Import Profiles"
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "family_id"],
+                name="unique_import_profile_per_family"
+            )
+        ]

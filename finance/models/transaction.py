@@ -16,7 +16,7 @@ class Transaction(models.Model):
     )
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
-    created = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
     transaction_date = models.DateTimeField()
     reference = models.CharField(max_length=500)
     business_entity_id = models.ForeignKey(

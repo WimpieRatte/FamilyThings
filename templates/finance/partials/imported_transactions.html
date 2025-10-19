@@ -7,24 +7,30 @@
                 </label>
             </div>
         </div>
-        <div class="row align-items-center">
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text" id="txtNewCategoryName" class="form-control" placeholder="New Category Name"/>
-                    <label for="txtNewCategoryName" class="form-label">New Category Name</label>
+        <form id="frmCategories">
+            {% csrf_token %}
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text" id="txtCategoryName" class="form-control" placeholder="New Category Name"/>
+                        <label for="txtCategoryName" class="form-label">New Category Name</label>
+                    </div>
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="submit" class="btn btn-primary" id="btnAddCategory"
+                        hx-post="{% url 'finance:create_category' %}"
+                        hx-trigger="click"
+                        hx-target=".category_select_boxes"
+                        hx-headers="js:{'X-Current-Path': 'import_transactions', 'txtCategoryNameValue': document.getElementById('txtCategoryName').value}"
+                    >
+                        Add Category
+                    </button>
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <a class="btn btn-primary" id="btnEditCategories" href="{% url 'finance:edit_categories' %}">Edit Categories</a>
                 </div>
             </div>
-            <div class="col-auto d-flex align-items-center">
-                <button type="button" class="btn btn-primary" id="btnAddCategory">
-                    Add Category
-                </button>
-            </div>
-            <div class="col-auto d-flex align-items-center">
-                <button type="button" class="btn btn-primary" id="btnEditCategories">
-                    Edit Categories
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
 
     <br>
@@ -58,11 +64,9 @@
                 <div class="col">EUR</div>
                 <div class="col">adsfadf</div>
                 <div class="col">
-                    <select name="" id="" class="form-select">
-                        <option value="">Food</option>
-                        <option value="">Clothes</option>
-                        <option value="">Transportation</option>
-                    </select>
+                    <div class="category_select_boxes">
+                        {% include "finance/partials/category_select_box.html" %}
+                    </div>
                 </div>
                 {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
             {% endfor %}{% endcomment %}
