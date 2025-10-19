@@ -1,0 +1,55 @@
+{% extends "site/site_base.html" %}
+{% block title %}Finance: Edit Transaction Categories{% endblock %}
+
+{% block append_to_head %}
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+<style>
+    body {
+        overflow-y: auto; /* allow standard page scrolling */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="edit-categories-container" class="container-sm pb-4 w-100">
+    {% include 'site/heading_section.html' with label="Transaction Categories" id="transaction_categories" %}
+
+    {% comment %} Name and Description Area: {% endcomment %}
+    <div id="transaction_category_details_container" class="container rounded bg-dark p-2 h-25 mh-25">
+        <div>
+            <label for="transaction-category-selector" class="form-label">
+                Select Transaction Category: {{ selected_transaction_category }}
+            </label>
+            <br>
+            <select class="form-select"
+                    aria-label="Select Transaction Category"
+                    id="transaction-category-selector"
+                    name="transaction_category_selector"
+                    tooltip="Select a transaction category to edit."
+                    hx-get="{% url 'finance:category_controls' %}"
+                    hx-trigger="load, change"
+                    hx-target="#transaction_category_controls"
+                    hx-include="#transaction-category-selector">
+                {% comment %} Always have the "Create New" entry on top: {% endcomment %}
+                <option value="-1">Create New</option>
+                {% comment %} Then load the categories from the database: {% endcomment %}
+                {% for category in categories %}
+                    {% if selected_transaction_category == category.id %}
+                        <option selected value="{{ category.id }}">{{ category.name }}</option>
+                    {% else %}
+                        <option value="{{ category.id }}" >{{ category.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <br>
+    <div id="transaction_category_details_container">
+        <div id="transaction_category_controls" class="container rounded bg-dark p-2 h-25 mh-25">
+            {% include 'finance/partials/transaction_category_controls.html' %}
+        </div>
+        <br>
+    </div>
+</div>
+{% endblock %}
