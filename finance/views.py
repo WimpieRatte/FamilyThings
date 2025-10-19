@@ -291,9 +291,106 @@ def create_category(request):
         pass
     return HttpResponse("")
 
-def edit_categories(request):
+def edit_categories(request, lang_code: str = ""):
     """Edit Categories"""
-    return render(request, "finance/edit_categories.html")
+    update_session(request=request, lang_code=lang_code)
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    # Get the selected Transaction Category, or select the first one available:
+    transaction_category_id = request.GET.get('selected_transaction_category')
+    # print(f"transaction_category_id={transaction_category_id}")
+    if transaction_category_id is None or transaction_category_id in ("-1", ""):
+        first_transaction_category = TransactionCategory.objects.filter(family_id=family_id).first()
+        if first_transaction_category is None:
+            transaction_category_id = -1
+        else:
+            transaction_category_id = first_transaction_category.id
+
+    # Get all categories for current family
+    categories = TransactionCategory.objects.filter(family_id=family_id).all()
+    context = {
+        "categories": categories,
+        "selected_transaction_category": int(transaction_category_id)
+    }
+    return render(request, "finance/edit_categories.html", context=context)
+
+@login_required(login_url='user_login')
+def save_transaction_category(request):
+    """Save a new or edited Transaction Category."""
+    # test for POST
+    if request.POST.get('action') == 'post':
+        # get existing TransactionCategory, if id is found:
+        transaction_category_id = request.POST.get('transaction_category_id')
+        # print(f"transaction_category_id: {transaction_category_id}")
+        if transaction_category_id is None or transaction_category_id in ("None", "", "-1"):  # Since its received as a post get, it's been converted to "None" as an str.
+            transaction_category = TransactionCategory()
+        else:
+            transaction_category = TransactionCategory.objects.get(pk=transaction_category_id)
+
+        # update with new values
+        transaction_category.name = request.POST.get('transaction_category_name')
+        transaction_category.description = request.POST.get('transaction_category_description')
+        # get current family from session
+        fam_user = FamilyUser.objects.filter(
+            custom_user_id=request.user)[request.session["current_family"]]
+        transaction_category.family_id = fam_user.family_id
+
+        # save changes
+        transaction_category.save()
+
+        # Return response
+        return JsonResponse({'transaction_category_id': transaction_category.id})
+    else:
+        return JsonResponse({'status': False})
+
+@login_required(login_url='user_login')
+def delete_transaction_category(request):
+    """Delete a specific Transaction Category."""
+
+    # test for POST
+    if request.POST.get('action') == 'post':
+        # get existing TransactionCategory, if id is found:
+        transaction_category_id = request.POST.get('transaction_category_id')
+        if transaction_category_id != "":
+            transaction_category = TransactionCategory.objects.get(pk=transaction_category_id)
+        else:
+            return JsonResponse({'status': False})
+
+        # delete record from database
+        transaction_category.delete()
+
+        # Return response
+        return JsonResponse({'transaction_category_id': transaction_category.id})
+    else:
+        return JsonResponse({'status': False})
+
+@login_required(login_url='user_login')
+def category_controls(request, lang_code: str = ""):
+    """Partial screen that shows the controls to edit the transaction category."""
+    update_session(request=request, lang_code=lang_code)
+
+    # Get the selected Import Profile from the combobox:
+    transaction_category_id = request.GET.get('transaction_category_selector')
+
+    # If no import profile was selected, select the first one available:
+    if transaction_category_id is None:
+        transaction_category_id = TransactionCategory.objects.first().id
+
+    # If nothing exists, just use an empty Import Profile instance:
+    if transaction_category_id is None or transaction_category_id in ("-1", ""):
+        transaction_category = TransactionCategory()
+    else:
+        transaction_category = TransactionCategory.objects.get(id=int(transaction_category_id))
+
+    context = {
+        "transaction_category": transaction_category,
+        "selected_transaction_category": int(transaction_category_id)
+    }
+    return render(request, "finance/partials/transaction_category_controls.html", context=context)
 
 def load_headers(request, lang_code: str = ""):
     """Load Headers"""
