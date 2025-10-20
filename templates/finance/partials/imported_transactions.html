@@ -34,44 +34,78 @@
     </div>
 
     <br>
-    <div class="row g-2 align-items-end">
-        <div class="row">
-            <div class="col">
-                <label class="form-label">
-                    Imported Transactions
-                </label>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% if success %}
+        <div class="alert alert-success">
+            Processed {{ row_count }} rows with columns: {{ column_names|join:", " }}
+        </div>
+
+        <div class="row g-2 align-items-end">
+            <div class="row">
+                <div class="col">
+                    <label class="form-label">
+                        Imported Transactions
+                    </label>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            {% for column in column_names %}
+                                <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in preview %}
+                            <tr>
+                                {% for column in column_names %}
+                                    <td>{{ row|get_item:column }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="row align-items-center">
+                {% comment %}{% for col in columnHeaders %}
+                    <div class="col">
+                        {{ col }}
+                    </div> {% endcomment %}
+                    <div class="col">Date</div>
+                    <div class="col">Business Entity</div>
+                    <div class="col">Amount</div>
+                    <div class="col">Currency</div>
+                    <div class="col">Reference</div>
+                    <div class="col">Category</div>
+                    {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
+                {% endfor %}{% endcomment %}
+            </div>
+            <div class="row align-items-center">
+                {% comment %} {% for row in importedTransactions %} {% endcomment %}
+                    <div class="col">2023-06-19</div>
+                    <div class="col">Aldi</div>
+                    <div class="col">23.33</div>
+                    <div class="col">EUR</div>
+                    <div class="col">adsfadf</div>
+                    <div class="col">
+                        <div class="category_select_boxes">
+                            {% include "finance/partials/category_select_box.html" %}
+                        </div>
+                    </div>
+                    {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
+                {% endfor %}{% endcomment %}
             </div>
         </div>
-        <div class="row align-items-center">
-            {% comment %}{% for col in columnHeaders %}
-                <div class="col">
-                    {{ col }}
-                </div> {% endcomment %}
-                <div class="col">Date</div>
-                <div class="col">Business Entity</div>
-                <div class="col">Amount</div>
-                <div class="col">Currency</div>
-                <div class="col">Reference</div>
-                <div class="col">Category</div>
-                {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
-            {% endfor %}{% endcomment %}
-        </div>
-        <div class="row align-items-center">
-            {% comment %} {% for row in importedTransactions %} {% endcomment %}
-                <div class="col">2023-06-19</div>
-                <div class="col">Aldi</div>
-                <div class="col">23.33</div>
-                <div class="col">EUR</div>
-                <div class="col">adsfadf</div>
-                <div class="col">
-                    <div class="category_select_boxes">
-                        {% include "finance/partials/category_select_box.html" %}
-                    </div>
-                </div>
-                {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
-            {% endfor %}{% endcomment %}
-        </div>
-    </div>
+    {% endif %}
 </div>
 
 <br>

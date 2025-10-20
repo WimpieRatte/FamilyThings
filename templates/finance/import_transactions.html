@@ -41,22 +41,25 @@
             </div>
         </div>
         <br>
-        <div class="row g-2 align-items-end">
-            <div class="col">
-                <label for="formFile" class="form-label">Select file to upload</label>
-                <input class="form-control" id="formFile" type="file">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}>
+            <div class="row g-2 align-items-end">
+                <div class="col">
+                    <label for="formFile" class="form-label">Select file to upload</label>
+                    <input class="form-control" id="formFile" type="file" name="formFile" accept=".csv,.xlsx,.xls">
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary"
+                            id="btnLoadHeaders"
+                            hx-post="{% url 'finance:load_headers' %}"
+                            hx-trigger="click"
+                            hx-target="#imported_transactions_container"
+                    >
+                        Load Headers
+                    </button>
+                </div>
             </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-primary"
-                        id="btnLoadHeaders"
-                        hx-get="{% url 'finance:load_headers' %}"
-                        hx-trigger="click"
-                        hx-target="#imported_transactions_container"
-                >
-                    Load Headers
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
 
     <br>

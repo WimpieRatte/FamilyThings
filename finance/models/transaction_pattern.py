@@ -1,4 +1,5 @@
 from django.db import models
+from models import TransactionCategory
 
 class TransactionPattern(models.Model):
     id = models.AutoField(primary_key=True)
@@ -9,7 +10,7 @@ class TransactionPattern(models.Model):
         decimal_places=2,
         max_digits=18
     )
-    transaction_category_id = models.ForeignKey('TransactionCategory', on_delete=models.CASCADE)
+    transaction_category_id = models.ForeignKey(TransactionCategory, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Transaction Category"

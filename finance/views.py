@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from core.session import update_session, create_alert
 from core.views import render_if_logged_in
-from .models import ImportProfile, ImportProfileMapping, TransactionCategory
+from .models import ImportProfile, ImportProfileMapping, TransactionCategory, TransactionPattern
 from core.models import FamilyUser
 from django.http import JsonResponse
 from core.utils import ImportProfileMappingDestinationColumns, text_to_enum_destination_column
@@ -12,6 +12,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from django.template.loader import render_to_string
 import json  # add this line near the top with the other imports
+import pandas as pd
 
 # Create your views here.
 @login_required(login_url='user_login')
@@ -395,7 +396,139 @@ def category_controls(request, lang_code: str = ""):
 def load_headers(request, lang_code: str = ""):
     """Load Headers"""
     update_session(request=request, lang_code=lang_code)
+    context = {}
 
-    categories = TransactionCategory.objects.all()
-    context = {"categories": categories}
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    # Get all categories for current family
+    categories = TransactionCategory.objects.filter(family_id=family_id).all()
+    context["categories"] = categories
+
+
+    # Load all headers from file:
+    if request.method == 'POST' and request.FILES.get('formFile'):
+        uploaded_file = request.FILES['formFile']
+
+        # Get Import Profile's Custom Mapping:
+        import_profile = ImportProfile.objects.get(pk=request.POST.get('import_profile_selector'))
+        import_profile_mappings = ImportProfileMapping.objects.filter(import_profile_id=import_profile.id).all()
+        columns_to_extract = []
+        column_names_lookup = {}
+        for mapping in import_profile_mappings:
+            columns_to_extract.append(mapping.from_file_header)
+            column_names_lookup[mapping.to_transaction_header] = mapping.from_file_header
+
+        try:
+            # Read file
+            if uploaded_file.name.endswith('.csv'):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+
+            # Extract only the columns specified in the Import Profile:
+            df_reordered = extract_specific_columns(df, columns_to_extract)
+
+            # region Transaction Pattern matching
+
+            # Get all Transaction Patters for all Transaction Categories this family has:
+            transaction_patterns = TransactionPattern.objects.filter(category_id__family_id=family_id).all()
+
+            # Mapping for category based on TransactionPattern matching
+            def get_suggested_category(row):
+                """Determine suggested category based on historical TransactionPattern"""
+
+                # If there are no Transaction Patterns defined, don't bother trying to match them:
+                if len(transaction_patterns) == 0:
+                    return None
+                # If there are no Transaction Patterns mapped to name, don't bother trying to match them:
+                if column_names_lookup.get(ImportProfileMappingDestinationColumns.NAME.value) is None:
+                    return None
+
+                # Get column that has the recipient name:
+                recipient = str(row.get(column_names_lookup[ImportProfileMappingDestinationColumns.NAME.value], ''))
+                return transaction_patterns.filter(name_regex=recipient).first().transaction_category_id
+
+            # Add suggested category column for each row
+            df['suggested_category'] = df.apply(get_suggested_category, axis=1)
+
+            # Convert DataFrame to HTML with dropdowns
+            html_output = generate_html_with_dropdowns(df, categories)
+            *** then continue here ***
+            # endregion
+
+            context.update({
+                'success': True,
+                'column_names': columns_to_extract
+                'result': df_reordered.to_dict("records"),
+                'row_count': len(df)
+            })
+
+            return render(request, 'finance/partials/imported_transactions.html', context)
+
+        except Exception as e:
+            context['error'] = f'Unexpected error: {str(e)}'
+            return render(request, 'finance/partials/imported_transactions.html', context)
+
+
     return render(request, "finance/partials/imported_transactions.html", context=context)
+
+def extract_specific_columns(df, desired_order):
+    """Extract DataFrame columns based on a list of column names"""
+    # Get columns that exist in both DataFrame and desired order
+    common_columns = [col for col in desired_order if col in df.columns]
+
+    return df[common_columns]
+
+def generate_html_with_dropdowns(df, categories):
+    *** first continue here ***
+    """Generate HTML table with category dropdowns"""
+    html_output = '<table class="table table-striped table-bordered">\n'
+
+    # Header row
+    html_output += '<thead><tr>'
+    for column in df.columns:
+        if column != 'suggested_category':  # Don't show suggested category column
+            html_output += f'<th>{html.escape(str(column))}</th>'
+    html_output += '<th>Category</th>'
+    html_output += '</tr></thead>\n'
+
+    # Data rows
+    html_output += '<tbody>'
+    for index, row in df.iterrows():
+        html_output += '<tr>'
+
+        # Data columns
+        for column in df.columns:
+            if column != 'suggested_category':
+                value = str(row[column]) if pd.notna(row[column]) else ''
+                html_output += f'<td>{html.escape(value)}</td>'
+
+        # Category dropdown
+        suggested_category = row['suggested_category']
+        html_output += f'<td>'
+        html_output += f'<select name="category_{index}" class="form-select category-select">'
+
+        for category in categories:
+            selected = 'selected' if category == suggested_category else ''
+            html_output += f'<option value="{html.escape(category)}" {selected}>{html.escape(category)}</option>'
+
+        html_output += '</select>'
+        html_output += f'<input type="hidden" name="suggested_category_{index}" value="{html.escape(suggested_category)}">'
+        html_output += '</td>'
+
+        html_output += '</tr>\n'
+    html_output += '</tbody></table>'
+
+    # Add submit button
+    html_output += '''
+    <div class="mt-3">
+        <button type="button" class="btn btn-success" onclick="submitCategories()">
+            Save Categories
+        </button>
+    </div>
+    '''
+
+    return html_output
