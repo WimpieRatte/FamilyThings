@@ -14,7 +14,6 @@
                 },
                 success: function(json) {
                     createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-                    console.log(json);
                     location.reload();
                 },
                 error: function(xhr, errmsg, err) {
@@ -36,7 +35,6 @@
                 },
                 success: function(json) {
                     createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-                    console.log(json);
                     location.reload();
                 },
                 error: function(xhr, errmsg, err) {
@@ -129,7 +127,6 @@
                 success: function(json) {
                     createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
                     event.target.disabled = false;
-                    console.log(json);
                     $("#invite-code").text(json['new-token']);
                 },
                 error: function(xhr, errmsg, err) {

@@ -1,2 +1,5 @@
 {
+    "lb-is_achievement, #id_is_achievement": "Marks this Accomplishment as a Special Achievement.<br>(They will be highlighted in yellow.)",
+    "lb-measurement, #id_measurement": "The short-form of the unit that is used for<br>a precise measurement of your Accomplishment.<br>(Meters, minutes etc.).<br><small>Optional</small>",
+    "timeframe-section": "Specify the time frame of the Accomplishment.<br><small>Optional, leave unchanged if you accomplished it today.<br>(Default: Today)</small>"
 }

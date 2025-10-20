@@ -10,7 +10,10 @@ from core.utils import get_first_custom_user
 class Accomplishment(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
+    description = models.CharField(
+        max_length=1000,
+        default="",
+        blank=True)
     icon = models.CharField(max_length=20, blank=True, default="")
     created = models.DateTimeField(
         default=timezone.now

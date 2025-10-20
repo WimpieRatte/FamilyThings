@@ -1,5 +1,5 @@
-<li class="nav-item position-relative">
-    <a id="nav-tooltip-{{id}}" href="{% url href %}" class="nav-link px-2 tooltip-source" style="color: {{color}}" data-tooltip-context="{{tooltip}}">
+<li class="nav-item position-relative" {% if dropdown %}data-bs-toggle="dropdown" aria-expanded="false"{% endif %}>
+    <a id="nav-tooltip-{{id}}" {% if href %}href="{% url href %}"{% endif %} class="nav-link px-2 tooltip-source" style="color: {{color}}" data-tooltip-context="{{tooltip}}">
         <i id="nav-item-icon" class="bi bi-{{icon}} pe-2"></i><span id="nav-{{id}}">{{label}}</span>
   </span>
   </a>

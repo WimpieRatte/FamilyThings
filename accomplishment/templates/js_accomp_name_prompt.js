@@ -40,6 +40,8 @@ function resetNamePrompt() {
     nameTakenText.style.display = "none";
     foundAccompText.textContent = "";
     foundAccompText.className = "";
+    submitButton.disabled = true;
+    repeatButton.disabled = true;
 }
 
 $("#name-prompt-popup #btn-abort").click(function(event) { 
@@ -59,7 +61,7 @@ $("#name-prompt-popup #btn-repeat").click(function(event) {
 
 var previousName = ""
 function nameCheckAvailable(enforceCheck = false) {
-    if ((nameField.value.length > 0 && previousName != nameField.value) || enforceCheck){
+    if (nameField.value.length > 0 && (previousName != nameField.value || enforceCheck)){
         previousName = nameField.value;
 
         $.ajax({ 
@@ -90,14 +92,10 @@ function nameCheckAvailable(enforceCheck = false) {
 
                 selectedAccomplishment = null;
                 accomplishmentStorage = null;
-                //console.log(document.getElementById("create-link"))
-                //document.getElementById("create-link").href = `{% url 'accomplishment:add_new' %}/text='${nameField.value}'`
             }
         });
     }
-    if (!enforceCheck){
-        setTimeout(function() { nameCheckAvailable() }, 1000);
-    }
+    setTimeout(function() { nameCheckAvailable() }, 1000);
 }
 nameCheckAvailable();
 

@@ -1,3 +1,11 @@
+function openRepeat(data) {
+    let _data = data.getAttribute("data-accomp-data").replaceAll(`'`, `"`).replaceAll(`None`, `null`).replaceAll(`False`, `false`).replaceAll(`True`, `true`);
+    accomplishmentStorage = JSON.parse(_data)
+    closePopup();
+    openPopup("repeat-accomp-popup");
+    prepareRepeat()
+}
+
 function prepareRepeat(){
     Object.entries(accomplishmentStorage).forEach(function(field) {
             let form_field = document.querySelector(`#repeat-accomp-form #id_${field[0]}`)

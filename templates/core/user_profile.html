@@ -11,7 +11,7 @@
 <div class="container-lg d-md-flex justify-content-evenly" style="max-height: 1800px">
     <div id="accomplishments-section" class="section container pb-4" style="width: 340px;">
         {% include 'site/heading_section.html' with id="todays-accomps" label="Today's Accomplishments" value=todays_accomplishments.length %}
-        <div style="height: 17em;">
+        <div class="pb-2">
             <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2", style="display: none;"></div>
             <div id="new-accomplishment-wrapper" class="w-auto m-auto">
                 <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
@@ -21,7 +21,7 @@
             </div>
         </div>
         {% include 'site/heading_section.html' with id="recent-activities" label='Recent Activities' %}
-        <div class="containe" style="height: 15em;">
+        <div>
             <div id="recent-accomplishments-container" class="flex-column bg-dark rounded p-1" style="display: none;"></div>
         </div>
     </div>
@@ -89,7 +89,6 @@
             && dateToCheck.getYear() == element["date"].getYear());
 
             if (entries.length > 0){
-                console.log(entries);
                 button.className += " tooltip-source"
 
                 button.dataset.tooltipContext = "<ul class='p-0 ps-3 m-0'>"
@@ -106,24 +105,14 @@
     const recentAccContainer = $("#recent-accomplishments-container")
     const todaysAccContainer = $("#todays-accomplishments-container")
 
-    /* Get Recent Accomplishments */
-    $.get( "{% url 'accomplishment:get_recent' 5 %}", function() {})
-    .done(function(response) {
-        Object.entries(response.result).forEach(function(entry) {
-            let data = entry[1]; //The key (0) is blank while (1) is the content
-
-            recentAccContainer.show();
-            /* Apply the accomplishment */
-            addAccomplishmentEntry(recentAccContainer, data)
-        });
-        updateTooltips(); // Required to make the new Entries interactable
-    })
-    .fail(function(err) {console.log(err);})
-
+    var maxEntries = 7; // How many total entries are going to be displayed on the left side
     /* Get Today's Accomplishments */
-    $.get( "{% url 'accomplishment:obtained_today' 4 %}", function() {})
+    $.get( `{{HOST}}/accomplishments/get/today/amount=${maxEntries}`, function() {})
     .done(function(response) {
-        Object.entries(response.result).forEach(function(entry) {
+        let entries = Object.entries(response.result);
+        maxEntries -= entries.length
+
+        entries.forEach(function(entry) {
             let data = entry[1]; //The key (0) is blank while (1) is the content
 
             todaysAccContainer.show();
@@ -134,23 +123,47 @@
     })
     .fail(function(err) {console.log(err);})
 
+        /* Get Recent Accomplishments */
+    $.get( `{{HOST}}/accomplishments/get/recent/amount=${maxEntries}`, function() {})
+    .done(function(response) {
+        let entries = Object.entries(response.result);
+        maxEntries -= entries.length
+
+        entries.forEach(function(entry) {
+            let data = entry[1]; //The key (0) is blank while (1) is the content
+
+            recentAccContainer.show();
+            /* Apply the accomplishment */
+            addAccomplishmentEntry(recentAccContainer, data)
+        });
+        updateTooltips(); // Required to make the new Entries interactable
+    })
+    .fail(function(err, err2) {console.log(err2);})
+
     /* TODO: Move this + thie accomplishment functions to its own JS script/module of sorts */
     var localContext = new Object()
     $.getJSON('/static/localization/{{request.session.lang_code}}/context.json', 
         function(json_data){localContext = json_data;})
 
     /* Dynamically create Accomplishment entries */
-    const accomplishmentTemplate = `{% include "home/user_accomplishment_item.html" with title="%title%" icon="%icon%" date="%date%" %}`
+    const accomplishmentTemplate = `{% include "core/temp_user_accomp_entry.html" %}`
 
     function addAccomplishmentEntry(target_container, data){
         let language = languageCode;
         if (language == ""){language="en";}
-        date = new Date(data["created"]).toLocaleDateString(language, {
+
+        date = new Date(data["created_date"]).toLocaleDateString(language, {
             weekday: "short", year: "numeric",
             month: "short", day: "numeric",})
+
+        let tooltip = date;
+        if (data["measurement_quantity"] > 0) {
+            tooltip += `<br>${data["measurement_quantity"]}${data["measurement"]}`.replace("null", "x").replace(".00", "")
+        }
+
         target_container.append(
             accomplishmentTemplate.replace("%title%", data["name"])
-            .replace("%date%", date)
+            .replace("%tooltip%", tooltip)
             .replace("%icon%", data["icon"])
             .replace("Accomplished on", localContext["accomplished"])
         )

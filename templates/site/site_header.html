@@ -1,17 +1,24 @@
 {% load static %}
 <header class="bg-primary rounded-bottom border-bottom">
-  <div class="dropdown">
-    <div id="drowdown-wrapper" class="d-flex px-5 bg-body-tertiary rounded-bottom border-bottom shadow-lg">
+    <div id="header-wrapper" class="d-flex px-5 bg-body-tertiary rounded-bottom border-bottom shadow-lg">
       <ul class="nav me-auto">
         {% if request.user.is_authenticated %}
           {% include 'header/nav_item.html' with id='profile' icon='person-arms-up' label='Profile' color="#ec739cff" href='core:user_profile' tooltip='Brief overview about you and your Family.' %}
           {% include 'header/nav_item.html' with id='accomplishments' icon='award' label='Accomplishments' color="#d99d51" href='accomplishment:overview' tooltip='See and manage all of your Accomplishments.' %}
-          {% include 'header/nav_item.html' with id='finance' icon='piggy-bank' label='Finance' color="#ddc67f" href='finance:import_transactions' tooltip='Keep your finances in check.' %}
+          <div class="dropdown">
+            {% include 'header/nav_item.html' with id='finance' icon='piggy-bank' label='Finance' color="#ddc67f" tooltip='Keep your finances in check.' dropdown=True %}
+            <div class="dropdown-menu dropdown-menu-lg-start" aria-labelledby="dropdownMenuButton" style="inset: -4px auto auto 0px !important;">
+              {% include 'header/dropdown_item.html' with href='finance:import_transactions' id="admin" icon='card-list' label='View Transactions' %}
+              {% include 'header/dropdown_item.html' with href='finance:import_transactions' id="admin" icon='plus-square' label='Import Transactions' %}
+              {% include 'header/dropdown_item.html' with href='finance:import_transactions' id="admin" icon='bar-chart-fill' label='Statistics' %}
+            </div>
+          </div>
           {% include 'header/nav_item.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='calendar:calendar' tooltip='An overview of upcoming events, holidays, etc.' %}
         {% endif %}
         {% include 'header/nav_item.html' with id='home' icon='house-door' label='Home' color="#5ccaff" href='core:home' %}
       </ul>
-      <button class="dropdown-toggle text-end me-4" style="border: 0; background: 0;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <div class="dropdown">
+        <button class="dropdown-toggle text-end me-4" style="border: 0; background: 0;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <img id="dropdown-user-icon" class="border border-3 border-primary" {% include 'header/icon.html' with icon=request.user.icon %} height="30" width="30" alt="..."><span class="ms-2">{{request.user.full_name}}</span>
           </button>
           <div class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownMenuButton">
@@ -44,6 +51,7 @@
               {% endif %}
             {% endif %}
           </div>
+        </div>
       </ul>
       </div>
     {% if show_time %}

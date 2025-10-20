@@ -17,7 +17,7 @@
             {% include 'site/form_field.html' with id="username" field=form.username %}
             {% include 'site/form_field.html' with id="password" field=form.password %}
             <a href="{% url 'core:forgot_password' %}" id="lb-registration-hint" class="text-center d-block">Forgot password?</a>
-            <button id="btn-login" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="submit">Log In</button>
+            <button id="btn-login" class="btn btn-success border-success mt-4 m-auto text-center d-block" type="submit">Log In</button>
         </form>
         <br>
         <div class="text-center d-block">

@@ -22,7 +22,7 @@
                     {% include 'site/form_field.html' with id="birthday" field=form.birthday optional=True %}
                     <div class="d-flex gap-5">
                         {% include 'site/form_field.html' with id="language" field=form.language %}
-                        {% include 'site/form_field.html' with id="cursor" field=form.cursor %}
+                        {% include 'site/form_field.html' with id="cursor" field=form.cursor field_class='form-switch' %}
                     </div>
                     {% include 'site/form_field.html' with id="color" field=form.color hidden='True' %}
                     {% include 'site/form_field.html' with id="user-icon" field=form.user_icon optional=True hidden='True' %}
