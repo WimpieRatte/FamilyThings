@@ -10,5 +10,6 @@ $("#edit-accomp-popup #btn-apply-changes").click(function(event) {
 
     basicAJAX(type="POST", url=`${editAccompURL}${selectedAccomplishment}`, data=form_array)
     createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
+    playCheckmarkAnimation();
     closePopup();
 });

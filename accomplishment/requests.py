@@ -313,3 +313,14 @@ def repeat_accomplishment(request):
         get_locale_text(
             request=request, ID="accomplishment-create-failed",
             default_text="Accomplishment couldn't be submitted."))
+
+
+def get_template(request):
+    """."""
+    ID = request.POST["ID"]
+    print(ID)
+    if ID != -1:
+        accom_details: Accomplishment = FamilyUserAccomplishment.objects.get(
+            id=ID).accomplishment_id.serialized()
+
+        return JsonResponse(data=accom_details)

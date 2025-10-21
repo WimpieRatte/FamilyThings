@@ -22,11 +22,13 @@ class AccomplishmentForm(forms.Form):
     is_repeat = forms.BooleanField(label="", required=False)
 
     # Link the widgets to the auto generated datalists (see constants.py for the elements)
-    accomplishment_type.widget.attrs.update({"list": "type-suggestions", 'placeholder': 'Optional'})
+    accomplishment_type.widget.attrs.update({"list": "type-suggestions", 'placeholder': 'Optional', "style": "width: 12em;"})
     measurement.widget.attrs.update({"list": "measurement-suggestions"})
 
+    name.widget.attrs.update({"style": "width: 12em;"})
+
     # By default, Django creates a Textarea with 10 rows, which is too much.
-    description.widget.attrs.update({"rows": "3", 'style': "width: 24.4em;", 'placeholder': 'Optional'})
+    description.widget.attrs.update({"rows": "3", 'style': "width: 24em;", 'placeholder': 'Optional'})
 
     # Add Bootstrap classes to the fields
     is_achievement.widget.attrs.update({"class": "form-check-input", "style": "width: 32px; height: 32px; margin: 0;"})

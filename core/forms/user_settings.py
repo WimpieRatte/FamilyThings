@@ -25,5 +25,5 @@ class UserSettingsForm(forms.Form):
         label="Remove Background", required=False)
 
     #  Add Bootstrap classes to the fields
-    cursor.widget.attrs.update({"class": "form-check-input"})
+    cursor.widget.attrs.update({"class": "form-check-input", "style": "width: 2.5em; height: 1.5em;"})
     language.widget.attrs.update({"class": "form-select"})

@@ -30,8 +30,8 @@
             </div>
             <div id="optional-fields" class="bg-body-tertiary rounded p-2 pb-3 mt-3">
                 <div class="d-flex justify-content-between px-3">
-                    {% include 'site/temp_form_field.html' with id="first-name" field=form.first_name optional=True %}
-                    {% include 'site/temp_form_field.html' with id="last-name" field=form.last_name optional=True %}
+                    {% include 'site/temp_form_field.html' with id="first-name" field=form.first_name %}
+                    {% include 'site/temp_form_field.html' with id="last-name" field=form.last_name %}
                 </div>
                 <div id="name-hint" class="w-100 m-auto text-center fs-sm">
                     <span id="lb-name-hint">You can always set up your full, or just first, name in the Settings.</span><br>

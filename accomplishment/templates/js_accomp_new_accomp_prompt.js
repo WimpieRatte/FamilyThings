@@ -7,11 +7,13 @@ function initiateCreate() {
     document.querySelector(`#new-accomp-popup #edit-accomp-icon`).className = `bi bi-plus-circle-fill h5`;
 
     //Reset fields while importing the name that was entered in the previous screen
-    $("#new-accomp-popup #id_name").val(nameField.value)
+    document.querySelector("#new-accomp-popup #id_name").value = nameField.value;
 
-    $('#new-accomp-popup #id_accomplishment_type').val("");
-    $('#new-accomp-popup #id_description').val("");
-    $('#new-accomp-popup #id_is_achievement').prop( "checked", false );
+    document.querySelector('#new-accomp-popup #id_accomplishment_type').value = "";
+    document.querySelector('#new-accomp-popup #id_description').value = "";
+    document.querySelector('#new-accomp-popup #id_measurement').value = "";
+    document.querySelector('#new-accomp-popup #id_measurement_quantity').value = 0;
+    document.querySelector('#new-accomp-popup #id_is_achievement').checked = false;
 
     let today = new Date()
     document.querySelector('#new-accomp-popup #id_date_from').valueAsDate = today;

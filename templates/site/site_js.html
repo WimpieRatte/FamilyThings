@@ -7,6 +7,7 @@
     const header = document.querySelector("header");
     const main = document.querySelector("main");
 
+    const checkmark = document.getElementById("check-mark-animation");
     const overlay = document.querySelector("#overlay");
     const cursor = document.querySelector('#cursor-base');
     const cursorImage = document.querySelector('#cursor-image');
@@ -216,6 +217,19 @@
     /* Prevent resubmissions */
     if ( window.history.replaceState ) {
         window.history.replaceState( null, null, window.location.href );
+    }
+
+    function playCheckmarkAnimation() {
+        checkmark.style.display = "block";
+        checkmark.style.opacity = 1;
+
+        setTimeout(function(){
+            checkmark.style.opacity = 0;
+        }, 3000);
+
+        setTimeout(function(){
+            checkmark.style.display = "none";
+        }, 4000);
     }
 
 </script>

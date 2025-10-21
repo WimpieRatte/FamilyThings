@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial source='new-accomp-popup' %}
+            {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial popup='new-accomp-popup' %}
             </div>
             <div class="d-flex gap-2 mt-4 pb-4 m-auto" style="width: fit-content;">
                 <button id="btn-create" class="btn btn-success border-success d-block m-auto" type="submit">Create</button>
@@ -54,23 +54,3 @@
         </form>
     </div>
 </div>
-<style>
-    .d-flex > p + input {
-        margin-left: 1em;
-    }
-
-    /* Achievement Button Styling */
-    #id_is_achievement {
-        --bs-form-check-bg-image: url({% static 'icons/task/award.svg' %});
-        background-size: 22px !important;
-    }
-    #id_is_achievement:checked {
-        background-color: #e2cf20;
-        border-color: #e2cf20;
-        --bs-form-check-bg-image: url({% static 'icons/task/award-fill.svg' %});
-    }
-    #id_is_achievement:focus {
-        border-color: #e2cf20;
-        box-shadow: 0 0 0 0.25rem rgba(250, 228, 26, 0.25);
-    }
-</style>

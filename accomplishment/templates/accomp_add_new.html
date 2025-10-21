@@ -18,9 +18,9 @@
                 <div class="ms-auto" style="width: 60%;">
                     <div id="" class="d-flex gap-2">
                         {% include 'site/temp_form_field.html' with id="name" field=form.name %}
-                        {% include 'site/temp_form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
+                        {% include 'site/temp_form_field.html' with id="accomplishment_type" field=form.accomplishment_type %}
                     </div>
-                    {% include 'site/temp_form_field.html' with id="description" field=form.description optional=True %}
+                    {% include 'site/temp_form_field.html' with id="description" field=form.description %}
                     {% include 'site/temp_form_field.html' with id="is_repeat" field=form.is_repeat %}
                 </div>
                 <div style="width: 40%;">

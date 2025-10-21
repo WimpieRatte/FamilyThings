@@ -11,9 +11,9 @@
                 <div class="w-fit">
                     <div id="" class="d-flex gap-2 w-fit">
                         {% include 'site/temp_form_field.html' with id="name" field=form.name %}
-                        {% include 'site/temp_form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
+                        {% include 'site/temp_form_field.html' with id="accomplishment_type" field=form.accomplishment_type %}
                     </div>
-                    {% include 'site/temp_form_field.html' with id="description" field=form.description optional=True field_class='w-fit' %}
+                    {% include 'site/temp_form_field.html' with id="description" field=form.description field_class='w-fit' %}
                 </div>
                 <div class="w-fit pt-4">
                     {% include 'site/temp_form_field.html' with id="is_achievement" field=form.is_achievement field_class="d-flex" %}
