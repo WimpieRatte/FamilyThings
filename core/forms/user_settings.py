@@ -26,4 +26,4 @@ class UserSettingsForm(forms.Form):
 
     #  Add Bootstrap classes to the fields
     cursor.widget.attrs.update({"class": "form-check-input"})
-    language.widget.attrs.update({"class": ".form-select"})
+    language.widget.attrs.update({"class": "form-select"})

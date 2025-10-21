@@ -146,16 +146,18 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
                     $('#edit-accomp-popup #edit-accomp-name').text(accompData["name"]);
                     document.getElementById('edit-accomp-icon').className = `bi bi-${accompData["icon"]}`;
 
-                    $('#edit-accomp-created').text(new Date(accompData["created"]).toLocaleDateString(language, {
+                    $('#edit-accomp-popup #edit-accomp-created').text(new Date(accompData["created"]).toLocaleDateString(language, {
                         weekday: "short", year: "numeric",
                         month: "short", day: "numeric",
                     }));
 
-                    $(`#id_measurement`).prop("disabled", true)
+                    $(`#edit-accomp-popup #id_measurement`).prop("disabled", true)
                     // If the user has not Measurement type but a quantity specified, use x (amount of times)
                     if (accompData['measurement'] == null) {
                         $(`#id_measurement`).val("x");
                     }
+                    document.querySelector('#edit-accomp-popup  #id_date_from').value = accompData["date_from"];
+                    document.querySelector('#edit-accomp-popup  #id_date_to').value = accompData["date_to"];
                 }
             });
     });

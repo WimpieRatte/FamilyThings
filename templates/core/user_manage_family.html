@@ -14,7 +14,6 @@
                 },
                 success: function(json) {
                     createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-                    console.log(json);
                     location.reload();
                 },
                 error: function(xhr, errmsg, err) {
@@ -36,7 +35,6 @@
                 },
                 success: function(json) {
                     createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
-                    console.log(json);
                     location.reload();
                 },
                 error: function(xhr, errmsg, err) {
@@ -73,7 +71,7 @@
                                     onerror="this.onerror=null; this.src='{% static 'default-user.png' %}'" height="25" width="25" alt="{% get_media_prefix %}{{icon}}"></td>
                                 <td class="p-1"><div class="rounded p-1 fs-sm me-2" style="background-color: var(--bs-{{info.color}}) !important; color: var(--bs-{{info.color}}-font) !important;">{{info.full_name}}</div></td>
                                 <td class="p-1">{{info.username}}</td>
-                                <td class="p-1">{% include 'header/role_name.html' with manager=info.is_manager owner=family.owner name=info.username %}</td>
+                                <td class="p-1">{% include 'header/temp_role_name.html' with manager=info.is_manager owner=family.owner name=info.username %}</td>
                                 <td class="p-1">{{info.joined}}</td>
                                 {% if request.user.username != info.username %}
                                     {% if family.owner == request.user.username or request.session.family_info.is_manager and info.username != family.owner and not info.is_manager %}
@@ -129,7 +127,6 @@
                 success: function(json) {
                     createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
                     event.target.disabled = false;
-                    console.log(json);
                     $("#invite-code").text(json['new-token']);
                 },
                 error: function(xhr, errmsg, err) {

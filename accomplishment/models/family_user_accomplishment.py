@@ -59,6 +59,14 @@ class FamilyUserAccomplishment(models.Model):
         editable=False
     )
 
+    def serialized(self) -> dict:
+        output = self.accomplishment_id.serialized()
+        output['created_date'] = self.created.strftime("%Y-%m-%d")
+        output['cleared_date'] = self.to_date.strftime("%Y-%m-%d")
+        output['measurement_quantity'] = self.measurement_quantity
+
+        return output
+
     def get_accomplishment(self):
         return self.accomplishment_id
 

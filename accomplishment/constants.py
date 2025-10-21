@@ -1,22 +1,22 @@
 ICONS = [
     # Generic
-    "dash", "list-check", "alphabet", "pencil", "calculator", "person-arms-up", "person-walking", "$SPACE$",
+    "dash", "list-check", "pencil", "calculator", "person-arms-up", "person-walking", "$SPACE$",
     # Chore
-    "car-front-fill", "basket", "trash", "hammer", "fork-knife", "briefcase", "dash", "$SPACE$",
+    "car-front-fill", "basket", "trash", "hammer", "fork-knife", "backpack", "briefcase", "$SPACE$",
     # Chore 2
-    "house-fill", "cash-coin", "fuel-pump", "lightbulb", "calendar-check", "alarm", "$BREAK$",
+    "house-fill", "cash-coin", "fuel-pump", "calendar-check", "alarm", "$BREAK$",
     # Good Habits
-    "sun-fill", "moon", "droplet", "clock", "wifi-off", "piggy-bank", "backpack", "$SPACE$",
+    "sun-fill", "moon", "droplet", "clock", "wifi-off", "piggy-bank", "$SPACE$",
     # Hobbies
     "dribbble", "bicycle", "book", 'palette', "music-note-beamed", "journal-text", "puzzle-fill", "$SPACE$",
     # Entertainment
-    "display", "tv", "controller", "laptop", "phone", "dash", "$BREAK$",
+    "display", "tv", "controller", "laptop", "phone", "$BREAK$",
     # Misc.
-    "heart", "chat", "bell", "cloud", "activity", "star", "envelope", "$SPACE$",
-    # Misc. 2
-    "dash", "dash", "dash", "camera", "boombox", "dash", "dash", "$SPACE$",
-    # Big Achievements
-    "mortarboard", "award", "trophy", "cake", "dash", "dash"
+    "heart", "chat", "cloud", "star", "$SPACE$",
+    # Misc. 2 / Big Achievements
+    "mortarboard", "award", "trophy", "cake", "$SPACE$",
+    # Emotes
+    "emoji-smile", "emoji-laughing", "emoji-grin", "emoji-sunglasses"
 ]
 
 CATEGORIES = [
