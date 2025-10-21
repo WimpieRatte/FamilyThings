@@ -9,11 +9,11 @@
             {% csrf_token %}
             <div id="required-fields" class="bg-body-tertiary rounded p-2 pb-3">
                 <div class="d-flex justify-content-between px-3" style="gap: 20px;">
-                    {% include 'site/form_field.html' with id="username" field=form.username %}
-                    {% include 'site/form_field.html' with id="email" field=form.email %}
+                    {% include 'site/temp_form_field.html' with id="username" field=form.username %}
+                    {% include 'site/temp_form_field.html' with id="email" field=form.email %}
                 </div>
                 <div class="d-block m-auto text-center" style="width: fit-content;">
-                    {% include 'site/form_field.html' with id="password" field=form.password %}
+                    {% include 'site/temp_form_field.html' with id="password" field=form.password %}
                 </div>
                 <div id="password-hint" class="w-100 m-auto text-center fs-sm">
                     <span id="lb-password-hint">Password must be at least 8 characters long,</span><br>
@@ -25,13 +25,13 @@
                     <span id="lb-invite-hint">Already got a Family Invite? Add the code here.</span><br>
                 </div>
                 <div class="d-block m-auto text-center" style="width: fit-content;">
-                    {% include 'site/form_field.html' with id="invite-code" field=form.invite_code %}
+                    {% include 'site/temp_form_field.html' with id="invite-code" field=form.invite_code %}
                 </div>
             </div>
             <div id="optional-fields" class="bg-body-tertiary rounded p-2 pb-3 mt-3">
                 <div class="d-flex justify-content-between px-3">
-                    {% include 'site/form_field.html' with id="first-name" field=form.first_name optional=True %}
-                    {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}
+                    {% include 'site/temp_form_field.html' with id="first-name" field=form.first_name optional=True %}
+                    {% include 'site/temp_form_field.html' with id="last-name" field=form.last_name optional=True %}
                 </div>
                 <div id="name-hint" class="w-100 m-auto text-center fs-sm">
                     <span id="lb-name-hint">You can always set up your full, or just first, name in the Settings.</span><br>

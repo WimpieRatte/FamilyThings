@@ -17,23 +17,23 @@
                 {% csrf_token %}
                 <div class="ms-auto" style="width: 60%;">
                     <div id="" class="d-flex gap-2">
-                        {% include 'site/form_field.html' with id="name" field=form.name %}
-                        {% include 'site/form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
+                        {% include 'site/temp_form_field.html' with id="name" field=form.name %}
+                        {% include 'site/temp_form_field.html' with id="accomplishment_type" field=form.accomplishment_type optional=True %}
                     </div>
-                    {% include 'site/form_field.html' with id="description" field=form.description optional=True %}
-                    {% include 'site/form_field.html' with id="is_repeat" field=form.is_repeat %}
+                    {% include 'site/temp_form_field.html' with id="description" field=form.description optional=True %}
+                    {% include 'site/temp_form_field.html' with id="is_repeat" field=form.is_repeat %}
                 </div>
                 <div style="width: 40%;">
-                    {% include 'site/form_field.html' with id="is_achievement" field=form.is_achievement field_class="d-flex" %}
+                    {% include 'site/temp_form_field.html' with id="is_achievement" field=form.is_achievement field_class="d-flex" %}
                     <div id="lb-measurement" class="pb-1">Measurement</div>
                     <div id="measurement-section" class="d-flex gap-2">
-                        {% include 'site/form_field.html' with id="" field=form.measurement_quantity %}
-                        {% include 'site/form_field.html' with id="" field=form.measurement %}
+                        {% include 'site/temp_form_field.html' with id="" field=form.measurement_quantity %}
+                        {% include 'site/temp_form_field.html' with id="" field=form.measurement %}
                     </div>
                     <div id="lb-time-range" class="pb-1">Time Range</div>
                     <div id="timeframe-section" class="flex-column gap-2">
-                        {% include 'site/form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="w-25" %}
-                        {% include 'site/form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
+                        {% include 'site/temp_form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="w-25" %}
+                        {% include 'site/temp_form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
                     </div>
                 </div>
                 {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial %}

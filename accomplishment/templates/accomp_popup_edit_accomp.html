@@ -9,8 +9,8 @@
             {% csrf_token %}
             <div id="measurement-settings">
                 <div id="measurement-section" class="d-flex gap-2 ps-4 pt-3">
-                    {% include 'site/form_field.html' with id="measurement-value" field=form.measurement_quantity %}
-                    {% include 'site/form_field.html' with id="measurement-type" field=form.measurement %}
+                    {% include 'site/temp_form_field.html' with id="measurement-value" field=form.measurement_quantity %}
+                    {% include 'site/temp_form_field.html' with id="measurement-type" field=form.measurement %}
                 </div>
             </div>
             <div>

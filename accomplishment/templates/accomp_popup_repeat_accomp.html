@@ -9,15 +9,15 @@
                 <input type="hidden" id="id_ID" name="ID" value="-1">
                 <div id="measurement-settings">
                     <div id="measurement-section" class="d-flex gap-2 ps-4 pt-3">
-                        {% include 'site/form_field.html' with id="measurement-value" field=form.measurement_quantity %}
-                        {% include 'site/form_field.html' with id="measurement-type" field=form.measurement %}
+                        {% include 'site/temp_form_field.html' with id="measurement-value" field=form.measurement_quantity %}
+                        {% include 'site/temp_form_field.html' with id="measurement-type" field=form.measurement %}
                     </div>
                 </div>
                 <div>
                     <div id="lb-time-range" class="pb-1">Time Range</div>
                     <div id="timeframe-section" class="flex-column gap-2">
-                        {% include 'site/form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="pe-3" %}
-                        {% include 'site/form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
+                        {% include 'site/temp_form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="pe-3" %}
+                        {% include 'site/temp_form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
                     </div>
                 </div>
         </div>
