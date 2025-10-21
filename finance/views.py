@@ -13,6 +13,7 @@ import plotly.express as px
 from django.template.loader import render_to_string
 import json  # add this line near the top with the other imports
 import pandas as pd
+import html
 
 # Create your views here.
 @login_required(login_url='user_login')
@@ -412,7 +413,7 @@ def load_headers(request, lang_code: str = ""):
     if request.method == 'POST' and request.FILES.get('formFile'):
         uploaded_file = request.FILES['formFile']
 
-        # Get Import Profile's Custom Mapping:
+        # Get selected Import Profile's Custom Mapping:
         import_profile = ImportProfile.objects.get(pk=request.POST.get('import_profile_selector'))
         import_profile_mappings = ImportProfileMapping.objects.filter(import_profile_id=import_profile.id).all()
         columns_to_extract = []
@@ -423,47 +424,55 @@ def load_headers(request, lang_code: str = ""):
 
         try:
             # Read file
-            if uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file)
+            if uploaded_file.name.lower().endswith('.csv'):
+                df = pd.read_csv(uploaded_file, sep=None, engine='python')  # This should auto-detect the separator
             else:
                 df = pd.read_excel(uploaded_file)
 
             # Extract only the columns specified in the Import Profile:
             df_reordered = extract_specific_columns(df, columns_to_extract)
 
+            # Rename the column headers to the ones specified in the Import Profile:
+            df_reordered.rename(columns=column_names_lookup, inplace=True)
+
+            # print the new headers:
+            print("Updated headers:")
+            print(df_reordered.columns.tolist())
+
             # region Transaction Pattern matching
 
-            # Get all Transaction Patters for all Transaction Categories this family has:
-            transaction_patterns = TransactionPattern.objects.filter(category_id__family_id=family_id).all()
+            # # Get all Transaction Patters for all Transaction Categories this family has:
+            # transaction_patterns = TransactionPattern.objects.filter(category_id__family_id=family_id).all()
 
-            # Mapping for category based on TransactionPattern matching
-            def get_suggested_category(row):
-                """Determine suggested category based on historical TransactionPattern"""
+            # # Mapping for category based on TransactionPattern matching
+            # def get_suggested_category(row):
+            #     """Determine suggested category based on historical TransactionPattern"""
 
-                # If there are no Transaction Patterns defined, don't bother trying to match them:
-                if len(transaction_patterns) == 0:
-                    return None
-                # If there are no Transaction Patterns mapped to name, don't bother trying to match them:
-                if column_names_lookup.get(ImportProfileMappingDestinationColumns.NAME.value) is None:
-                    return None
+            #     # If there are no Transaction Patterns defined, don't bother trying to match them:
+            #     if len(transaction_patterns) == 0:
+            #         return None
+            #     # If there are no Transaction Patterns mapped to name, don't bother trying to match them:
+            #     if column_names_lookup.get(ImportProfileMappingDestinationColumns.NAME.value) is None:
+            #         return None
 
-                # Get column that has the recipient name:
-                recipient = str(row.get(column_names_lookup[ImportProfileMappingDestinationColumns.NAME.value], ''))
-                return transaction_patterns.filter(name_regex=recipient).first().transaction_category_id
+            #     # Get column that has the recipient name:
+            #     recipient = str(row.get(column_names_lookup[ImportProfileMappingDestinationColumns.NAME.value], ''))
+            #     return transaction_patterns.filter(name_regex=recipient).first().transaction_category_id
 
-            # Add suggested category column for each row
-            df['suggested_category'] = df.apply(get_suggested_category, axis=1)
+            # # Add suggested category column for each row
+            # df['suggested_category'] = df_reordered.apply(get_suggested_category, axis=1)
 
-            # Convert DataFrame to HTML with dropdowns
-            html_output = generate_html_with_dropdowns(df, categories)
-            *** then continue here ***
+            # # Convert DataFrame to HTML with dropdowns
+            # html_output = generate_html_with_dropdowns(df_reordered, categories)
+            # *** then continue here ***
+
             # endregion
 
             context.update({
                 'success': True,
-                'column_names': columns_to_extract
+                'column_names': columns_to_extract,
                 'result': df_reordered.to_dict("records"),
-                'row_count': len(df)
+                'row_count': len(df_reordered)
             })
 
             return render(request, 'finance/partials/imported_transactions.html', context)
@@ -483,7 +492,7 @@ def extract_specific_columns(df, desired_order):
     return df[common_columns]
 
 def generate_html_with_dropdowns(df, categories):
-    *** first continue here ***
+    # TODO: *** first continue here ***
     """Generate HTML table with category dropdowns"""
     html_output = '<table class="table table-striped table-bordered">\n'
 
