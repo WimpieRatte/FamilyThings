@@ -1,0 +1,8 @@
+<select class="form-select">
+    {% if not categories %}
+        <option disabled selected>No Categories Found</option>
+    {% endif %}
+    {% for category in categories %}
+        <option value="{{category.id}}">{{category.name}}</option>
+    {% endfor %}
+</select>

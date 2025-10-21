@@ -1,6 +1,8 @@
 from enum import Enum
 
 class ImportProfileMappingDestinationColumns(Enum):
+    # name = value
+    # The value is used both for displaying and for what should be saved in the database.
     NAME = "Name"
     DESCRIPTION = "Description"
     TRANSACTION_DATE = "Transaction Date"

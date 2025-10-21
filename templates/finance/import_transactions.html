@@ -1,6 +1,7 @@
 {% extends "site/site_base.html" %}
 {% block append_to_head %}
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.7/dist/htmx.min.js"></script>
     <style>
         body {
             overflow-y: auto; /* allow standard page scrolling */
@@ -24,7 +25,7 @@
                         tooltip="If this is a file format you haven't imported before, please first create a new import profile accordingly."
                         onchange="change(this.value)">
                     {% if not profiles %}
-                        <option>Create New</option>
+                        <option selected disabled>Create New</option>
                     {% endif %}
                     {% for profile in profiles %}
                         <option value="{{ profile.id }}">{{ profile.name }}</option>
@@ -46,7 +47,12 @@
                 <input class="form-control" id="formFile" type="file">
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-primary" id="btnLoadHeaders">
+                <button type="button" class="btn btn-primary"
+                        id="btnLoadHeaders"
+                        hx-get="{% url 'finance:load_headers' %}"
+                        hx-trigger="click"
+                        hx-target="#imported_transactions_container"
+                >
                     Load Headers
                 </button>
             </div>
@@ -54,19 +60,49 @@
     </div>
 
     <br>
-    {% include 'finance/partials/imported_transactions.html' %}
-    <div id="imported_transactions_container" class="container rounded bg-dark p-2 h-25 mh-25">
 
-        <br>
+    <div id="imported_transactions_container">
+        {% comment %} Will be loaded via btnLoadHeaders {% endcomment %}
+        {% comment %} {% include 'finance/partials/imported_transactions.html' %} {% endcomment %}
+
     </div>
     <br>
 </div>
 
 <script>
 
+    // Change the edit profiles button link based on selected profile
     function change(val){
         document.getElementById("btnEditProfiles").href = "{% url 'finance:import_profiles' %}?selected_import_profile=" + val;
     }
+
+    document.body.addEventListener("htmx:beforeRequest", function (event) {
+        if (event.target.id !== "btnLoadHeaders") return;
+
+        const profileSelect = document.getElementById("import-profile-selector");
+        const fileInput = document.getElementById("formFile");
+
+        let blocked = false;
+
+        if (!profileSelect.value || profileSelect.value === "Create New") {
+            event.preventDefault();
+            profileSelect.classList.add("is-invalid");
+            alert("Please pick an import profile before loading headers.");
+            blocked = true;
+        } else {
+            profileSelect.classList.remove("is-invalid");
+        }
+
+        if (!fileInput.files.length) {
+            event.preventDefault();
+            fileInput.classList.add("is-invalid");
+            if (!blocked) {
+                alert("Please select a file before loading headers.");
+            }
+        } else {
+            fileInput.classList.remove("is-invalid");
+        }
+    });
 
 </script>
 

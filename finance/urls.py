@@ -12,4 +12,10 @@ urlpatterns = [
 	path('delete_import_profile', views.delete_import_profile, name='delete_import_profile'),
  	path('save_import_profile_mapping', views.save_import_profile_mapping, name='save_import_profile_mapping'),
   	path('delete_import_profile_mapping/<int:pk>', views.delete_import_profile_mapping, name='delete_import_profile_mapping'),
+	path('create_category', views.create_category, name='create_category'),
+ 	path('category_controls', views.category_controls, name='category_controls'),
+	path('edit_categories', views.edit_categories, name='edit_categories'),
+ 	path('save_transaction_category', views.save_transaction_category, name='save_transaction_category'),
+	path('delete_transaction_category', views.delete_transaction_category, name='delete_transaction_category'),
+	path('load_headers', views.load_headers, name='load_headers'),
 ]

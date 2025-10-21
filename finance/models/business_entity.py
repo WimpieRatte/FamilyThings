@@ -16,3 +16,10 @@ class BusinessEntity(models.Model):
     class Meta:
         verbose_name = "Business Entity"
         verbose_name_plural = "Business Entities"
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "family_id"],
+                name="unique_business_entity_per_family"
+            )
+        ]
