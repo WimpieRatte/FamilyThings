@@ -1,11 +1,11 @@
 <div class="w-100">
-    {% include 'site/form_field.html' with id="accomp-icon" field=form.icon hidden=True %}{# Hidden Field #}
+    {% include 'site/temp_form_field.html' with id="accomp-icon" field=form.icon hidden=True %}{# Hidden Field #}
     <div class="m-auto" style="width: fit-content; gap:.125em">
         <div id="lb-accomp-icon">Icon</div>
         <div class="d-flex flex-wrap">
         {% for icon in icons %}
             {% if icon == "$BREAK$" %}
-                </div><div class="d-flex flex-wrap">
+                </div><div class="d-flex flex-wrap m-auto w-fit">
             {% elif icon == "$SPACE$" %}
                 <div style="width: .5em;"></div>
             {% else %}
@@ -38,7 +38,8 @@
         button.classList.add("active");
     }
 
+    var source = "{{popup}}"
     /* Check if an icon (when repeating an Accomplishment) is defined, if not use the default icon. */
-    //if ('{{initial.icon}}' != ''){ input_change_value(document.querySelector("#icon-btn-{{initial.icon}}"), '#id_icon'); }
-      //  else{ input_change_value(document.querySelector(".icon-btn"), '#id_icon'); }
+    if ('{{initial.icon}}' != ''){ input_change_value(document.querySelector(`${source} #icon-btn-{{initial.icon}}`), `${source} #id_icon`); }
+        else{ input_change_value(document.querySelector(`${source} .icon-btn`), `${source} #id_icon`); }
 </script>

@@ -4,10 +4,20 @@ function initiateCreate() {
 
     //Apply name and icon
     document.querySelector(`#new-accomp-popup #edit-accomp-name`).textContent = nameField.value;
-    $("#new-accomp-popup #id_name").val(nameField.value)
     document.querySelector(`#new-accomp-popup #edit-accomp-icon`).className = `bi bi-plus-circle-fill h5`;
-    //document.querySelector(`#new-accomp-popup #edit-accomp-icon`).className = `bi bi-${accomplishmentStorage["icon"]} h5`;
-    //document.querySelector(`#repeat-accomp-popup #lb-created-on`).textContent = ""
+
+    //Reset fields while importing the name that was entered in the previous screen
+    $("#new-accomp-popup #id_name").val(nameField.value)
+
+    $('#new-accomp-popup #id_accomplishment_type').val("");
+    $('#new-accomp-popup #id_description').val("");
+    $('#new-accomp-popup #id_is_achievement').prop( "checked", false );
+
+    let today = new Date()
+    document.querySelector('#new-accomp-popup #id_date_from').valueAsDate = today;
+    document.querySelector('#new-accomp-popup #id_date_to').valueAsDate = today;
+
+    input_change_value(document.querySelector(`#new-accomp-popup #icon-btn-dash`), `#new-accomp-popup #id_icon`);
 }
 
 
@@ -17,6 +27,17 @@ const accompNameField = document.getElementById("id_name");
 const accompDescriptionField = document.getElementById("id_description");
 const accompSubmitButton = document.getElementById("btn-create");
 
+$('#new-accomp-popup #id_is_achievement').click(function() {
+        if ($(this).prop("checked") == true) { 
+            document.querySelector(`#new-accomp-popup #edit-accomp-icon`).className = `bi bi-plus-circle-fill h5 special-achievement`;
+            document.querySelector(`#new-accomp-popup #edit-accomp-name`).className = `h5 special-achievement`;
+        }
+        else { 
+            document.querySelector(`#new-accomp-popup #edit-accomp-icon`).className = `bi bi-plus-circle-fill h5`;
+            document.querySelector(`#new-accomp-popup #edit-accomp-name`).className = `h5`;
+        }
+    }
+);
 
 $("#new-accomp-popup #btn-abort").click(function(event) {
     closePopup();
@@ -29,13 +50,16 @@ $("#new-accomp-popup #btn-create").click(function(event) {
 
     enableLoadingScreen();  // Function is defined in site_js
 
-    let form_data = $("#new-accomp-popup #accomplishment-form")
-    $("#new-accomp-popup #accomplishment-form").disabled = false;
     accompDescriptionField.disabled = false;
 
+    let form_data = $("#new-accomp-popup #accomplishment-form")
+    let form_array = form_data.serializeArray()
+    form_array.push({'name': 'date_from', 'value': document.querySelector('#new-accomp-popup #id_date_from').value});
+    form_array.push({'name': 'date_to', 'value': document.querySelector('#new-accomp-popup #id_date_to').value});
+    
     $.ajax({ 
         type: 'POST', url: '{% url "accomplishment:submit_new" %}',
-        data: form_data.serializeArray(),
+        data: form_array,
         success: function(json) {
             disableLoadingScreen();
             createAlert(text=json["alert-message"], key="", type=json["alert-type"]);

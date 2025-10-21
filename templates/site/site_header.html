@@ -1,37 +1,44 @@
 {% load static %}
 <header class="bg-primary rounded-bottom border-bottom">
-  <div class="dropdown">
-    <div id="drowdown-wrapper" class="d-flex px-5 bg-body-tertiary rounded-bottom border-bottom shadow-lg">
+    <div id="header-wrapper" class="d-flex px-5 bg-body-tertiary rounded-bottom border-bottom shadow-lg">
       <ul class="nav me-auto">
         {% if request.user.is_authenticated %}
-          {% include 'header/nav_item.html' with id='profile' icon='person-arms-up' label='Profile' color="#ec739cff" href='core:user_profile' tooltip='Brief overview about you and your Family.' %}
-          {% include 'header/nav_item.html' with id='accomplishments' icon='award' label='Accomplishments' color="#d99d51" href='accomplishment:overview' tooltip='See and manage all of your Accomplishments.' %}
-          {% include 'header/nav_item.html' with id='finance' icon='piggy-bank' label='Finance' color="#ddc67f" href='finance:import_transactions' tooltip='Keep your finances in check.' %}
-          {% include 'header/nav_item.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='calendar:calendar' tooltip='An overview of upcoming events, holidays, etc.' %}
+          {% include 'header/temp_header_nav.html' with id='profile' icon='person-arms-up' label='Profile' color="#ec739cff" href='core:user_profile' tooltip='Brief overview about you and your Family.' %}
+          {% include 'header/temp_header_nav.html' with id='accomplishments' icon='award' label='Accomplishments' color="#d99d51" href='accomplishment:overview' tooltip='See and manage all of your Accomplishments.' %}
+          <div class="dropdown">
+            {% include 'header/temp_header_nav.html' with id='finance' icon='piggy-bank' label='Finance' color="#ddc67f" tooltip='Keep your finances in check.' dropdown=True %}
+            <div class="dropdown-menu dropdown-menu-lg-start" aria-labelledby="dropdownMenuButton" style="inset: -4px auto auto 0px !important;">
+              {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='card-list' label='View Transactions' %}
+              {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='plus-square' label='Import Transactions' %}
+              {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='bar-chart-fill' label='Statistics' %}
+            </div>
+          </div>
+          {% include 'header/temp_header_nav.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='calendar:calendar' tooltip='An overview of upcoming events, holidays, etc.' %}
         {% endif %}
-        {% include 'header/nav_item.html' with id='home' icon='house-door' label='Home' color="#5ccaff" href='core:home' %}
+        {% include 'header/temp_header_nav.html' with id='home' icon='house-door' label='Home' color="#5ccaff" href='core:home' %}
       </ul>
-      <button class="dropdown-toggle text-end me-4" style="border: 0; background: 0;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <img id="dropdown-user-icon" class="border border-3 border-primary" {% include 'header/icon.html' with icon=request.user.icon %} height="30" width="30" alt="..."><span class="ms-2">{{request.user.full_name}}</span>
+      <div class="dropdown">
+        <button class="dropdown-toggle text-end me-4" style="border: 0; background: 0;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <img id="dropdown-user-icon" class="border border-3 border-primary" {% include 'header/temp_user_icon.html' with icon=request.user.icon %} height="30" width="30" alt="..."><span class="ms-2">{{request.user.full_name}}</span>
           </button>
           <div class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownMenuButton">
             {% if not request.user.is_authenticated %}
-              {% include 'header/dropdown_item.html' with href='core:user_register' id="register" icon='pencil-square' label='Register' %}
-              {% include 'header/dropdown_item.html' with href='core:user_login' id="log-in" icon='box-arrow-right' label='Log In' %}
+              {% include 'header/temp_dropdown_item.html' with href='core:user_register' id="register" icon='pencil-square' label='Register' %}
+              {% include 'header/temp_dropdown_item.html' with href='core:user_login' id="log-in" icon='box-arrow-right' label='Log In' %}
             {% else %}
               <small id="dropdown-item-role" class="dropdown-item no-ptr-evt">
-                {% include 'header/role_name.html' with superuser=request.user.is_superuser manager=request.session.family_info.is_manager %}<br>
+                {% include 'header/temp_role_name.html' with superuser=request.user.is_superuser manager=request.session.family_info.is_manager %}<br>
                 {{ request.session.family_info.family_name }}
               </small>
               <li><hr class="dropdown-divider"></li>
-              {% include 'header/dropdown_item.html' with href='core:user_settings' id="user-settings" icon='gear' label='Settings' %}
+              {% include 'header/temp_dropdown_item.html' with href='core:user_settings' id="user-settings" icon='gear' label='Settings' %}
               {% if request.user.is_superuser %}
-                {% include 'header/dropdown_item.html' with href='admin:index' id="admin" icon='sliders' label='Admin Page' new_tab='True' %}
+                {% include 'header/temp_dropdown_item.html' with href='admin:index' id="admin" icon='sliders' label='Admin Page' new_tab='True' %}
               {% endif %}
               {% if request.session.family_info.is_manager %}
-                {% include 'header/dropdown_item.html' with href='core:manage_family' id="family-settings" icon='person-arms-up' label='Family Management' %}
+                {% include 'header/temp_dropdown_item.html' with href='core:manage_family' id="family-settings" icon='person-arms-up' label='Family Management' %}
               {% endif %}
-              {% include 'header/dropdown_item.html' with href='core:request_logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
+              {% include 'header/temp_dropdown_item.html' with href='core:request_logout' id="log-out" icon='box-arrow-right' label='Log Out' %}
               {% if request.session.families|length > 1 %}
                 <li><hr class="dropdown-divider"></li>
                 <small id="lb-switch-to" class="dropdown-item no-ptr-evt" style="line-height: .75em;">Switch to</small>
@@ -44,6 +51,7 @@
               {% endif %}
             {% endif %}
           </div>
+        </div>
       </ul>
       </div>
     {% if show_time %}

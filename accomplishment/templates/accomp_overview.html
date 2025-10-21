@@ -14,17 +14,17 @@
         <div id="accomplishments-wrapper" class="container rounded py-2">
             <div class="d-flex justify-content-between flex-wrap p-3">
                 <div style="width: 65%">
+                    {% include 'site/heading_small.html' with label="All Activity" id="all-activity" %}
                     <div class="d-flex flex-wrap justify-content-between pb-2">
-                        {% include 'site/heading_small.html' with label="All Activity" id="all-activity" %}
-                        <form id="filter-form">
-                            <div class="d-flex pe-3">
-                                <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter Accomplishments..." aria-label="Search">
-                                <select id="filter-selector" class="form-select fs-sm">
+                        <form id="filter-form" class="w-100">
+                            <div class="d-flex w-50 ms-auto">
+                                <select id="filter-selector" class="form-select fs-sm position-relative">
                                     <option selected value="name">Name</option>
                                     <option value="uncategorized">Name (w/o Category)</option>
                                     <option value="achievement">Name (Sp. Achievement)</option>
                                     <option value="category">Category</option>
                                 </select>
+                                <input id="search-filter" class="form-control me-3 fs-sm" style="width: 15em;" type="search" placeholder="Filter Accomplishments..." aria-label="Search">
                             </div>
                             <button id="" type="submit" class="d-none"></button>
                         </form>
@@ -38,6 +38,7 @@
                                     <th class="p-1" id="lb-measurement" style="width: 18%;" scope="col">Measurement</th>
                                     <th class="p-1" id="lb-category" style="width: 20%;" scope="col">Category</th>
                                     <th class="p-1" id="lb-created-on" style="width: 20%;" scope="col">Created on</th>
+                                    <th class="p-1" id="lb-cleared-on" style="width: 20%; display: none;" scope="col">Cleared on</th>
                                     <th class="p-1" style="width: 12%;" scope="col"></th>
                                 </tr>
                             </thead>
@@ -91,20 +92,6 @@
     var currentAJAXURL = editAccompURL;
 
     var selectedAccomplishment = "" //Stores the ID of the Accomplishment/Template that is being edited.
-
-    function openRepeat(data) {
-        let _data = data.getAttribute("data-accomp-data").replaceAll(`'`, `"`).replaceAll(`None`, `null`).replaceAll(`False`, `false`).replaceAll(`True`, `true`);
-        accomplishmentStorage = JSON.parse(_data)
-        closePopup();
-        openPopup("repeat-accomp-popup");
-        prepareRepeat()
-    }
-
-    $("#nav-tooltip-home").click(function(event) {
-        event.preventDefault();
-        openPopup("edit-template-popup");
-    });
-
 
     {% include 'js_accomp_search_table.js' %}
     {% include 'js_accomp_edit_accomp_prompt.js' %}

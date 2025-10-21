@@ -24,6 +24,12 @@
 
 .border-primary, .btn-primary {border-color: var(--bs-{{color}}) !important;}
 
+.active {
+    color: var(--bs-{{color}}) !important;
+    background-color: var(--bs-dark) !important;
+}
+
+
 {% if cursor %}
     html, :root, head, body, main, footer, a, textarea, select, option, input,
     button, [type="button"]:not(:disabled), [type="reset"]:not(:disabled), [type="submit"]:not(:disabled), button:not(:disabled),

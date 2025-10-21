@@ -12,12 +12,12 @@ class AccomplishmentForm(forms.Form):
     icon = forms.CharField(
         label="", max_length=40, required=True, widget=forms.HiddenInput())
     measurement = forms.CharField(max_length=4,
-        label="Meas.", required=False)
+        label="Unit", required=False)
     measurement_quantity = forms.DecimalField(
         label="Value", required=False, min_value=0, widget=forms.NumberInput())
     date_from = forms.DateField(label="From", required=False, initial=timezone.now, widget=forms.DateInput())
     date_to = forms.DateField(label="To", required=False, initial=timezone.now, widget=forms.DateInput())
-    is_achievement = forms.BooleanField(label="Special Achievement", required=False)
+    is_achievement = forms.BooleanField(label="Spec. Achievement", required=False)
     #  Used in case the user wants to repeat an existing one
     is_repeat = forms.BooleanField(label="", required=False)
 
@@ -32,8 +32,8 @@ class AccomplishmentForm(forms.Form):
     is_achievement.widget.attrs.update({"class": "form-check-input", "style": "width: 32px; height: 32px; margin: 0;"})
 
     # Size tweaks for the measurement section
-    measurement_quantity.widget.attrs.update({"style": "width: 5em; font-size: 1.25em;"})
-    measurement.widget.attrs.update({"style": "width: 2.5em; font-size: 1.25em;"})
+    measurement_quantity.widget.attrs.update({"style": "width: 5em; font-size: 1.25em;", 'placeholder': '0'})
+    measurement.widget.attrs.update({"style": "width: 2.5em; font-size: 1.25em;", 'placeholder': 'x'})
 
     accomplishment_type.widget.attrs.update({"style": "width: 12em; height: 2em;"})
 

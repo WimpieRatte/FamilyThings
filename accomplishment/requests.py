@@ -17,9 +17,9 @@ def accomplishments_list_from_query(query):
     """Return a list of Accomplishments based on a
     FamilyUserAccomplishment QuerySet."""
     result = []
-    for _ in query:
-        _ = Accomplishment.objects.filter(id__in=_).values()
-        result += _
+    user_accomp: FamilyUserAccomplishment
+    for user_accomp in query:
+        result += [user_accomp.serialized()]
     result = list(result)
 
     return (result)
@@ -31,15 +31,15 @@ def get_obtained_today(request, amount: int = 4):
         return HttpResponseBadRequest()
     else:
         today: timezone.datetime = timezone.now()
-        fam_user_accomplishments = FamilyUserAccomplishment.objects.filter(
+        query = FamilyUserAccomplishment.objects.filter(
                 created_by_id=request.user,
                 created__year=today.year,
                 created__month=today.month,
                 created__day=today.day
-        ).order_by('created').reverse().values_list("accomplishment_id")[:amount]
+        ).order_by('created')
 
         return JsonResponse(data={
-            'result': accomplishments_list_from_query(fam_user_accomplishments)
+            'result': accomplishments_list_from_query(query=query[:min(amount, len(query))])
         })
 
 
@@ -49,13 +49,13 @@ def get_recent(request, amount: int = 5):
         return HttpResponseBadRequest()
     else:
         yesterday: timezone.datetime = timezone.now() - timezone.timedelta(days=1)
-        fam_user_accomplishments = FamilyUserAccomplishment.objects.filter(
+        query = FamilyUserAccomplishment.objects.filter(
                 created_by_id=request.user,
                 created__lt=yesterday
-        ).order_by('created').reverse().values_list("accomplishment_id")[:amount]
+        ).order_by('-created')
 
         return JsonResponse(data={
-            'result': accomplishments_list_from_query(fam_user_accomplishments)
+            'result': accomplishments_list_from_query(query=query[:min(amount, len(query))])
         })
 
 
@@ -149,9 +149,7 @@ def get_accomp_by_id(request, ID):
     accom_details.update({
         'created': accom.created,
         'measurement_quantity': accom.measurement_quantity,
-        'date_from_day': from_date_tz.day, 'date_from_month': from_date_tz.month,
-        'date_from_year': from_date_tz.year, 'date_to_day': to_date_tz.day,
-        'date_to_month': to_date_tz.month, 'date_to_year': to_date_tz.year,
+        'date_from': accom.from_date.strftime("%Y-%m-%d"), 'date_to': accom.to_date.strftime("%Y-%m-%d")
     })
     print(accom_details)
     return JsonResponse(data=accom_details)
@@ -177,8 +175,8 @@ def edit_accomp(request, ID):
         else:
             accom.measurement_quantity = float(request.POST.get("measurement_quantity", 0))
 
-        accom.from_date = datetime_from_field(form=form, field="date_from")
-        accom.to_date = datetime_from_field(form=form, field="date_to")
+        accom.from_date = request.POST["date_from"]
+        accom.to_date = request.POST["date_to"]
         accom.save()
         return JsonResponseAlert(
             request=request, type="success", message=get_locale_text(
@@ -204,7 +202,6 @@ def submit_accomplishment(request):
 
     form = AccomplishmentForm(data=request.POST)
     if form.is_valid():
-        print(form.cleaned_data)
         # We want to be strict with the name matching, so we only
         # search an Accomplishment with the same name and user,
         # and otherwise create a new one.
@@ -217,21 +214,23 @@ def submit_accomplishment(request):
         if created:
             if form.cleaned_data.get("accomplishment_type", "") != "":
                 accomp_type = AccomplishmentType.objects.get_or_create(
-                    name=form.cleaned_data.get("accomplishment_type", ""),
+                    name=form.cleaned_data["accomplishment_type"],
                     description=""
                 )[0]
                 new_accomp.accomplishment_type_id = accomp_type
 
             if form.cleaned_data.get("measurement", "") != "":
                 measurement: MeasurementType = MeasurementType.objects.get_or_create(
-                    name=form.cleaned_data.get("measurement", ""),
-                    abbreviation=form.cleaned_data.get("measurement", ""),
+                    name=form.cleaned_data["measurement"],
+                    abbreviation=form.cleaned_data["measurement"],
                     description=""
                 )[0]
                 new_accomp.measurement_type_id = measurement
 
-            new_accomp.description=form.cleaned_data.get("description", ""),
-            new_accomp.icon=form.cleaned_data.get("icon", "")
+            if form.cleaned_data.get("description", "") != "":
+                new_accomp.description = form.cleaned_data["description"]
+
+            new_accomp.icon=form.cleaned_data.get("icon", "dash")
             new_accomp.is_achievement=form.cleaned_data.get("is_achievement", False)
             new_accomp.save()
 
@@ -240,8 +239,8 @@ def submit_accomplishment(request):
             accomplishment_id=new_accomp,
             created_by=request.user,
             measurement_quantity=form.cleaned_data.get("measurement_quantity", 1),
-            from_date=timezone.now(),
-            to_date=timezone.now()
+            from_date=form.cleaned_data.get("date_from"),
+            to_date=form.cleaned_data.get("date_to"),
         )
         return JsonResponseAlert(
             request=request, message="Accomplishment successfully created!",

@@ -16,20 +16,20 @@
                 <form id="settings-form" class="mb-3 pe-5" enctype="multipart/form-data" method="post" style="width: fit-content !important;">
                     {% csrf_token %}
                     <div class="d-flex gap-2">
-                        {% include 'site/form_field.html' with id="first-name" field=form.first_name optional=True %}
-                        {% include 'site/form_field.html' with id="last-name" field=form.last_name optional=True %}
+                        {% include 'site/temp_form_field.html' with id="first-name" field=form.first_name optional=True %}
+                        {% include 'site/temp_form_field.html' with id="last-name" field=form.last_name optional=True %}
                     </div>
-                    {% include 'site/form_field.html' with id="birthday" field=form.birthday optional=True %}
+                    {% include 'site/temp_form_field.html' with id="birthday" field=form.birthday optional=True %}
                     <div class="d-flex gap-5">
-                        {% include 'site/form_field.html' with id="language" field=form.language %}
-                        {% include 'site/form_field.html' with id="cursor" field=form.cursor %}
+                        {% include 'site/temp_form_field.html' with id="language" field=form.language %}
+                        {% include 'site/temp_form_field.html' with id="cursor" field=form.cursor field_class='form-switch' %}
                     </div>
-                    {% include 'site/form_field.html' with id="color" field=form.color hidden='True' %}
-                    {% include 'site/form_field.html' with id="user-icon" field=form.user_icon optional=True hidden='True' %}
-                    {% include 'site/form_field.html' with id="background-image" field=form.background_image optional=True hidden='True' %}
+                    {% include 'site/temp_form_field.html' with id="color" field=form.color hidden='True' %}
+                    {% include 'site/temp_form_field.html' with id="user-icon" field=form.user_icon optional=True hidden='True' %}
+                    {% include 'site/temp_form_field.html' with id="background-image" field=form.background_image optional=True hidden='True' %}
                     <div class="d-flex">
-                        {% include 'site/form_field.html' with id="remove-icon" field=form.remove_icon optional=True hidden='True'%}
-                        {% include 'site/form_field.html' with id="remove-background" field=form.remove_background optional=True hidden='True'%}
+                        {% include 'site/temp_form_field.html' with id="remove-icon" field=form.remove_icon optional=True hidden='True'%}
+                        {% include 'site/temp_form_field.html' with id="remove-background" field=form.remove_background optional=True hidden='True'%}
                     </div>
                     <br>
                     <button id="btn-apply" class="btn btn-primary border-primary" type="submit">Apply</button>
@@ -39,7 +39,7 @@
                 <div id="user-icon-setting" class="d-flex flex-column w-25">
                     {% include 'site/heading_small.html' with id="icon" title='Icon' %}
                     <div class="position-relative" style="height: 75px; width: 75px;">
-                        <img id="user-icon-preview" {% include 'header/icon.html' with icon=request.user.icon %} class="border border-5 border-primary mb-1 position-absolute" height="75" width="75" alt="...">
+                        <img id="user-icon-preview" {% include 'header/temp_user_icon.html' with icon=request.user.icon %} class="border border-5 border-primary mb-1 position-absolute" height="75" width="75" alt="...">
                         <div id="lb-change" class="pe-none position-absolute top-50 start-50 translate-middle" style="z-index: 90;">Change</div>
                         <button id="btn-clear-icon" class="btn btn-primary border-primary fs-sm mt-1 position-absolute top-100 start-50 translate-middle-x" type="submit">
                             <span id="btn-clear">Clear</span>

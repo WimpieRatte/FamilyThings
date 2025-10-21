@@ -9,20 +9,26 @@
             {% csrf_token %}
             <div id="measurement-settings">
                 <div id="measurement-section" class="d-flex gap-2 ps-4 pt-3">
-                    {% include 'site/form_field.html' with id="measurement-value" field=form.measurement_quantity %}
-                    {% include 'site/form_field.html' with id="measurement-type" field=form.measurement %}
+                    {% include 'site/temp_form_field.html' with id="measurement-value" field=form.measurement_quantity %}
+                    {% include 'site/temp_form_field.html' with id="measurement-type" field=form.measurement %}
                 </div>
             </div>
             <div>
                 <div id="lb-time-range" class="pb-1">Time Range</div>
-                <div id="timeframe-section" class="flex-column gap-2">
-                    {% include 'site/form_field.html' with id="date-from" field=form.date_from field_class="d-flex" label_class="pe-3" %}
-                    {% include 'site/form_field.html' with id="date-to" field=form.date_to field_class="d-flex" label_class="w-25" %}
+                <div id="timeframe-section" class="w-fit m-auto">
+                    <div class="d-flex gap-2">
+                        <div id="lb-date-from" style="width: 3em;">From</div>
+                        <input type="date" class="form-control" id="id_date_from" style="padding: .2em; text-transform: uppercase; width: 120px;" placeholder="Today">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <div id="lb-date-to" style="width: 3em;">To</div>
+                        <input type="date" class="form-control" id="id_date_to" style="padding: .2em; text-transform: uppercase; width: 120px;" placeholder="Today">
+                    </div>
                 </div>
             </div>
             </div>
             <div class="d-flex gap-2 pt-4 m-auto" style="width: fit-content;">
-                <button id="btn-apply-changes" class="btn btn-primary border-primary" type="button">Submit Change</button>
+                <button id="btn-apply-changes" class="btn btn-success border-success" type="button">Submit Change</button>
                 <button id="btn-abort" class="btn-abort-edit btn btn-danger" type="button">Abort</button>
             </div>
         </form>

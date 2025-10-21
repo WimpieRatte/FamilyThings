@@ -14,7 +14,7 @@ def page_overview(request):
     """An overview of an User's Accomplishments."""
 
     recent_additions = Accomplishment.objects.filter(
-                    created_by=request.user.id).order_by('created').values()[:10]
+                    created_by=request.user.id).order_by('-created').values()[:15]
 
     return render(
         request, "accomp_overview.html",

@@ -12,8 +12,8 @@
                     <span id="lb-new-family-hint">You can create your own Family here.</span><br>
                 </div>
                 <div class="d-block m-auto text-center" style="width: fit-content;">
-                    {% include 'site/form_field.html' with id="family-name" field=form.family_name %}
-                    <button id="btn-create" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="button">Create</button>
+                    {% include 'site/temp_form_field.html' with id="family-name" field=form.family_name %}
+                    <button id="btn-create" class="btn btn-success border-success mt-4 m-auto text-center d-block" type="button">Create</button>
                 </div>
             </div>
             <div id="family-invite" class="w-50 mx-2 bg-body-tertiary rounded p-2 mt-3">
@@ -21,8 +21,8 @@
                     <span id="lb-invite-hint">Already got a Family Invite? Add the code here.</span><br>
                 </div>
                 <div class="d-block m-auto text-center" style="width: fit-content;">
-                    {% include 'site/form_field.html' with id="" field=form.invite_code %}
-                    <button id="btn-apply" class="btn btn-primary border-primary mt-4 m-auto text-center d-block" type="button">Submit</button>
+                    {% include 'site/temp_form_field.html' with id="" field=form.invite_code %}
+                    <button id="btn-apply" class="btn btn-success border-success mt-4 m-auto text-center d-block" type="button">Submit</button>
                 </div>
             </div>
         </form>

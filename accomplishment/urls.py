@@ -17,7 +17,7 @@ urlpatterns = [
      # AJAX Urls
      re_path(r"^get/(?:amount=(?P<amount>[0-9]+)/)?(?:start=(?P<start>[0-9]+)/)?(?:selector='(?P<selector>[a-zA-Z]+)'/)?(?:key='(?P<key>[0-9a-zA-Z ]+)')?$",
           requests.get_entries, name="get"),
-     path("get/recent?amount=<int:amount>",
+     path("get/recent/amount=<int:amount>",
           requests.get_recent, name="get_recent"),
      path("get/today/amount=<int:amount>",
           requests.get_obtained_today, name="obtained_today"),
