@@ -59,11 +59,13 @@ $(saveBtn).click(function(event) {
         },
         success: function(json) {
             disableLoadingScreen();
+            playCheckmarkAnimation();
             //closePopup();
             createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
+
             setTimeout(function() {
-                window.location.replace('{{request.session.last_visited_page}}');}, 
-                1000);
+                window.location.replace('{{request.session.last_visited_page}}'); 
+            }, 2600);
         },
         error: function(xhr, errmsg, err) {
             event.target.disabled = false;

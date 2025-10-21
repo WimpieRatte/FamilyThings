@@ -11,7 +11,7 @@
             {% elif icon == "$SPACE$" %}
                 <div style="width: .5em;"></div>
             {% else %}
-                <button id="icon-btn-{{icon}}" type="button" onclick="input_change_value(this, '#id_icon')", value="{{icon}}" class="icon-btn btn btn-dark border border-secondary p-1 m-0 rounded">
+                <button id="icon-btn-{{icon}}" type="button" onclick="input_change_value(this, '#{{popup}} #id_icon')", value="{{icon}}" class="icon-btn btn btn-dark border border-secondary p-1 m-0 rounded">
                     <div class="bi bi-{{icon}} h4 p-0 m-0"></div>
                 </button></i>
             {% endif %}

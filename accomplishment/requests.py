@@ -11,6 +11,7 @@ from core.models.family import Family
 from core.models.family_user import FamilyUser
 from core.models.custom_user import CustomUser
 from core.session import get_locale_text, JsonResponseAlert
+from django.shortcuts import render, redirect
 
 
 def accomplishments_list_from_query(query):
@@ -324,3 +325,32 @@ def get_template(request):
             id=ID).accomplishment_id.serialized()
 
         return JsonResponse(data=accom_details)
+
+
+def save_template(request):
+    """."""
+    accom_details: Accomplishment = Accomplishment.objects.get(id=request.POST["ID"])
+
+    form = AccomplishmentForm(data=request.POST)
+    if form.is_valid():
+        accom_details.name = form.cleaned_data["name"]
+        accom_details.description = form.cleaned_data["description"]
+        accom_details.icon = form.cleaned_data["icon"]
+        if form.cleaned_data.get("is_achievement", "") != "":
+            accom_details.is_achievement = form.cleaned_data["is_achievement"]
+        if form.cleaned_data.get("accomplishment_type", "") != "":
+            accom_details.accomplishment_type_id = AccomplishmentType.objects.get_or_create(
+                    name=request.POST["accomplishment_type"])[0]
+        if form.cleaned_data.get("measurement", "") != "":
+            accom_details.measurement_type_id = MeasurementType.objects.get_or_create(
+                    abbreviation=request.POST["measurement"])[0]
+        else:
+            accom_details.measurement_type_id = None
+        accom_details.save()
+
+        return JsonResponseAlert(
+                request=request, type="success", message=get_locale_text(
+                    request=request, ID="changes-applied",
+                    default_text="All changes have been successfully applied."))
+
+    return HttpResponseBadRequest()

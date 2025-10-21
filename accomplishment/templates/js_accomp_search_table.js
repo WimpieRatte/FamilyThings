@@ -95,7 +95,7 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
     else if (data["fields"]["measurement_quantity"] != null && data["fields"]["measurement_quantity"] != 0) {
         measurement_data = `${parseInt(data["fields"]["measurement_quantity"])}x`;
     }
-    templateDump = templateDump.replace("%measurement%", measurement_data);
+    templateDump = templateDump.replace("%measurement%", measurement_data).replaceAll(".00", "");
 
     target_container.append(templateDump);
 
@@ -124,42 +124,8 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
         prepareRepeat()
     });
 
-    $(`#edit-accomp-${data["pk"]}`).click(function (event) {
-        selectedAccomplishment = $(this).val();
-        currentAJAXURL = editAccompURL;
-
-        let AJAXData = { csrfmiddlewaretoken: '{{ csrf_token }}' };
-
-        $.when(basicAJAX(type = "POST", url = `${getAccompURL}${$(this).val()}`, data = AJAXData))
-            .done(function (accompData) {
-                if (accompData != null) {
-                    openPopup("edit-accomp-popup");
-
-                    // Fill the fields with the obtained data
-                    var fields = ['measurement', "measurement_quantity", "date_from_day", "date_from_month",
-                        "date_from_year", "date_to_day", "date_to_month", "date_to_year"]
-
-                    fields.forEach(function (field) {
-                        $(`#id_${field}`).val(accompData[field]);
-                    });
-
-                    $('#edit-accomp-popup #edit-accomp-name').text(accompData["name"]);
-                    document.getElementById('edit-accomp-icon').className = `bi bi-${accompData["icon"]}`;
-
-                    $('#edit-accomp-popup #edit-accomp-created').text(new Date(accompData["created"]).toLocaleDateString(language, {
-                        weekday: "short", year: "numeric",
-                        month: "short", day: "numeric",
-                    }));
-
-                    $(`#edit-accomp-popup #id_measurement`).prop("disabled", true)
-                    // If the user has not Measurement type but a quantity specified, use x (amount of times)
-                    if (accompData['measurement'] == null) {
-                        $(`#id_measurement`).val("x");
-                    }
-                    document.querySelector('#edit-accomp-popup  #id_date_from').value = accompData["date_from"];
-                    document.querySelector('#edit-accomp-popup  #id_date_to').value = accompData["date_to"];
-                }
-            });
+    $(`#edit-accomp-${data["pk"]}`).click(function() {
+        openEditPrompt($(this).val())
     });
 }
 

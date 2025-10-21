@@ -10,6 +10,7 @@
             <div class="d-flex gap-5" style="width: 90%;">
                 <div id="" class="d-flex flex-column" style="width: 60%;">
                     <div class="d-flex gap-2">
+                        <input type="hidden" id="id_ID" name="ID" value='-1' />
                         {% include 'site/temp_form_field.html' with id="name" field=form.name %}
                         {% include 'site/temp_form_field.html' with id="accomplishment_type" field=form.accomplishment_type %}
                     </div>
@@ -22,7 +23,7 @@
                     {% include 'site/temp_form_field.html' with id="measurement-type" field=form.measurement %}
                 </div>
             </div>
-            {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial popup='new-accomp-popup' %}
+            {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial popup='edit-template-popup' %}
             </div>
             <div class="d-flex gap-2 mt-4 pb-4 m-auto" style="width: fit-content;">
                 <button id="btn-apply-changes" class="btn btn-success border-success d-block m-auto" type="button">Apply Changes</button>

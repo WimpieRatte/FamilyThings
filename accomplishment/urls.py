@@ -32,8 +32,8 @@ urlpatterns = [
           requests.edit_accomp, name="edit_accomp"),
      path("entry/repeat",
           requests.repeat_accomplishment, name="repeat_accomp"),
-     path("template/get",
-          requests.get_template, name="get_template"),
+     path("template/get", requests.get_template, name="get_template"),
+     path("template/save", requests.save_template, name="save_template"),
 
      # Operations (Creating/Deleting)
      path("submit",
