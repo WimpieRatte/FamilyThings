@@ -1,10 +1,10 @@
 <div class="carousel-item {% if active %}active{% endif %}">
     {% include 'home/placeholder_image.html' %}
     <div class="container {{class}}">
-        <div class="carousel-caption {{caption_class}}">
-            <h1>{{header}}</h1>
-            <p class="fs-6">{{paragraph}}</p>
-            <p><a class="btn btn-lg btn-primary" href="#">Browse gallery</a></p>
+        <div class="carousel-caption bg-dark px-5 rounded-2 {{caption_class}} text-light" style="--bs-bg-opacity: .4; max-height: 150px;">
+            <h2>{{header}}</h2>
+            <p class="fs-5 mb-2" style="line-height: 1.25em;">{{paragraph}}</p>
+            {% if link %}<p><a class="btn btn-lg btn-primary" href="{% url link %}">{{link_caption}}</a></p>{% endif %}
         </div>
     </div>
 </div>

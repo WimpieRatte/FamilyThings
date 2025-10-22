@@ -92,7 +92,7 @@ $("#new-accomp-popup #btn-create").click(function(event) {
             
             setTimeout(function() {
                 playConfetti(offset=0.6);
-            }, 4);
+            }, 1);
 
             setTimeout(function() {
                 createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);

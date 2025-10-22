@@ -1,7 +1,6 @@
 {% load static %}
 <!doctype html>
 <html lang="en" data-bs-theme="dark" {% include 'site/site_bg_img.html' with image=request.user.background_image %}>
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +17,7 @@
 <body>
   <img class="position-absolute top-0 start-50 translate-middle-x" style="z-index: 1000;" 
       src="{% static 'logo.png' %}" alt="FamilyThings logo" height="80">
-  <main id="main" role="main" style="font-size: 0.6em;">
+  <main id="main" role="main" style="font-size: 0.6em; max-height: calc(100vh - 131px) !important;">
     <div class="bg-dark" style="padding-bottom: 20em;">
       <div class="carousel home-section">
         <div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">
@@ -29,9 +28,9 @@
             <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
           </div>
           <div class="carousel-inner ft-sm">
-            {% include 'home/home_carousel_item.html' with header='One more for good measure.' paragraph='Some representative placeholder content for the third slide of this carousel.' link='Browse gallery' caption_class='text-start' active=True %}
-            {% include 'home/home_carousel_item.html' with header='One more for good measure.' paragraph='Some representative placeholder content for the third slide of this carousel.' link='Browse gallery' caption_class='text-center' %}
-            {% include 'home/home_carousel_item.html' with header='One more for good measure.' paragraph='Some representative placeholder content for the third slide of this carousel.' link='Browse gallery' caption_class='text-end' %}
+            {% include 'home/home_carousel_item.html' with image='home/pexels-thatguycraig000-1835927.jpg' header="Forget the chaos and pressure, it's time for FamilyThings!" paragraph="No more simple To-Dos, become aware of your Accomplishments... <br> And share them with your family and loved ones!" caption_class='text-start' active=True %}
+            {% include 'home/home_carousel_item.html' with image='home/pexels-cottonbro-4325466.jpg' header='Build Routines.' paragraph='Be it a morning routine, homework, groceries - Accomplishments, once created, can always be repeated on the fly!' %}
+            {% include 'home/home_carousel_item.html' with image='home/pexels-pavel-danilyuk-8763062.jpg' header="Let's begin this journey!" paragraph='Create your own Account <strong>for free</strong> and get started!' link='core:user_register' link_caption='Register for free' caption_class='text-end' %}
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -68,14 +67,12 @@
       <hr>
       <div id="powered-by" class="home-section pb-5">
         <h3 class="text-center pt-5 pop" style="font-size: 4em; transform-origin: 50% 100%;">Powered By</h3>
-        <div id="powered-by" class="container-fluid my-5 w-50">
-          <div class="d-flex flex-column justify-content-evenly">
-            <div class="container d-flex justify-content-evenly pb-5" >
-              <a href="https://python.org" target="_blank" rel="noopener noreferrer" class="rounded-circle border-primary fade-in w-25 object-fit-contain"> <img src="{% static 'home/Python.svg' %}" alt="Python logo" height="100"> </a>
-              <a href="https://www.djangoproject.com" target="_blank" rel="noopener noreferrer" class="rounded-circle border-primary fade-in w-25 object-fit-contain"> <img src="{% static 'home/Django.svg' %}" alt="Django logo" height="100"> </a>
-              <a href="https://getbootstrap.com" target="_blank" rel="noopener noreferrer" class="rounded-circle border-primary fade-in w-25 object-fit-contain"> <img src="{% static 'home/Bootstrap.svg' %}" alt="Bootstrap logo" height="100"> </a>
+        <div id="powered-by" class="container-fluid my-5">
+            <div class="container d-flex justify-content-center pb-5" >
+              <a id="logo-python" href="https://python.org" target="_blank" rel="noopener noreferrer" class="rounded-circle border-primary fade-in w-fit object-fit-contain" style="min-width: 340px;"> <img src="{% static 'home/Python.svg' %}" alt="Python logo" height="100" class="d-block m-auto"> </a>
+              <a id="logo-django" href="https://www.djangoproject.com" target="_blank" rel="noopener noreferrer" class="rounded-circle border-primary fade-in w-fit object-fit-contain" style="min-width: 340px;"> <img src="{% static 'home/Django.svg' %}" alt="Django logo" height="100" class="d-block m-auto"> </a>
+              <a id="logo-bootstrap" href="https://getbootstrap.com" target="_blank" rel="noopener noreferrer" class="rounded-circle border-primary fade-in w-fit object-fit-contain" style="min-width: 340px;"> <img src="{% static 'home/Bootstrap.svg' %}" alt="Bootstrap logo" height="100" class="d-block m-auto"> </a>
             </div>
-          </div>
         </div>
       </div>
       </div>

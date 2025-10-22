@@ -52,7 +52,7 @@
             {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
             <div class="flex-column bg-dark rounded p-1 mh-25">
                 {% for entry in family_activity %}
-                    {% include 'home/family_accomplishment_item.html' with title=entry.name icon=entry.icon color=entry.color date=entry.date%}
+                    {% include 'core/temp_family_accomp_entry.html' with title=entry.name icon=entry.icon color=entry.color date=entry.date%}
                 {% endfor %}
             </div>
         </div>

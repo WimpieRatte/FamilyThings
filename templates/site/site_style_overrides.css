@@ -24,7 +24,7 @@
 
 .border-primary, .btn-primary {border-color: var(--bs-{{color}}) !important;}
 
-.active {
+.active:not(.home-section) {
     color: var(--bs-{{color}}) !important;
     background-color: var(--bs-dark) !important;
 }
