@@ -153,4 +153,9 @@ LOGOUT_REDIRECT_URL = "core:user_login"
 AUTH_USER_MODEL = "core.CustomUser"
 
 # Email backend
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'family.things102025@gmail.com'
+EMAIL_HOST_PASSWORD = 'hweifchufszzhyua'

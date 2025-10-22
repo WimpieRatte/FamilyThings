@@ -4,28 +4,25 @@
         <span class="bi bi-calendar2-week background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
         <div id="calendar-event-wrapper" class="px-5 py-2">
 
+            <!-- Hidden field for edit -->
+            <input type="hidden" id="event-id" value="">
+
             <!-- Event Title -->
-            <input type="text" class="form-control text-center m-auto mb-3"
-                id="event-title" placeholder="Title"
-                style="width: 20em; font-size: 1.25em !important;">
+            <input type="text" class="form-control text-center m-auto mb-3" id="event-title"
+                placeholder="Title" style="width: 20em; font-size: 1.25em !important;">
 
             <!-- Event Description -->
-            <textarea class="form-control text-center m-auto mb-3"
-                id="event-description" placeholder="Description (Optional)"
-                rows="3" style="width: 20em; font-size: 1.1em !important;"></textarea>
+            <textarea class="form-control text-center m-auto mb-3" id="event-description"
+                placeholder="Description (Optional)" rows="3" style="width: 20em; font-size: 1.1em !important;"></textarea>
 
             <!-- Event Date -->
-            <input type="date" class="form-control text-center m-auto mb-3"
-                id="event-date" style="width: 20em; font-size: 1.1em !important;">
+            <input type="date" class="form-control text-center m-auto mb-3" id="event-date"
+                style="width: 20em; font-size: 1.1em !important;">
 
             <!-- Validation messages -->
             <div class="w-75 m-auto" style="height: 4em;">
-                <p id="event-success" class="text-success text-center p-1 rounded" style="display: none;">
-                    Event successfully created!
-                </p>
-                <p id="event-error" class="text-danger text-center p-1 rounded" style="display: none;">
-                    Please fill in all fields before creating the event.
-                </p>
+                <p id="event-success" class="text-success text-center p-1 rounded" style="display: none;"></p>
+                <p id="event-error" class="text-danger text-center p-1 rounded" style="display: none;"></p>
             </div>
 
             <!-- Action buttons -->
