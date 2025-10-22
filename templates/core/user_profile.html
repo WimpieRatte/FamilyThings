@@ -3,8 +3,8 @@
 
 {% block title %}Profile -{% endblock %}
 
-{% block append_to_head %}
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+{% block popups %}
+    {% include 'core/popup_user_details.html' %}
 {% endblock %}
 
 {% block content %}
@@ -52,7 +52,7 @@
             {% include 'site/heading_section.html' with id="family-feed" label='Family Feed'%}
             <div class="flex-column bg-dark rounded p-1 mh-25">
                 {% for entry in family_activity %}
-                    {% include 'core/temp_family_accomp_entry.html' with title=entry.name icon=entry.icon color=entry.color date=entry.date%}
+                    {% include 'core/temp_family_accomp_entry.html' with title=entry.name icon=entry.icon user_icon=entry.user_icon user_ID=entry.fam_user_ID color=entry.color date=entry.date%}
                 {% endfor %}
             </div>
         </div>
@@ -150,15 +150,15 @@
 
     function addAccomplishmentEntry(target_container, data){
         let language = languageCode;
-        if (language == ""){language="en";}
+        if (language == ""){language=navigator.language;}
 
-        date = new Date(data["created_date"]).toLocaleDateString(language, {
+        date = new Date(data["created_date"]).toLocaleDateString(navigator.language, {
             weekday: "short", year: "numeric",
             month: "short", day: "numeric",})
 
         let tooltip = date;
         if (data["measurement_quantity"] > 0) {
-            tooltip += `<br>${data["measurement_quantity"]}${data["measurement"]}`.replace("null", "x").replace(".00", "")
+            tooltip += `<br><h6 class='p-0 m-0'>${data["measurement_quantity"]}${data["measurement"]}</h6>`.replace("null", "x").replace(".00", "")
         }
 
         target_container.append(

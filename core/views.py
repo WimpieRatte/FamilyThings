@@ -183,8 +183,9 @@ def user_profile_page(request):
                 user_accomp = user_accomp.accomplishment_id.serialized()
                 user_accomp["cleared_by"] = user.custom_user_id.full_name()
                 user_accomp["color"] = user.custom_user_id.color
-                user_accomp["icon"] = user.custom_user_id.icon
+                user_accomp["user_icon"] = user.custom_user_id.icon
                 user_accomp["date"] = create_date
+                user_accomp["fam_user_ID"] = str(user.id)
                 accomplishments += [user_accomp]
             except (IndexError):
                 pass

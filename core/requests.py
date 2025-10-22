@@ -174,3 +174,9 @@ def get_messages(request):
     return render(request, "core/temp_user_chat.html", {
             'chat': list(messages)
         })
+
+
+def get_user(request):
+    result = FamilyUser.objects.get(id=request.POST['ID'])
+
+    return JsonResponse(data=result.serialized())
