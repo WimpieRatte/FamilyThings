@@ -1,10 +1,10 @@
-var buttonEditAbort = document.querySelector("#edit-accomp-popup #btn-abort");
-var buttonEditApply = document.querySelector("#edit-accomp-popup #btn-apply-changes");
+let buttonEditAbort = document.querySelector("#edit-accomp-popup #btn-abort");
+let buttonEditApply = document.querySelector("#edit-accomp-popup #btn-apply-changes");
 
-var form = document.querySelector("#edit-accomp-form");
+let form = document.querySelector("#edit-accomp-form");
 
 buttonEditAbort.addEventListener("click", function() {
-    closePopup();
+    movePopupDown();
 });
 
 buttonEditApply.addEventListener("click", function() {
@@ -13,18 +13,28 @@ buttonEditApply.addEventListener("click", function() {
 
     let form_data = $("#edit-accomp-form")
     let form_array = form_data.serializeArray()
-    form_array.push({'name': 'date_from', 'value': document.querySelector('#edit-accomp-form #id_date_from').value});
-    form_array.push({'name': 'date_to', 'value': document.querySelector('#edit-accomp-form #id_date_to').value});
+    if (document.querySelector('#edit-accomp-form #id_date').deactivated){
+        form_array.push({'name': 'date_from', 'value': document.querySelector('#edit-accomp-form #id_date_from').value});
+        form_array.push({'name': 'date_to', 'value': document.querySelector('#edit-accomp-form #id_date_to').value});
+    }
+    else {
+        form_array.push({'name': 'date_from', 'value': document.querySelector('#edit-accomp-form #id_date').value});
+        form_array.push({'name': 'date_to', 'value': document.querySelector('#edit-accomp-form #id_date').value});
+    }
 
     basicAJAX(type="POST", url=`${editAccompURL}${selectedAccomplishment}`, data=form_array)
+
     playCheckmarkAnimation();
 
     setTimeout(function() {
         createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-        closePopup();
+    }, 1600);
+
+    setTimeout(function() {
+        movePopup()
         buttonEditAbort.disabled = false;
         buttonEditApply.disabled = false;
-    }, 2600);
+    }, 3000);
 });
 
 //$(`#edit-accomp-${data["pk"]}`).click(function (event) {
@@ -43,12 +53,13 @@ function openEditPrompt(ID) {
                 openPopup("edit-accomp-popup");
 
                 // Fill the fields with the obtained data
-                var fields = ['measurement', "measurement_quantity", "date_from_day", "date_from_month",
-                    "date_from_year", "date_to_day", "date_to_month", "date_to_year"]
+                var fields = ['measurement', "measurement_quantity", "date_from", "date_to"]
 
                 fields.forEach(function (field) {
                     $(`#edit-accomp-popup #id_${field}`).val(accompData[field]);
                 });
+
+                $(`#edit-accomp-popup #id_measurement_quantity`).val($(`#edit-accomp-popup #id_measurement_quantity`).val().replaceAll(".00", ""));
 
                 $('#edit-accomp-popup #edit-accomp-name').text(accompData["name"]);
                 document.getElementById('edit-accomp-icon').className = `bi bi-${accompData["icon"]}`;
@@ -66,8 +77,18 @@ function openEditPrompt(ID) {
                 else {
                     $(`#edit-accomp-popup #id_measurement`).val(accompData['measurement']);
                 }
-                document.querySelector('#edit-accomp-popup  #id_date_from').value = accompData["date_from"];
-                document.querySelector('#edit-accomp-popup  #id_date_to').value = accompData["date_to"];
+                document.querySelector('#edit-accomp-popup #id_date').value = accompData["date_from"];
+                document.querySelector('#edit-accomp-popup #id_date_from').value = accompData["date_from"];
+                document.querySelector('#edit-accomp-popup #id_date_to').value = accompData["date_to"];
+
+                if (accompData["date_to"] != accompData["date_from"]) {
+                    document.querySelector('#edit-accomp-popup #id_timeframe').checked = false;
+                    document.querySelector('#edit-accomp-popup #id_timeframe').click();
+                }
+                else {
+                    document.querySelector('#edit-accomp-popup #id_timeframe').checked = true;
+                    document.querySelector('#edit-accomp-popup #id_timeframe').click();
+                }
             }
         });
 };

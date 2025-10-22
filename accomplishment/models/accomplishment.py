@@ -56,7 +56,7 @@ class Accomplishment(models.Model):
         }
 
         if self.accomplishment_type_id:
-            output['type'] = self.accomplishment_type_id.name
+            output['accomplishment_type'] = self.accomplishment_type_id.name
         return output
 
     class Meta:

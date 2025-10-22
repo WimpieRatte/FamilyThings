@@ -182,7 +182,7 @@ main {
     overflow-y: auto;
     /*height: 84vh;*/
     height: calc(100vh - 50px) !important;
-    max-height: calc(85vh - 50px) !important;
+    /*max-height: calc(85vh - 50px) !important;*/
 }
 
 hr {
@@ -8082,10 +8082,6 @@ input:disabled {
   margin-right: auto !important;
 }
 
-.mb-0 {
-  margin-bottom: 0 !important;
-}
-
 .mb-1 {
   margin-bottom: 0.25rem !important;
 }
@@ -8104,6 +8100,10 @@ input:disabled {
 
 .mb-5 {
   margin-bottom: 3rem !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
 }
 
 .mb-auto {

@@ -16,6 +16,11 @@ function prepareRepeat(){
             }
         });
 
+    let today = new Date()
+    document.querySelector(`#repeat-accomp-form #id_date`).valueAsDate = today;
+    document.querySelector(`#repeat-accomp-form #id_date_from`).valueAsDate = today;
+    document.querySelector(`#repeat-accomp-form #id_date_to`).valueAsDate = today;
+
     //Apply name and icon
     document.querySelector(`#repeat-accomp-popup #edit-accomp-name`).textContent = accomplishmentStorage["name"]
     document.querySelector(`#repeat-accomp-popup #edit-accomp-icon`).className = `bi bi-${accomplishmentStorage["icon"]} h5`;
@@ -23,46 +28,53 @@ function prepareRepeat(){
 
     document.querySelector(`#repeat-accomp-popup #id_measurement`).disabled = true;
 
+    document.querySelector("#repeat-accomp-popup #btn-create").disabled = false;
+    document.querySelector("#repeat-accomp-popup #btn-abort").disabled = false;
+
     $("#repeat-accomp-popup #btn-create").disabled = false;
     $("#repeat-accomp-popup #btn-abort").disabled = false;
 }
 
 
 $("#repeat-accomp-popup #btn-abort").click(function (event) {
-    closePopup();
+    movePopupDown();
 });
 
 
 $("#repeat-accomp-popup #btn-create").click(function (event) {
+    document.querySelector("#repeat-accomp-popup #btn-create").disabled = true;
+    document.querySelector("#repeat-accomp-popup #btn-abort").disabled = true;
+
     let form = $("#repeat-accomp-form");
     let AJAXData = form.serializeArray();
 
     $("#repeat-accomp-popup #btn-create").disabled = true;
     $("#repeat-accomp-popup #btn-abort").disabled = true;
 
+    if (document.querySelector("#repeat-accomp-popup #id_date").deactivated){
+        AJAXData.push({'name': 'date_from', 'value': document.querySelector("#repeat-accomp-popup #id_date_from").value});
+        AJAXData.push({'name': 'date_to', 'value': document.querySelector("#repeat-accomp-popup #id_date_to").value});
+    }
+    else {
+        AJAXData.push({'name': 'date', 'value': document.querySelector("#repeat-accomp-popup #id_date").value});
+    }
+
     $.when(basicAJAX(type = "POST", url = `${repeatAccompURL}`, data = AJAXData))
         .done(function (accompData) {
-            if (accompData != null) {
+            if (accompData != null) {                
                 setTimeout(function() {
-                    closePopup();
-                    createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-                }, 2000);
-                
-                setTimeout(function () {
-                    var count = 200;
-                    var new_shape = confetti.shapeFromPath({ path: 'M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z' });
-                    var defaults = { origin: { y: 0.55 }, shapes: [new_shape], gravity: 1.133 };
+                    playConfetti(offset=0.55);
+                }, 4);
 
-                    function fire(particleRatio, opts) {
-                        confetti({ ...defaults, ...opts, particleCount: Math.floor(count * particleRatio) });
-                    }
-                    fire(0.25, { spread: 26, startVelocity: 55, zIndex: 2000, });
-                    fire(0.2, { spread: 60, zIndex: 2000, scalar: 1.2 });
-                    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8, zIndex: 2000});
-                    fire(0.1, { spread: 120, startVelocity: 25, scalar: 1.2, decay: 0.92, scalar: 1.2, zIndex: 2000 });
-                    fire(0.1, { spread: 120, startVelocity: 45, scalar: 1.2, zIndex: 2000});
-                }, 1);
-                createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
+                setTimeout(function() {
+                    createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
+                }, 1600);
+
+                setTimeout(function() {
+                    movePopup()
+                }, 2500);
             }
+            $("#repeat-accomp-popup #btn-create").disabled = false;
+            $("#repeat-accomp-popup #btn-abort").disabled = false;
         })
 });

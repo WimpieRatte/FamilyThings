@@ -37,6 +37,7 @@
 
     // Popups
     const popupWindow = document.querySelector('#popup-container');
+    const popups = document.getElementById('popups');
 
     if (popupWindow) {
         popupWindow.style.display = "none"
@@ -44,11 +45,15 @@
         var activePopup = ""
         function openPopup(name = ""){
             popupWindow.style.display = "block";
+            popups.style.animationFillMode = "forwards";
+            popups.style.animation = "popup-enter 0.4s ease-out 1";
             main.style.pointerEvents = "none";
             header.style.pointerEvents = "none";
 
             if (name != "") {
-                document.getElementById(name).style.display = "block";
+                let targetPopup = document.getElementById(name);
+                targetPopup.setAttribute("data-show-icons", true)
+                targetPopup.style.display = "block";
                 activePopup = name;
             }
         }
@@ -61,6 +66,31 @@
             if (activePopup != "") {
                 document.getElementById(activePopup).style.display = "none";
                 activePopup = "";
+            }
+            popups.style.animation = "";
+        }
+
+        function movePopup() { 
+            popups.style.animationFillMode = "forwards";
+            popups.style.animation = "popup-leave 0.45s ease-in 1";
+
+            setTimeout(function(){
+                closePopup();
+            }, 500)
+        }
+
+        function movePopupDown() {
+            popups.style.animationFillMode = "backwards";
+            popups.style.animation = "popup-leave-down 0.25s linear 1";
+
+            setTimeout(function(){
+                closePopup();
+            }, 330)
+        }
+
+        function hidePopupIcons() {
+            if (activePopup != "") {
+                document.getElementById(activePopup).setAttribute("data-show-icons", false)
             }
         }
     }

@@ -1,4 +1,3 @@
-
 let newName = document.querySelector(`#new-accomp-popup #edit-accomp-name`);
 let newIcon = document.querySelector(`#new-accomp-popup #edit-accomp-icon`)
 
@@ -8,8 +7,12 @@ let formDescriptionField = document.querySelector('#new-accomp-popup #id_descrip
 let formUnitField = document.querySelector('#new-accomp-popup #id_measurement')
 let formQuantityField = document.querySelector('#new-accomp-popup #id_measurement_quantity')
 let formAchievementField = document.querySelector('#new-accomp-popup #id_is_achievement')
+let formDateField = document.querySelector('#new-accomp-popup #id_date')
 let formDateFromField = document.querySelector('#new-accomp-popup #id_date_from')
 let formDateToField = document.querySelector('#new-accomp-popup #id_date_to')
+
+let formButtonCreate = document.querySelector("#new-accomp-popup #btn-create");
+let formButtonAbort = document.querySelector("#new-accomp-popup #btn-abort");
 
 
 function initiateCreate() {
@@ -30,18 +33,18 @@ function initiateCreate() {
     formAchievementField.checked = false;
 
     let today = new Date()
+    formDateField.valueAsDate = today;
     formDateFromField.valueAsDate = today;
     formDateToField.valueAsDate = today;
 
+    formButtonCreate.disabled = false;
+    formButtonAbort.disabled = false;
+
+    document.querySelector('#new-accomp-popup #id_timeframe').checked = true;
+    document.querySelector('#new-accomp-popup #id_timeframe').click();
+
     input_change_value(document.querySelector(`#new-accomp-popup #icon-btn-dash`), `#new-accomp-popup #id_icon`);
 }
-
-
-const duplicateAccomplishmentPrompt = document.getElementById("duplicate-accomplishment-prompt");
-var duplicateAccomplishment = new Object()
-const accompNameField = document.getElementById("id_name");
-const accompDescriptionField = document.getElementById("id_description");
-const accompSubmitButton = document.getElementById("btn-create");
 
 $('#new-accomp-popup #id_is_achievement').click(function() {
         if ($(this).prop("checked") == true) { 
@@ -56,22 +59,29 @@ $('#new-accomp-popup #id_is_achievement').click(function() {
 );
 
 $("#new-accomp-popup #btn-abort").click(function(event) {
-    closePopup();
+    if (confirm(`Are you sure you want to quit?`)) {
+        movePopupDown();
+        createAlert(text="Creation aborted.", key="", type="warning");
+    }
 });
 
 // AJAX Submission
 $("#new-accomp-popup #btn-create").click(function(event) {
     event.preventDefault(); // Prevents the button from creating the default HTTPRequest
-    submitButton.disabled = true; //  Disables the log in button
+    formButtonCreate.disabled = true;
+    formButtonAbort.disabled = true;
 
     enableLoadingScreen();  // Function is defined in site_js
 
-    accompDescriptionField.disabled = false;
-
     let form_data = $("#new-accomp-popup #accomplishment-form")
     let form_array = form_data.serializeArray()
-    form_array.push({'name': 'date_from', 'value': formDateFromField.value});
-    form_array.push({'name': 'date_to', 'value': formDateToField.value});
+    if (formDateField.deactivated){
+        form_array.push({'name': 'date_from', 'value': formDateFromField.value});
+        form_array.push({'name': 'date_to', 'value': formDateToField.value});
+    }
+    else {
+        form_array.push({'name': 'date', 'value': formDateField.value});
+    }
     
     $.ajax({ 
         type: 'POST', url: '{% url "accomplishment:submit_new" %}',
@@ -79,18 +89,25 @@ $("#new-accomp-popup #btn-create").click(function(event) {
         success: function(json) {
             disableLoadingScreen();
             createAlert(text=json["alert-message"], key="", type=json["alert-type"]);
+            
+            setTimeout(function() {
+                playConfetti(offset=0.6);
+            }, 4);
 
             setTimeout(function() {
-                closePopup();
                 createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-            }, 2000);
+            }, 1600);
 
-            playConfetti();
+            setTimeout(function() {
+                movePopup()
+            }, 2500);
         },
         error: function(xhr, errmsg, err) {
             event.target.disabled = false;
             disableLoadingScreen();
             createAlert(xhr.responseText, key="", type="danger");
+            formButtonCreate.disabled = false;
+            formButtonAbort.disabled = false;
         }
     });
 });

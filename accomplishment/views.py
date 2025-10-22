@@ -10,7 +10,7 @@ from core.models.custom_user import CustomUser
 
 
 @update_user_session()
-def page_overview(request):
+def page_overview(request, popup: str = ""):
     """An overview of an User's Accomplishments."""
 
     recent_additions = Accomplishment.objects.filter(
@@ -25,6 +25,7 @@ def page_overview(request):
             'categories': constants.CATEGORIES,
             'measurements': constants.MEASUREMENTS,
             'form': AccomplishmentForm(),
+            'popup': popup
         })
 
 

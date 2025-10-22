@@ -16,7 +16,7 @@ const queryURL = "{{HOST}}/accomplishments/get"
 function createAccomplishmentsTable(length = 15, start = 1, search = "", selector = "name") {
     tablePreviousButton.disabled = true;
     tableNextButton.disabled = true;
-    currentIndex = start;
+    currentIndex = Math.max(1, start);
 
     let queryURLFinal = `${queryURL}/amount=${length}/start=${start}/selector='${selector}'`
 
@@ -81,7 +81,7 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
         .replaceAll("%name%", accomp_name)
         .replaceAll("%ID%", data["pk"])
         .replace("%icon%", accom_template["icon"])
-        .replace("%category%", accom_template["type"])
+        .replace("%category%", accom_template["accomplishment_type"])
         .replace("%description%", accom_template["description"])
         .replace("%repeatURL%", `"add%3Frepeat=${accom_template["ID"]}""`)
         .replace("undefined", "N/A")
@@ -140,7 +140,7 @@ function updateSearch() {
     if (previousSearch != searchBar.value){
         previousSearch = searchBar.value;
         searchText = new RegExp(`(${searchBar.value})`,'gi');
-        createAccomplishmentsTable(15, 0, searchBar.value, searchSelector);
+        createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
     }
     setTimeout(function() { updateSearch() }, 300);
 }

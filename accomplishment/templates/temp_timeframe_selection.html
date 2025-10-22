@@ -1,0 +1,35 @@
+<div id="timeframe-section" class="d-flex flex-column w-fit m-auto p-0" style="line-height: 1.9em; max-height: 100px; height: 100px; width: 190px;">
+    <div id="field-cleared" class="mx-auto" style="height: 120px;">
+        <div id="lb-cleared-on" class="mx-auto w-fit">Cleared on</div>
+        <input type="date" class="form-control" id="id_date" style="padding: .2em; text-transform: uppercase; width: 120px;" placeholder="Today">
+    </div>
+    <div id="field-from" class="d-none" style="height: 60px;">
+        <div id="lb-date-from" style="width: 3em;">From</div>
+        <input type="date" class="form-control fs-sm" id="id_date_from" style="padding: .2em; text-transform: uppercase; width: 120px; height: 2.5em;" placeholder="Today">
+    </div>
+    <div id="field-to" class="d-none" style="height: 60px;">
+        <div id="lb-date-to" style="width: 3em;">To</div>
+        <input type="date" class="form-control fs-sm" id="id_date_to" style="padding: .2em; text-transform: uppercase; width: 120px; height: 2.5em;" placeholder="Today">
+    </div>
+    {% include 'site/temp_form_field.html' with id="timeframe" field=form.timeframe field_class='form-switch d-flex p-0 mb-0 m-0 fs-sm mx-auto' %}
+</div>
+<script>
+    document.querySelector(`#{{popup}} #id_timeframe`).addEventListener("click", function(event){
+        if (event.target.checked){
+            document.querySelector(`#{{popup}} #id_date`).deactivated = true;
+            document.querySelector(`#{{popup}} #field-cleared`).className = "d-none";
+            document.querySelector(`#{{popup}} #id_date_from`).deactivated = false;
+            document.querySelector(`#{{popup}} #field-from`).className = "d-flex gap-2 fs-sm m-auto";
+            document.querySelector(`#{{popup}} #id_date_to`).deactivated = false;
+            document.querySelector(`#{{popup}} #field-to`).className = "d-flex gap-2 fs-sm m-auto";
+        }
+        else {
+            document.querySelector(`#{{popup}} #id_date`).deactivated = false;
+            document.querySelector(`#{{popup}} #field-cleared`).className = "mx-auto";
+            document.querySelector(`#{{popup}} #id_date_from`).deactivated = true;
+            document.querySelector(`#{{popup}} #field-from`).className = "d-none";
+            document.querySelector(`#{{popup}} #id_date_to`).deactivated = true;
+            document.querySelector(`#{{popup}} #field-to`).className = "d-none";
+        }
+    })
+</script>

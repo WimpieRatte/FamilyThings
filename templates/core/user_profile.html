@@ -14,7 +14,7 @@
         <div class="pb-2">
             <div id="todays-accomplishments-container" class="flex-column bg-dark rounded p-1 mb-2", style="display: none;"></div>
             <div id="new-accomplishment-wrapper" class="w-auto m-auto">
-                <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="{% url 'accomplishment:add_new' %}" data-tooltip-context="Add New">
+                <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="{% url 'accomplishment:overview' 'add_new' %}" data-tooltip-context="Add New">
                     <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
                     <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></h6>
                 </a>

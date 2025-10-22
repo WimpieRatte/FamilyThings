@@ -202,6 +202,7 @@ def submit_accomplishment(request):
                 default_text="You aren't part of a Family."))
 
     form = AccomplishmentForm(data=request.POST)
+    print(request.POST)
     if form.is_valid():
         # We want to be strict with the name matching, so we only
         # search an Accomplishment with the same name and user,
@@ -235,14 +236,23 @@ def submit_accomplishment(request):
             new_accomp.is_achievement=form.cleaned_data.get("is_achievement", False)
             new_accomp.save()
 
-        FamilyUserAccomplishment.objects.get_or_create(
+        user_accomp, created = FamilyUserAccomplishment.objects.get_or_create(
             family_user_id=family_user,
             accomplishment_id=new_accomp,
             created_by=request.user,
             measurement_quantity=form.cleaned_data.get("measurement_quantity", 1),
-            from_date=form.cleaned_data.get("date_from"),
-            to_date=form.cleaned_data.get("date_to"),
         )
+
+        if form.cleaned_data.get("date_from", "") != "":
+            user_accomp.from_date = form.cleaned_data["date_from"]
+            user_accomp.to_date = form.cleaned_data["date_to"]
+            user_accomp.save()
+            print("works?")
+        else:
+            user_accomp.from_date = form.cleaned_data["date"]
+            user_accomp.to_date = form.cleaned_data["date"]
+            user_accomp.save()
+
         return JsonResponseAlert(
             request=request, message="Accomplishment successfully created!",
             type="success")
@@ -262,10 +272,20 @@ def delete_accomplishment(request, ID):
             default_text="You don't have permission to perform this operation."))
 
     try:
-        message: FamilyUserAccomplishment = \
+        accomp: FamilyUserAccomplishment = \
             FamilyUserAccomplishment.objects.get(
                 id=ID, created_by=request.user)
-        message.delete()
+        accomp.delete()
+
+        # Clean up orphaned Accomplishment templates
+        template_query = Accomplishment.objects.filter(created_by=request.user)
+
+        for entry in template_query:
+            _ = FamilyUserAccomplishment.objects.filter(accomplishment_id=entry)
+
+            if len(_) == 0:
+                entry.delete()
+
         return JsonResponse(
             data={'alert-message': "", 'alert-type': 'success'})
     except (FamilyUserAccomplishment.DoesNotExist):
@@ -284,36 +304,44 @@ def require_login(request, func):
 
 @require_http_methods(["POST"])
 def repeat_accomplishment(request):
+    try:
+        family_user: FamilyUser = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
+        if family_user is None:
+            return HttpResponseBadRequest(
+                get_locale_text(
+                    request=request, ID="not-in-a-family",
+                    default_text="You aren't part of a Family."))
 
-    family_user: FamilyUser = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
-    if family_user is None:
+        quantity = request.POST.get("measurement_quantity", "")
+
+        if (quantity == ""):
+            quantity = 0
+        print(request.POST)
+        user_accomp = FamilyUserAccomplishment.objects.create(
+            family_user_id=family_user,
+            accomplishment_id=Accomplishment.objects.get(id=request.POST["ID"]),
+            created_by=request.user,
+            measurement_quantity=float(quantity),
+        )
+
+        if request.POST.get("date", "") == "":
+            user_accomp.from_date = request.POST.get("date_from")
+            user_accomp.to_date = request.POST.get("date_to")
+            user_accomp.save()
+        else:
+            user_accomp.from_date = request.POST.get("date")
+            user_accomp.to_date = request.POST.get("date")
+            user_accomp.save()
+
+        return JsonResponseAlert(
+            request=request, message="Accomplishment successfully created!",
+            type="success")
+    except (Exception):
+        print("what?")
         return HttpResponseBadRequest(
             get_locale_text(
-                request=request, ID="not-in-a-family",
-                default_text="You aren't part of a Family."))
-
-    quantity = request.POST.get("measurement_quantity", "")
-
-    if (quantity == ""):
-        quantity = 0
-
-    FamilyUserAccomplishment.objects.get_or_create(
-        family_user_id=family_user,
-        accomplishment_id=Accomplishment.objects.get(id=request.POST["ID"]),
-        created_by=request.user,
-        measurement_quantity=float(quantity),
-        from_date=timezone.now(),
-        to_date=timezone.now()
-    )
-
-    return JsonResponseAlert(
-        request=request, message="Accomplishment successfully created!",
-        type="success")
-
-    return HttpResponseBadRequest(
-        get_locale_text(
-            request=request, ID="accomplishment-create-failed",
-            default_text="Accomplishment couldn't be submitted."))
+                request=request, ID="accomplishment-create-failed",
+                default_text="Accomplishment couldn't be submitted."))
 
 
 def get_template(request):

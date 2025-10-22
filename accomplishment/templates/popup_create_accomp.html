@@ -4,7 +4,7 @@
     <div class="rounded bg-dark px-5 d-block py-4 position-relative">
         <div class="position-relative" style="top: 0%; top: -20% !important">
             <span class="bi bi-journal-text background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
-            <span class="bi bi-plus background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
+            <span class="bi bi-plus background-bi bi-edit-accomp h1 p-0 m-0 position-absolute" style="left: 2% !important; top: -154px !important; font-size: 28em !important;"></span>
         </div>
         {% include 'temp_accomp_info.html' %}
         <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap mx-5" style="width: 700px;">
@@ -23,8 +23,8 @@
                 {% include 'site/temp_form_field.html' with id="description" field=form.description %}
                 {% include 'site/temp_form_field.html' with id="is_repeat" field=form.is_repeat %}
             </div>
-            <div class="d-flex flex-column justify-content-center p-2 rounded-3 bg-primary-subtle" style="width: 40%;">
-                <div id="measurement-section" class="d-flex gap-2 w-fit m-auto">
+            <div class="p-2 rounded-3 bg-primary-subtle" style="width: 40%;">
+                <div id="measurement-section" class="d-flex gap-2 w-fit mx-auto my-0" style="max-height: 70px; height: 70px;">
                     {% include 'site/temp_form_field.html' with id="measurement-value" field=form.measurement_quantity %}
                     {% include 'site/temp_form_field.html' with id="measurement-type" field=form.measurement %}
                     <datalist id="measurement-suggestions">
@@ -33,16 +33,7 @@
                         {% endfor %}
                     </datalist>
                 </div>
-                <div id="timeframe-section" class="w-fit m-auto">
-                    <div class="d-flex gap-2">
-                        <div id="lb-date-from" style="width: 3em;">From</div>
-                        <input type="date" class="form-control" id="id_date_from" style="padding: .2em; text-transform: uppercase; width: 120px;" placeholder="Today">
-                    </div>
-                    <div class="d-flex gap-2">
-                        <div id="lb-date-to" style="width: 3em;">To</div>
-                        <input type="date" class="form-control" id="id_date_to" style="padding: .2em; text-transform: uppercase; width: 120px;" placeholder="Today">
-                    </div>
-                </div>
+                {% include 'temp_timeframe_selection.html' with popup='new-accomp-popup' %}
             </div>
             {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial popup='new-accomp-popup' %}
             </div>
