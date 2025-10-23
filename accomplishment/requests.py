@@ -241,8 +241,8 @@ def submit_accomplishment(request):
             created_by=request.user,
             measurement_quantity=form.cleaned_data.get("measurement_quantity", 1),
         )
-
-        if form.cleaned_data.get("date_from", "") != "":
+        print(form.cleaned_data)
+        if form.cleaned_data.get("date", None) is None:
             user_accomp.from_date = form.cleaned_data["date_from"]
             user_accomp.to_date = form.cleaned_data["date_to"]
             user_accomp.save()

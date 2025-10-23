@@ -182,6 +182,7 @@ main {
     overflow-y: auto;
     /*height: 84vh;*/
     height: calc(100vh - 50px) !important;
+    max-height: calc(100vh - 50px) !important;
     /*max-height: calc(85vh - 50px) !important;*/
 }
 
