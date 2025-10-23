@@ -8,9 +8,9 @@
           <div class="dropdown">
             {% include 'header/temp_header_nav.html' with id='finance' icon='piggy-bank' label='Finance' color="#ddc67f" tooltip='Keep your finances in check.' dropdown=True %}
             <div class="dropdown-menu dropdown-menu-lg-start" aria-labelledby="dropdownMenuButton" style="inset: -4px auto auto 0px !important;">
-              {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='card-list' label='View Transactions' %}
+              {% include 'header/temp_dropdown_item.html' with href='finance:transaction_patterns' id="admin" icon='card-list' label='Transaction Patterns' %}
               {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='plus-square' label='Import Transactions' %}
-              {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='bar-chart-fill' label='Statistics' %}
+              {% comment %} {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='bar-chart-fill' label='Statistics' %} {% endcomment %}
             </div>
           </div>
           {% include 'header/temp_header_nav.html' with id='calendar' icon='calendar-week' label='Calendar' color="#71d27c" href='calendar:calendar' tooltip='An overview of upcoming events, holidays, etc.' %}
