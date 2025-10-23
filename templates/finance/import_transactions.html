@@ -336,6 +336,138 @@ document.body.addEventListener('htmx:afterSwap', function(event) {
     }
 });
 
+/////////////////////////////////////////////////////////////// Javascript for category inserts //////////////////////////////////////
+
+// Function to add new category to all select dropdowns
+function addNewCategoryToSelects(categoryId, categoryName) {
+    const allSelects = document.querySelectorAll('#transactions-table .category-select');
+
+    console.log(`Adding category ${categoryName} (ID: ${categoryId}) to ${allSelects.length} dropdowns`);
+
+    allSelects.forEach((select, index) => {
+        // Check if option already exists
+        const existingOption = Array.from(select.options).find(opt => opt.value === categoryId);
+        if (!existingOption) {
+            const newOption = new Option(categoryName, categoryId);
+            select.appendChild(newOption);
+            console.log(`Added to dropdown ${index + 1}`);
+        } else {
+            console.log(`Category already exists in dropdown ${index + 1}`);
+        }
+    });
+
+    // Show success message
+    showCategoryMessage(`Category "${categoryName}" added successfully!`, 'success');
+
+    // Update the pie chart to include the new category
+    setTimeout(() => {
+        if (typeof updatePieChart === 'function') {
+            updatePieChart();
+        }
+    }, 100);
+}
+
+// Function to show messages
+function showCategoryMessage(message, type) {
+    const messageContainer = document.getElementById('category-messages');
+    if (messageContainer) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        messageContainer.innerHTML = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            const alert = messageContainer.querySelector('.alert');
+            if (alert) {
+                alert.remove();
+            }
+        }, 5000);
+    }
+}
+
+// Handle form submission
+function initializeCategoryForm() {
+    const categoryForm = document.getElementById('frmCategories');
+    if (categoryForm) {
+        categoryForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const categoryNameInput = document.getElementById('txtCategoryName');
+            const categoryName = categoryNameInput.value.trim();
+
+            if (!categoryName) {
+                showCategoryMessage('Please enter a category name', 'error');
+                categoryNameInput.focus();
+                return;
+            }
+
+            // Disable button during request
+            const submitButton = document.getElementById('btnAddCategory');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Adding...';
+            submitButton.disabled = true;
+
+            // Get CSRF token from the form
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Use fetch to create the category
+            fetch("{% url 'finance:create_category_and_update_selects' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken,
+                    'X-Current-Path': 'import_transactions'
+                },
+                body: `category_name=${encodeURIComponent(categoryName)}&csrfmiddlewaretoken=${csrfToken}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    addNewCategoryToSelects(data.category.id, data.category.name);
+                    categoryNameInput.value = ''; // Clear input
+                } else {
+                    showCategoryMessage('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding category:', error);
+                showCategoryMessage('Error adding category: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Re-enable button
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            });
+        });
+    }
+}
+
+// Initialize category form when DOM is loaded or when HTMX loads content
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCategoryForm();
+});
+
+// Also initialize when HTMX loads the transactions container
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'imported_transactions_container') {
+        setTimeout(function() {
+            initializeCategoryForm();
+            if (typeof initializeChart === 'function') {
+                initializeChart();
+            }
+        }, 100);
+    }
+});
+
 </script>
 
 {% endblock %}

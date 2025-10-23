@@ -1,10 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from core.session import update_session, create_alert
 from core.views import render_if_logged_in
 from .models import ImportProfile, ImportProfileMapping, TransactionCategory, TransactionPattern
 from core.models import FamilyUser
-from django.http import JsonResponse
 from core.utils import ImportProfileMappingDestinationColumns, text_to_enum_destination_column
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -16,6 +15,8 @@ import pandas as pd
 import html
 import io
 from django.apps import apps
+from decimal import Decimal, InvalidOperation
+
 
 # Create your views here.
 @login_required(login_url='user_login')
@@ -288,12 +289,49 @@ def create_category(request):
         context = {"categories": categories}
         return render(request, "finance/partials/category_select_box.html", context=context)
     elif requested_from == "edit_categories":
-        # TODO:
         pass
     else:
-        # TODO:
         pass
     return HttpResponse("")
+
+def create_category_and_update_selects(request):
+    """Create Category via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # get current family from session
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family = fam_user.family_id
+
+    # Get category name from POST data
+    category_name = request.POST.get('category_name', '').strip()
+    if not category_name:
+        return JsonResponse({'success': False, 'error': 'Category name cannot be empty'})
+
+    print(f"Creating category: {category_name}")
+
+    try:
+        category, created = TransactionCategory.objects.get_or_create(
+            name=category_name,
+            family_id=family
+        )
+
+        if not created:
+            return JsonResponse({'success': False, 'error': 'Category already exists'})
+
+        # Return the new category data as JSON
+        return JsonResponse({
+            'success': True,
+            'category': {
+                'id': category.id,
+                'name': category.name
+            }
+        })
+
+    except Exception as e:
+        print(f"Error creating category: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)})
 
 def edit_categories(request, lang_code: str = ""):
     """Edit Categories"""
@@ -613,6 +651,131 @@ def save_imported_transactions(request):
         return JsonResponse({'success': False, 'error': str(e)})
 
 def transaction_patterns(request, lang_code: str = ""):
-    """Manage Transaction Patterns"""
+    """Transaction Patterns management view"""
     update_session(request=request, lang_code=lang_code)
-    # TODO: Add functionality here
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    # Get all categories and patterns for current family
+    categories = TransactionCategory.objects.filter(family_id=family_id).all()
+    patterns = TransactionPattern.objects.filter(transaction_category_id__family_id=family_id).all()
+
+    context = {
+        'categories': categories,
+        'patterns': patterns,
+    }
+
+    return render(request, 'finance/transaction_patterns.html', context)
+
+def create_transaction_pattern(request):
+    """Create Transaction Pattern via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    try:
+        name_regex = request.POST.get('name_regex', '').strip()
+        category_id = request.POST.get('category_id', '').strip()
+
+        # Validate required fields
+        if not name_regex:
+            return JsonResponse({'success': False, 'error': 'Name is required'})
+
+        if not category_id:
+            return JsonResponse({'success': False, 'error': 'Category is required'})
+
+        # Get category and verify it belongs to current family
+        category = get_object_or_404(TransactionCategory, id=category_id, family_id=family_id)
+
+        # Create the pattern
+        pattern = TransactionPattern.objects.create(
+            name_regex=name_regex,
+            transaction_category_id=category
+        )
+
+        return JsonResponse({
+            'success': True,
+            'pattern': {
+                'id': pattern.id,
+                'name_regex': pattern.name_regex,
+                'category_id': pattern.transaction_category_id.id,
+                'category_name': pattern.transaction_category_id.name
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def update_transaction_pattern(request, pattern_id):
+    """Update Transaction Pattern via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    try:
+        pattern = get_object_or_404(TransactionPattern, id=pattern_id, transaction_category_id__family_id=family_id)
+
+        name_regex = request.POST.get('name_regex', '').strip()
+        category_id = request.POST.get('category_id', '').strip()
+
+        # Validate required fields
+        if not name_regex:
+            return JsonResponse({'success': False, 'error': 'Name is required'})
+
+        if not category_id:
+            return JsonResponse({'success': False, 'error': 'Category is required'})
+
+        # Get category and verify it belongs to current family
+        category = get_object_or_404(TransactionCategory, id=category_id, family_id=family_id)
+
+        # Update the pattern
+        pattern.name_regex = name_regex
+        pattern.transaction_category_id = category
+        pattern.save()
+
+        return JsonResponse({
+            'success': True,
+            'pattern': {
+                'id': pattern.id,
+                'name_regex': pattern.name_regex,
+                'category_id': pattern.transaction_category_id.id,
+                'category_name': pattern.transaction_category_id.name
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def delete_transaction_pattern(request, pattern_id):
+    """Delete Transaction Pattern via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    try:
+        pattern = get_object_or_404(TransactionPattern, id=pattern_id, transaction_category_id__family_id=family_id)
+        pattern_name = pattern.name_regex
+        pattern.delete()
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Pattern "{pattern_name}" deleted successfully'
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

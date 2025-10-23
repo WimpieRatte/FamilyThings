@@ -7,6 +7,10 @@
                 </label>
             </div>
         </div>
+
+        <!-- Message container for success/error messages -->
+        <div id="category-messages"></div>
+
         <form id="frmCategories">
             {% csrf_token %}
             <div class="row align-items-center">
@@ -17,12 +21,7 @@
                     </div>
                 </div>
                 <div class="col-auto d-flex align-items-center">
-                    <button type="submit" class="btn btn-primary" id="btnAddCategory"
-                        hx-post="{% url 'finance:create_category' %}"
-                        hx-trigger="click"
-                        hx-target=".category_select_boxes"
-                        hx-headers="js:{'X-Current-Path': 'import_transactions', 'txtCategoryNameValue': document.getElementById('txtCategoryName').value}"
-                    >
+                    <button type="submit" class="btn btn-primary" id="btnAddCategory">
                         Add Category
                     </button>
                 </div>
