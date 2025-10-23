@@ -31,10 +31,8 @@ buttonEditApply.addEventListener("click", function() {
     }, 1600);
 
     setTimeout(function() {
-        movePopup()
-        buttonEditAbort.disabled = false;
-        buttonEditApply.disabled = false;
-    }, 3000);
+        movePopup();
+    }, movePopupDelay);
 });
 
 //$(`#edit-accomp-${data["pk"]}`).click(function (event) {
@@ -91,4 +89,7 @@ function openEditPrompt(ID) {
                 }
             }
         });
+
+    buttonEditAbort.disabled = false;
+    buttonEditApply.disabled = false;
 };

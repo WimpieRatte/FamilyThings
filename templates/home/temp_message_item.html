@@ -5,9 +5,9 @@
     {% endif %}
     {% if 'text-end' in class %}
         {% include 'home/message_item_text.html' with name='You' content=message.content color=sender.color class=class date=message.created_on %}
-        {% include 'home/message_item_icon.html' with icon=sender.icon color=sender.color %}
+        {% include 'home/message_item_icon.html' with user_ID=sender.id icon=sender.icon color=sender.color %}
     {% else %}
-        {% include 'home/message_item_icon.html' with icon=sender.icon color=sender.color %}
+        {% include 'home/message_item_icon.html' with user_ID=sender.id icon=sender.icon color=sender.color %}
         {% include 'home/message_item_text.html' with name=sender.full_name content=message.content color=sender.color class=class date=message.created_on %}
     {% endif %}
 </div>

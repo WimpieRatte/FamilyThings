@@ -11,7 +11,6 @@ from core.models.family import Family
 from core.models.family_user import FamilyUser
 from core.models.custom_user import CustomUser
 from core.session import get_locale_text, JsonResponseAlert
-from django.shortcuts import render, redirect
 
 
 def accomplishments_list_from_query(query):
@@ -241,7 +240,7 @@ def submit_accomplishment(request):
             created_by=request.user,
             measurement_quantity=form.cleaned_data.get("measurement_quantity", 1),
         )
-        print(form.cleaned_data)
+
         if form.cleaned_data.get("date", None) is None:
             user_accomp.from_date = form.cleaned_data["date_from"]
             user_accomp.to_date = form.cleaned_data["date_to"]

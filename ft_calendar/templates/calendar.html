@@ -14,7 +14,7 @@
                     <div id="rome-calendar"></div>
                 </form>
                 <div id="new-accomplishment-wrapper" class="w-auto mt-3 position-absolute top-100 start-50 translate-middle-x">
-                    <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" data-tooltip-context="Add New">
+                    <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" data-tooltip-context="Add New" onclick="openCalendarPopup()">
                         <h4 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
                         <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-1"></i></h4>
                     </a>
@@ -25,6 +25,10 @@
             <div id="calendar-date" class="bg-primary rounded-2 p-1 m-0" style="width: 35% !important;">-</div>
             <div id="accordion" class="accordion accordion fs-sm pt-2">
             </div>
+            <a id="add-new-button" class="nav-link m-auto tooltip-source" style="width: fit-content;" data-tooltip-context="Add New" onclick="openCalendarPopup()">
+                <div id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
+                <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></div>
+            </a>
         </div>
     </div>
 </div>
@@ -59,6 +63,8 @@
         calendar.setValue(dateOffset)
         updateDate()}, 
     10)
+
+    setTimeout(function() {updateDate()}, 502)
 
     function updateDate(event){
         let dateToCheck = calendar.getDate();
@@ -98,19 +104,19 @@
                             <!-- Action buttons -->
                             <div class="d-flex align-items-center gap-2">
                                 <button 
-                                    class="btn btn-sm btn-outline-info btn-edit-event"
+                                    id="btn-edit-entry"
+                                    class="btn btn-sm btn-outline-info"
                                     data-event-id="${entry["ID"]}"
                                     data-event-title="${entry["title"]}"
                                     data-event-description="${entry["description"] || ""}"
                                     data-event-date="${entry["date"]}"
-                                    title="Edit Event"
                                 >
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
                                 <button 
-                                    class="btn btn-sm btn-outline-danger btn-delete-event"
+                                    id="btn-delete-entry"
+                                    class="btn btn-sm btn-outline-danger"
                                     data-event-id="${entry["ID"]}"
-                                    title="Delete Event"
                                 >
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -143,11 +149,12 @@
             </div>`;
         }
         document.getElementById("accordion").innerHTML = newContent; // Clear so that there's space for the list
+        setTimeout(function(){applyLocaleToTooltips();}, 10)
     }
 </script>
 <style>
-    .birthday .btn-edit-event,
-    .birthday .btn-delete-event {
+    .birthday .btn-edit-entry,
+    .birthday .btn-delete-entry {
         display: none;
     } 
 </style>

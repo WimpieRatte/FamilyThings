@@ -42,7 +42,6 @@ function getEntries(){
                 entry["date"] = new Date(entry["date"])
             });
             setTimeout(function() {resetDayButtons();}, 500)
-            setTimeout(function() {updateDate()}, 502)
         })
 }
 getEntries();
@@ -67,7 +66,6 @@ function resetDayButtons(event){
         }
         else {
             button.innerHTML = `<span class="no-ptr-evt text-body">${button.dataset.value}</span>`;
-            console.log(button)
         }
     });
 

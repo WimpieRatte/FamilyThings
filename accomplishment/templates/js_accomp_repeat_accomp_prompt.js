@@ -72,7 +72,7 @@ $("#repeat-accomp-popup #btn-create").click(function (event) {
 
                 setTimeout(function() {
                     movePopup()
-                }, 2500);
+                }, movePopupDelay);
             }
             $("#repeat-accomp-popup #btn-create").disabled = false;
             $("#repeat-accomp-popup #btn-abort").disabled = false;

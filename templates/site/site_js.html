@@ -85,7 +85,6 @@
             }
         });
     }
-    updateTooltips()
 
     addEventListener("mouseout", (event) => {tooltip.style.display = "none";})
 
@@ -159,12 +158,13 @@
                 /* Each entry would normally be a Key/Value pair in JSON. */
                 let key = entry[0]; let text = entry[1];
                 let elements = document.querySelectorAll("#" + key);
-
+                
                 elements.forEach(function(element) {
-                    element.className += " tooltip-source"
+                    element.className += " tooltip-source";
                     element.setAttribute("data-tooltip-context", text);
                 });
             });
+            setTimeout(function(){updateTooltips();}, 10)
         })
     }
     applyLocaleToTooltips();
@@ -225,11 +225,11 @@
 
         setTimeout(function(){
             checkmark.style.opacity = 0;
-        }, 2000);
+        }, 1650);
 
         setTimeout(function(){
             checkmark.style.display = "none";
-        }, 3600);
+        }, 3000);
     }
 
     function playConfetti(origin = 0.55) {
@@ -254,7 +254,10 @@
         $.when(basicAJAX(type = "POST", url = `${"{{HOST}}/family/get_user"}`, data = AJAXData))
         .done(function (result) {
             openPopup("user-details-popup")
-            document.querySelector("#user-details-popup #dropdown-user-icon").src = element.src
+            document.querySelector("#user-details-popup #dropdown-user-icon").src = `{{HOST}}/user_uploads/${result["icon"]}`
+            document.querySelector("#user-details-popup #dropdown-user-icon").addEventListener("error", function(event){
+                event.target.onerror=null; event.target.src='/static/default-user.png'
+            })
             document.querySelector("#user-details-popup #dropdown-user-icon").style.borderColor = `var(--bs-${result['color']})`
             document.querySelector("#user-details-popup #username").textContent = result["full_name"]
             document.querySelector("#user-details-popup #email").textContent = `(${result["email"]})`
@@ -264,17 +267,40 @@
             document.querySelector("#user-details-popup #recent-activity").innerHTML = ""
 
             result["recent_activity"].forEach(element => {
+                date = new Date(element["cleared_date"]).toLocaleDateString(navigator.language, {
+                weekday: "short", year: "numeric",
+                month: "short", day: "numeric",})
+
+                let tooltip = date;
+                if (element["measurement_quantity"] > 0) {
+                    tooltip += `<br><h6 class='p-0 m-0'>${element["measurement_quantity"]}${element["measurement"]}</h6>`.replace("null", "x").replace(".00", "")
+                }
+                
                 document.querySelector("#user-details-popup #recent-activity").innerHTML += 
-                `<div class="d-flex gap-2 rounded p-2 bg-gradient shadow-sm fs-sm" style="width: 260px; background-color: var(--bs-${result['color']}); color: var(--bs-${result['color']}-font);">
+                `<div id="accomplishment-item" class="d-flex gap-2 rounded p-2 bg-gradient shadow-sm fs-sm tooltip-source"
+                data-tooltip-context="Accomplished on" data-tooltip-content="%tooltip%"
+                style="width: 260px; background-color: var(--bs-${result['color']}); color: var(--bs-${result['color']}-font);">
                     <div class="accomplishment-icon pop rounded position-relative" style="height: 1.5em; width: 1.5em; background-color: #bcdcec;">
                     <i class="bi bi-${element['icon']} h5 position-absolute top-50 start-50 translate-middle" style="color: black;" width="20" height="20" alt=""></i>
-                </div>${element['name']}</div></div>`
+                </div>${element['name']}</div></div>`.replace("%tooltip%", tooltip)
             });
+            applyLocaleToTooltips();
         });
     }
 
+    // Dynamically resize the main section based on the header and footer's height; This is done to make the page fit perfectly to any screen.
+    function mainSetHeight(){
+        main.style.height = `${window.innerHeight - document.querySelector("header").offsetHeight - document.querySelector("footer").offsetHeight}px`;
+        main.style.height = `${window.innerHeight - document.querySelector("header").offsetHeight - document.querySelector("footer").offsetHeight}px`;
+    }
+
+    addEventListener("resize", (event) => { 
+        mainSetHeight();
+    })
+
     $( document ).ready(function() {
-        document.querySelector("main").style.height = `${window.innerHeight - document.querySelector("header").offsetHeight - document.querySelector("footer").offsetHeight}px`;
-        document.querySelector("main").style.height = `${window.innerHeight - document.querySelector("header").offsetHeight - document.querySelector("footer").offsetHeight}px`;
+        setTimeout(function(){
+            mainSetHeight();
+        }, 10)
     });
 </script>

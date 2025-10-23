@@ -104,45 +104,46 @@
 
     #popups {
         animation-fill-mode: forwards !important;
+        transform: translate(-50%, -50%);
     }
 
     @keyframes popup-enter { 
-        0% { left: 0%; top: 50% } 
-        100% { left: 50%; top: 50% } 
+        0% { left: 0%; top: 50%; transform: translate(-50%, -50%) scale(1, .6); } 
+        100% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
     }
     @-moz-keyframes popup-enter { 
-        0% { left: 0%; top: 50% } 
-        100% { left: 50%; top: 50% } 
+        0% { left: 0%; top: 50%; transform: translate(-50%, -50%) scale(1, .6); } 
+        100% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
     }
     @-webkit-keyframes popup-enter { 
-        0% { left: 0%; top: 50% } 
-        100% { left: 50%; top: 50% } 
+        0% { left: 0%; top: 50%; transform: translate(-50%, -50%) scale(1, .6); } 
+        100% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
     }
 
     @keyframes popup-leave { 
-        0% { left: 50%; top: 50% } 
-        100% { left: 120%; top: 50% } 
+        0% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
+        100% { left: 120%; top: 50%; transform: translate(-50%, -50%) scale(1, .6); } 
     }
     @-moz-keyframes popup-leave { 
-        0% { left: 50%; top: 50% } 
-        100% { left: 120%; top: 50% } 
+        0% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
+        100% { left: 120%; top: 50%; transform: translate(-50%, -50%) scale(1, .6); } 
     }
     @-webkit-keyframes popup-leave { 
-        0% { left: 50%; top: 50% } 
-        100% { left: 120%; top: 50% } 
+        0% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
+        100% { left: 120%; top: 50%; transform: translate(-50%, -50%) scale(1, .6); } 
     }
 
     @keyframes popup-leave-down { 
-        0% { left: 50%; top: 50% } 
-        100% { left: 50%; top: 140% } 
+        0% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
+        100% { left: 50%; top: 140%; transform: translate(-50%, -50%) scale(0.1, 1); } 
     }
     @-moz-keyframes popup-leave-down { 
-        0% { left: 50%; top: 50% } 
-        100% { left: 50%; top: 140% } 
+        0% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
+        100% { left: 50%; top: 140%; transform: translate(-50%, -50%) scale(0.1, 1); } 
     }
     @-webkit-keyframes popup-leave-down { 
-        0% { left: 50%; top: 50% } 
-        100% { left: 50%; top: 140% } 
+        0% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1, 1); } 
+        100% { left: 50%; top: 140%; transform: translate(-50%, -50%) scale(0.1, 1); } 
     }
 
     table th:first-of-type { border-top-left-radius: 5px; }
@@ -151,13 +152,17 @@
     table tr:last-of-type td:first-of-type, table { border-bottom-left-radius: 5px !important; }
     table tr:last-of-type td:last-of-type, table { border-bottom-right-radius: 5px !important; }
 
-    #btn-actions {
+    #btn-actions,
+    #btn-close-popup,
+    #delete-message {
         filter: grayscale(.7);
         transition-property: filter;
         transition-duration: .25s;
     }
 
-    #btn-actions:hover, #btn-actions.show {
+    #btn-actions:hover, #btn-actions.show,
+    #btn-close-popup:hover,
+    #delete-message:hover {
         filter: grayscale(0);
     }
 
@@ -270,14 +275,5 @@
         border-color: #e2cf20;
         box-shadow: 0 0 0 0.25rem rgba(250, 228, 26, 0.25);
     }
-
-    /* // Large devices (desktops, 992px and up) */
-    @media (min-width: 992px) {}
-
-    /* // X-Large devices (large desktops, 1200px and up) */
-    @media (min-width: 1200px) {}
-
-    /* // XX-Large devices (larger desktops, 1400px and up) */
-    @media (min-width: 1400px) {}
 
 </style>

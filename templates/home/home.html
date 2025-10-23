@@ -29,8 +29,8 @@
           </div>
           <div class="carousel-inner ft-sm">
             {% include 'home/home_carousel_item.html' with image='home/pexels-thatguycraig000-1835927.jpg' header="Forget the Pressures and Chaos, it's Time for FamilyThings!" paragraph="No more masses of unfinished To-Dos, become aware of what you accomplished... <br> And share it with your family and loved ones!" caption_class='text-start' active=True %}
-            {% include 'home/home_carousel_item.html' with image='home/pexels-cottonbro-4325466.jpg' header='Build Routines.' paragraph='Be it a morning routine, homework, groceries - Accomplishments, once created, can always be repeated on the fly!' %}
-            {% include 'home/home_carousel_item.html' with image='home/pexels-pavel-danilyuk-8763062.jpg' header="Let's Begin This Journey!" paragraph='Create your own Account <strong>for free</strong> and get started!' link='core:user_register' link_caption='Register for free' caption_class='text-end' %}
+            {% include 'home/home_carousel_item.html' with image='home/pexels-pavel-danilyuk-8763062.jpg' header='Build Routines.' paragraph='Be it a morning routine, homework, groceries - Accomplishments, once created, can always be repeated on the fly!' %}
+            {% include 'home/home_carousel_item.html' with image='home/pexels-thatguycraig000-1835927.jpg' header="Let's Begin This Journey!" paragraph='Create your own Account <strong>for free</strong> and get started!' link='core:user_register' link_caption='Register for free' caption_class='text-end' %}
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -43,24 +43,24 @@
         </div>
       </div>
       <hr>
-      <div class="d-flex featurette ms-5">
-        <div class="me-3">
+      <div class="d-flex featurette m-auto w-fit py-4">
+        <div class="me-3" style="width: 740px;">
           <h2 id="home-accomp1" class="featurette-heading">Create your own Accomplishments! <span class="text-muted"></span></h2>
-          <p id="home-accomp2"class="lead">Elevate your daily workflow with an intuitive tool designed to help you create, manage, and continuously improve your accomplishments. Gain a clear, comprehensive overview at a glance, and track your progress with ease for smarter planning and measurable results.</p>
+          <h3 id="home-accomp2" class="lead" style="line-height: 1.5em !important;">Elevate your daily workflow with an intuitive tool designed to help you create, manage, and continuously improve your accomplishments. Gain a clear, comprehensive overview at a glance, and track your progress with ease for smarter planning and measurable results.</h3>
         </div>
         <div>
-          <img class="featurette-image img-fluid mx-auto" alt="1000x400" height="500" src="static\home\Accomplishments.gif">
+          <img class="featurette-image img-fluid mx-auto" alt="" width="700" src="static\home\Accomplishments.gif">
         </div>
       </div>
       <hr>
       <div id="about-us" class="home-section">
         <h3 class="text-center pt-5 pop" style="font-size: 4em; transform-origin: 50% 100%;">The Team Behind It</h3>
         <div id="about-us-people" class="container-fluid my-5 w-75">
-          <div class="d-flex justify-content-evenly">
-            {% include 'home/home_aboutus_item.html' with name='Wilhelm Ratte' github='WimpieRatte' linkedin='wilhelm-josef-ratte-3a8a1a67' role='Creator, Team Leader<br>Backend Developer' photo='wilhelmratte.jpg' delay='0' %}
+          <div class="d-flex justify-content-center" style="gap: 4rem !important;">
+            {% include 'home/home_aboutus_item.html' with name='Wilhelm Ratte' github='WimpieRatte' linkedin='wilhelm-josef-ratte-3a8a1a67' role='Creator, Team Leader<br>Fullstack Developer' photo='wilhelmratte.jpg' delay='0' %}
             {% include 'home/home_aboutus_item.html' with name='Roman Heus' github='RomanH1999' linkedin='roman-heus' role='Fullstack Developer<br>User Interface<br>Chronic Jokester' delay='0.03' %}
-            {% include 'home/home_aboutus_item.html' with name='Padma Devi Talatam' github='ryalipadma' role='Database' delay='0.06' %}
-            {% include 'home/home_aboutus_item.html' with name='Thomas Leis' role='Team Coordinator<br>Testing' delay='0.10' %}
+            {% include 'home/home_aboutus_item.html' with name='Thomas Leis' role='Team Coordinator<br>Testing' delay='0.10' photo='thomasleis.jpg' %}
+            {% include 'home/home_aboutus_item.html' with name='Padma Devi Talatam' github='ryalipadma' role='Database<br>Frontend Developer' delay='0.06' %}
           </div>
         </div>
       </div>

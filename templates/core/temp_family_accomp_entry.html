@@ -1,14 +1,13 @@
 {% load static %}
-<div id="accomplishment-item" class="container w-100 my-1 p-2 rounded bg-gradient shadow-sm tooltip-source" style="height: 2.5em; color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});" 
+<div id="accomplishment-item" class="container w-100 my-1 p-2 rounded bg-gradient shadow-sm tooltip-source"
+style="height: 2.5em; color: var(--bs-{{color}}-font); background-color: var(--bs-{{color}});" 
+onclick="getUser('{{user_ID}}', this)"
 data-tooltip-context="Cleared on" data-tooltip-content="{{date}}">
     <div class="d-flex align-items-start p-0 m-0 position-relative">
         <img id="dropdown-user-icon" class="position-absolute top-50 start-0 translate-middle-y border border-3;" style="border-color: var(--bs-{{color}}) !important;" src="{% get_media_prefix %}{{user_icon}}" height="30" width="30" 
-        onerror="this.onerror=null; this.src='{% static 'default-user.png' %}'" onclick="getUser('{{user_ID}}', this)">
+        onerror="this.onerror=null; this.src='{% static 'default-user.png' %}'">
         <div class="flex-column p-0" style="margin-left: 36px; line-height: 1.35em;">
             <span class="fs-sm bi bi-{{icon}}"></span><span class="fs-sm">{{title}}</span>
         </div>
     </div>
 </div>
-<script>
-    
-</script>

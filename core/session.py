@@ -56,7 +56,10 @@ def update_user_session(require_login: bool = True, require_family: bool = True,
                     request.session["families"] = list(family_queue.values_list("family_id__name"))
                     # Also grab a dict with all the relevant info about the family you're
                     # currently switched to
-                    request.session["family_info"] = family_queue[request.session["current_family"]].serialized()
+                    try:
+                        request.session["family_info"] = family_queue[request.session["current_family"]].serialized()
+                    except (IndexError):
+                        request.session["family_info"] = family_queue[0].serialized()
 
             #  Apply a language code based on either the existing value,
             #  an User's own setting, or lastly, the browser's.
