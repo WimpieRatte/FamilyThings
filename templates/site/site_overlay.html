@@ -1,15 +1,22 @@
 {% load static %}
 <div id="overlay" class="vw-100 position-absolute overflow-hidden no-ptr-evt" style="min-height: 100vh; z-index: 1080;">
-    <div id="alert-container" class="w-25 mw-25 position-absolute start-50 text-center translate-middle-x pt-1 no-ptr-evt" style="z-index: 1080;">
+    <div id="alert-container"
+        class="w-25 mw-25 position-absolute start-50 text-center translate-middle-x pt-1 no-ptr-evt"
+        style="z-index: 1080;">
         {% for message in messages %}
-            {% include 'site/site_alert.html' with message=message tags=message.tags %}
+        {% include 'site/site_alert.html' with message=message tags=message.tags %}
         {% endfor %}
     </div>
     <div id="screen-transition" class="position-absolute vw-100 vh-100 top-0 start-0 no-ptr-evt" style="z-index: 3055;">
-        <img id="loading-arrow" class="m-auto d-block position-absolute top-50 start-50 no-ptr-evt" height="150" width="150" src="{% static 'icons/cursor/arrow-repeat.svg' %}" alt="">
+        <img id="loading-arrow" class="m-auto d-block position-absolute top-50 start-50 no-ptr-evt" height="150"
+            width="150" src="{% static 'icons/cursor/arrow-repeat.svg' %}" alt="">
     </div>
-    <div id="tooltip" class="position-absolute p-2 rounded bg-primary bg-gradient border border-2 border-dark shadow-sm fs-sm no-ptr-evt" style="display: none; z-index: 1041; white-space: pre;"></div>
+    <div id="tooltip"
+        class="position-absolute p-2 rounded bg-primary bg-gradient border border-2 border-dark shadow-sm fs-sm no-ptr-evt"
+        style="display: none; z-index: 1041; white-space: pre;"></div>
 </div>
-<svg id="cursor-base" class="position-absolute overflow-visible no-ptr-evt" style="display: none; z-index: 1090;" width="600" height="220" xmlns="">
-    <image id="cursor-image" height="32" width="32" class="no-ptr-evt" style="filter: drop-shadow(7px 4px 2px black);" href="{% static 'icons/cursor/cursor-regular.svg' %}" />
+<svg id="cursor-base" class="position-absolute overflow-visible no-ptr-evt" style="display: none; z-index: 1090;"
+    width="600" height="220" xmlns="">
+    <image id="cursor-image" height="32" width="32" class="no-ptr-evt" style="filter: drop-shadow(7px 4px 2px black);"
+        href="{% static 'icons/cursor/cursor-regular.svg' %}" />
 </svg>

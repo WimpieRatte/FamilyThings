@@ -1,0 +1,21 @@
+{% load static %}
+<div id="user-details-popup" class="container popup" style="display: none; margin-bottom: 12rem !important;  min-width: 650px;">
+{% include 'site/heading_section.html' with label="User Details" id="lb-user-details" class='m-auto' %}
+    <div class="rounded bg-dark px-5 d-block py-4 position-relative" style="min-height: 350px;">
+        <div class="d-flex gap-4 mb-3">
+            <img id="dropdown-user-icon" style="border: 1px solid; border-width: 4px !important;" src="" height="90" width="90" 
+            onerror="this.onerror=null; this.src='{% static 'default-user.png' %}'">
+            <div>
+                <p class="m-0 mb-2"><span id="username"></span> <small id="email">-</small></p> 
+                <small class="m-0"><span id="lb-joined-family">Joined Family</span>: <span id="joined-family">-</span></small><br>
+                <small class="m-0"><span id="lb-last-login">Last Login</span>: <span id="last-login">-</span></small>
+            </div>
+        </div>
+        {% include 'site/heading_section.html' with label="Recent Activity" id="lb-recent-activity" %}
+        <div id="recent-activity" style="width: 540px;" class="d-flex gap-2 flex-wrap m-auto">
+            
+        </div>
+    </div>
+    <div id="close-details" onclick="movePopupDown()" value="" class="tooltip-source badge rounded-circle border bg-danger border-dark fs-sm position-absolute top-0 translate-middle"
+        style="width: 2em; height: 2em; z-index: 210; line-height: 1em; left: 98.5% !important;"><i class="bi bi-x h3 position-absolute top-50 start-50 translate-middle" style="top: 51% !important; font-size: 2.5em;"></i></div>
+</div>

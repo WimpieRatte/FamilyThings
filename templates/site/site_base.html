@@ -14,9 +14,17 @@
   </style>
   {% block append_to_head %}{% endblock %}
 </head>
+<svg id="check-mark-animation" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 214 214" class="check-circle position-absolute translate-middle start-50" style="top: 45%; z-index: 1080; height: 35em; display: none;">
+    <g fill="none" stroke="var(--bs-success)" stroke-width="2">
+        <circle class="semi-transparent" fill="var(--bs-success)" opacity="0.5" cx="107" cy="107" r="72"></circle>
+        <circle class="colored" fill="var(--bs-success)" cx="107" cy="107" r="72" opacity="0.8"></circle>
+        <polyline stroke="var(--bs-body-color)" stroke-width="10" points="73.5,107.8 93.7,127.9 142.2,79.4"
+            style="stroke-dasharray: 50%, 50%; stroke-dashoffset: 100%" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+</svg>
 <div id="popup-container" class="position-absolute vw-100 vh-100" style="display: none; z-index: 1051;">
     <div id="popup-cover" class="position-absolute vw-100 vh-100 top-0 start-0 no-ptr-evt"></div>
-    <div id="popups" class="position-absolute start-50 top-50 translate-middle overflow-visible">
+    <div id="popups" class="position-absolute translate-middle overflow-visible">
       {% block popups %}{% endblock %}
     </div>
 </div>
@@ -24,7 +32,7 @@
 {% include 'site/site_js_preload.html' %}
 {% include 'site/site_header.html' with show_time=True %}
 <body>
-  <main class="container px-4 py-2 mt-3 m-auto">
+  <main class="container px-4 py-2 m-auto">
     {% block content %}
     {# Content will be injected here #}
     {% endblock %}

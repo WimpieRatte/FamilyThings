@@ -60,8 +60,6 @@
         updateDate()}, 
     10)
 
-    setTimeout(function() {updateDate()}, 502)
-
     function updateDate(event){
         let dateToCheck = calendar.getDate();
         let entries = null;
@@ -73,71 +71,68 @@
         && element["date"].getMonth() == dateToCheck.getMonth()
         && element["date"].getYear() == dateToCheck.getYear());
 
-        // Put entries on screen
-        $("#accordion").text(''); // Clear so that there's space for the list
-
+        let newContent = ""
+        
         if (entries.length > 0) {
-            $("#accordion").text(''); // Clear so that there's space for the list
             entries.forEach(function(entry) {
-                $("#accordion").append(`<div id="card${entry["ID"]}" class="card"></div>`);
+                newContent += (`<div id="card${entry["ID"]}" class="card"></div>`);
 
                 let extraClasses = "";
                 if (entry["description"] && entry["description"].length > 0){ extraClasses = " bi-caret-down-fill bi-space" }
                     else { extraClasses = " bi-circle-fill bi-space bi-small" }
 
                 setTimeout(function() {
-    $(`#card${entry["ID"]}`).append(`
-        <div class="card-header card-footer d-flex justify-content-between align-items-center ${entry["type"]}" id="heading${entry["ID"]}">
-            <h5 class="mb-0">
-                <button 
-                    class="btn btn-link link-underline link-underline-opacity-0 text-body-emphasis py-2"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#calendarEntry${entry["ID"]}"
-                    aria-controls="collapseOne"
-                >
-                    <span class="bi ${extraClasses} me-2"></span>${entry["title"]}
-                </button>
-            </h5>
+                    $(`#card${entry["ID"]}`).append(`
+                        <div class="card-header card-footer d-flex justify-content-between align-items-center ${entry["type"]}" id="heading${entry["ID"]}">
+                            <h5 class="mb-0">
+                                <button 
+                                    class="btn btn-link link-underline link-underline-opacity-0 text-body-emphasis py-2"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#calendarEntry${entry["ID"]}"
+                                    aria-controls="collapseOne"
+                                >
+                                    <span class="bi ${extraClasses} me-2"></span>${entry["title"]}
+                                </button>
+                            </h5>
 
-            <!-- Action buttons -->
-            <div class="d-flex align-items-center gap-2">
-                <button 
-                    class="btn btn-sm btn-outline-primary btn-edit-event"
-                    data-event-id="${entry["ID"]}"
-                    data-event-title="${entry["title"]}"
-                    data-event-description="${entry["description"] || ""}"
-                    data-event-date="${entry["date"]}"
-                    title="Edit Event"
-                >
-                    <i class="bi bi-pencil-square"></i>
-                </button>
-                <button 
-                    class="btn btn-sm btn-outline-danger btn-delete-event"
-                    data-event-id="${entry["ID"]}"
-                    title="Delete Event"
-                >
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-        </div>
-    `);
+                            <!-- Action buttons -->
+                            <div class="d-flex align-items-center gap-2">
+                                <button 
+                                    class="btn btn-sm btn-outline-info btn-edit-event"
+                                    data-event-id="${entry["ID"]}"
+                                    data-event-title="${entry["title"]}"
+                                    data-event-description="${entry["description"] || ""}"
+                                    data-event-date="${entry["date"]}"
+                                    title="Edit Event"
+                                >
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button 
+                                    class="btn btn-sm btn-outline-danger btn-delete-event"
+                                    data-event-id="${entry["ID"]}"
+                                    title="Delete Event"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `);
 
-    if (entry["description"] && entry["description"].length > 0) {
-        $(`#card${entry["ID"]}`).append(`
-            <div id="calendarEntry${entry["ID"]}" class="collapse" aria-labelledby="heading${entry["ID"]}" data-bs-parent="#accordion">
-                <div class="card-body">
-                    ${entry["description"]}
-                </div>
-            </div>
-        `);
-    }
-}, 1);
-
+                    if (entry["description"] && entry["description"].length > 0) {
+                        $(`#card${entry["ID"]}`).append(`
+                            <div id="calendarEntry${entry["ID"]}" class="collapse" aria-labelledby="heading${entry["ID"]}" data-bs-parent="#accordion">
+                                <div class="card-body">
+                                    ${entry["description"]}
+                                </div>
+                            </div>
+                        `);
+                    }
+                }, 1);
             });
-            $("#accordion").append('</div>')
+            newContent += '</div>'
         }
         else {
-            $("#accordion").append(`
+            newContent += `
             <div id="card" class="card">
                 <div class="card-header card-footer" id="">
                 <h5 class="mb-0">
@@ -145,8 +140,15 @@
                         <span class="bi bi bi-circle-fill bi-space bi-small">No entries.</span>
                     </button>
                 </h5>
-            </div>`);
+            </div>`;
         }
+        document.getElementById("accordion").innerHTML = newContent; // Clear so that there's space for the list
     }
 </script>
+<style>
+    .birthday .btn-edit-event,
+    .birthday .btn-delete-event {
+        display: none;
+    } 
+</style>
 {% endblock %}

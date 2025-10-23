@@ -3,11 +3,6 @@
 
 {% block append_to_head %}
 <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
-<style>
-    body {
-        overflow-y: auto; /* allow standard page scrolling */
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -53,5 +48,4 @@
             {% include 'finance/partials/import_profile_mappings.html' %}
         </div>
     </div>
-</div>
 {% endblock %}

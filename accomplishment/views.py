@@ -10,7 +10,7 @@ from core.models.custom_user import CustomUser
 
 
 @update_user_session()
-def page_overview(request):
+def page_overview(request, popup: str = ""):
     """An overview of an User's Accomplishments."""
 
     recent_additions = Accomplishment.objects.filter(
@@ -25,6 +25,7 @@ def page_overview(request):
             'categories': constants.CATEGORIES,
             'measurements': constants.MEASUREMENTS,
             'form': AccomplishmentForm(),
+            'popup': popup
         })
 
 
@@ -101,7 +102,6 @@ def page_edit_user_accomplishment(request, ID: int = -1, cache_last_visited_page
 def page_edit_accomplishment_details(request, ID=-1):
     """."""
     form: AccomplishmentForm = AccomplishmentForm()
-    print(ID)
     if ID != -1:
         accom_details: Accomplishment = FamilyUserAccomplishment.objects.get(
             id=ID).accomplishment_id

@@ -21,7 +21,7 @@ $(document).ready(function() {
             ? editEventUrlTemplate.replace('0', eventId)
             : createEventUrl;
     }
-
+    
     /********************************
      * UTILITIES
      ********************************/
@@ -35,7 +35,7 @@ $(document).ready(function() {
     }
 
     $(cancelBtn).click(function() {
-        closePopup();
+        movePopupDown();
         clearFormData();
     });
 
@@ -44,12 +44,14 @@ $(document).ready(function() {
         openPopup("calendar-event-popup");
         $("#lb-calendar-create").text("Create Calendar Entry");
         clearFormData();
+        document.getElementById("event-date").valueAsDate = calendar.getDate();
     });
 
     /********************************
      * CREATE OR EDIT CALENDAR ENTRY
      ********************************/
     $(saveBtn).click(async function() {
+        saveBtn.disabled = true;
         const title = titleField.val().trim();
         const description = descField.val().trim();
         const date = dateField.val();
@@ -82,17 +84,27 @@ $(document).ready(function() {
             const data = await response.json();
 
             if (data.status === "success") {
-                successMsg.text(data.message).fadeIn();
-                errorMsg.hide();
+                // successMsg.text(data.message).fadeIn();
+                // errorMsg.hide();
+
+                disableLoadingScreen();
+                playCheckmarkAnimation();
+                createAlert(text=data.message, key="", type="success");
+                getEntries();
+
                 setTimeout(function() {
-                    window.location.replace('{{request.session.last_visited_page}}');}, 
-                    1000);
+                    movePopup();
+                }, 2600);
             } else {
                 throw new Error(data.message || "Something went wrong");
             }
         } catch (err) {
-            errorMsg.text(err.message).fadeIn();
-            successMsg.hide();
+            // errorMsg.text(err.message).fadeIn();
+            // successMsg.hide();
+            
+            disableLoadingScreen();
+            createAlert(text=err.message, key="", type="danger");
+
         }
     });
 
@@ -122,7 +134,7 @@ $(document).ready(function() {
     $(document).on("click", ".btn-delete-event", async function() {
         const eventId = $(this).data("event-id");
         const url = `{% url 'calendar:calendar_delete' 0 %}`.replace('0', eventId);
-        if (!confirm("Are you sure you want to delete this event?")) return;
+        if (!confirm("Are you sure you want to delete this Entry?")) return;
     
         try {
             const response = await fetch(url, {
@@ -133,11 +145,10 @@ $(document).ready(function() {
             });
             if (response.ok) {
                 $(`#card${eventId}`).fadeOut();
-                setTimeout(function() {
-                    window.location.replace('{{request.session.last_visited_page}}');}, 
-                    1000);
+                createAlert(text="Entry has been successfully deleted.", key="", type="warning");
+                getEntries();
             } else {
-                alert("Failed to delete event");
+                createAlert(text="Failed to delete Entry.", key="", type="danger");
             }
         } catch (err) {
             console.error(err);

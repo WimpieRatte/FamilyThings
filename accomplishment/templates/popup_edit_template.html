@@ -1,0 +1,35 @@
+<div id="edit-template-popup" class="container" style="display: none; margin-bottom: 9rem !important;">
+    {% include 'site/heading_section.html' with label="Edit Accomplishment Template" id="edit-user-accomp" class='m-auto' %}
+    <div class="rounded bg-dark px-5 d-block py-4 position-relative">
+        <div class="position-relative" style="top: 0%; top: -20% !important">
+            <span class="bi bi-journal-text background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
+            <span class="bi bi-pen background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
+        </div>
+        <form id="accomplishment-form" method="post" class="m-auto d-flex justify-content-center flex-wrap mx-5" style="width: 700px;">
+            {% csrf_token %}
+            <div class="d-flex gap-5" style="width: 90%;">
+                <div id="" class="d-flex flex-column" style="width: 60%;">
+                    <div class="d-flex gap-2">
+                        <input type="hidden" id="id_ID" name="ID" value='-1' />
+                        {% include 'site/temp_form_field.html' with id="name" field=form.name %}
+                        {% include 'site/temp_form_field.html' with id="accomplishment_type" field=form.accomplishment_type %}
+                    </div>
+                    <div>
+                        {% include 'site/temp_form_field.html' with id="description" field=form.description %}
+                    </div>
+                </div>
+                <div class="d-flex flex-column justify-content-center p-2" style="width: 40%;">
+                    {% include 'site/temp_form_field.html' with id="is_achievement" field=form.is_achievement %}
+                    {% include 'site/temp_form_field.html' with id="measurement-type" field=form.measurement %}
+                </div>
+            </div>
+            {% include 'temp_accomp_icon_selection.html' with icons=icons initial=initial popup='edit-template-popup' %}
+            </div>
+            <div class="d-flex gap-2 mt-4 pb-4 m-auto" style="width: fit-content;">
+                <button id="btn-apply-changes" class="btn btn-success border-success d-block m-auto" type="button">Apply Changes</button>
+                <a><button id="btn-abort" class="btn btn-danger" type="button">Abort</button></a>
+            </div>
+            </div>
+        </form>
+    </div>
+</div>

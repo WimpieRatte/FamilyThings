@@ -1,0 +1,24 @@
+<div id="repeat-accomp-popup" class="container" style="display: none; margin-bottom: 12rem !important; width: 650px;">
+    {% include 'site/heading_section.html' with label="Repeat Accomplishment" id="repeat-user-accomp" class='m-auto' %}
+    <div class="rounded bg-dark px-5 d-block pb-4 position-relative">
+        <span class="bi bi-repeat-1 background-bi bi-edit-accomp p-0 m-0 position-absolute"></span>
+        <div id="edit-accomp-wrapper" class="px-5 py-2">
+            {% include 'temp_accomp_info.html' with show_date=True %}
+            <form id="repeat-accomp-form" method="post" class="m-auto d-flex justify-content-center flex-wrap gap-5">
+                {% csrf_token %}
+                <input type="hidden" id="id_ID" name="ID" value="-1">
+                <div id="measurement-settings">
+                    <div id="measurement-section" class="d-flex gap-2 ps-4 pt-3">
+                        {% include 'site/temp_form_field.html' with id="measurement-value" field=form.measurement_quantity %}
+                        {% include 'site/temp_form_field.html' with id="measurement-type" field=form.measurement %}
+                    </div>
+                </div>
+                {% include 'temp_timeframe_selection.html' with popup='repeat-accomp-popup' %}
+        </div>
+        <div class="d-flex gap-2 pt-4 m-auto" style="width: fit-content;">
+            <button id="btn-create" class="btn btn-success border-success" type="button">Create</button>
+            <button id="btn-abort" class="btn-abort-edit btn btn-danger" type="button">Abort</button>
+        </div>
+        </form>
+    </div>
+</div>

@@ -1,11 +1,11 @@
 {% extends "site/site_base.html" %}
 {% block title %}Accomplishments - {% endblock %}
 {% block popups %}
-    {% include 'accomp_popup_name_prompt.html' %}
-    {% include 'accomp_popup_new_accomp.html' with icons=icons %}
-    {% include 'accomp_popup_edit_accomp.html' %}
-    {% include 'accomp_popup_repeat_accomp.html' %}
-    {% include 'accomp_popup_edit_template.html' %}
+    {% include 'popup_name_prompt.html' %}
+    {% include 'popup_create_accomp.html' with icons=icons %}
+    {% include 'popup_edit_accomp.html' %}
+    {% include 'popup_repeat_accomp.html' %}
+    {% include 'popup_edit_template.html' %}
 {% endblock %}
 {% block content %}
 <div id="accomplishments-overview" class="container-sm pb-4 w-100">
@@ -88,6 +88,8 @@
     var getAccompURL = "{{HOST}}/accomplishments/entry/get/id=";
     var editAccompURL = "{{HOST}}/accomplishments/entry/edit/id=";
     var repeatAccompURL = "{{HOST}}/accomplishments/entry/repeat";
+    var getTemplateURL = "{% url 'accomplishment:get_template' %}"
+    var saveTemplateURL = "{% url 'accomplishment:save_template' %}"
     var nameCheckURL = "{{HOST}}/accomplishments/get/name=";
     var currentAJAXURL = editAccompURL;
 
@@ -97,9 +99,17 @@
     {% include 'js_accomp_edit_accomp_prompt.js' %}
     {% include 'js_accomp_repeat_accomp_prompt.js' %}
     {% include 'js_accomp_name_prompt.js' %}
-
-    //WIP
+    {% include 'js_accomp_create_accomp_prompt.js' %}
     {% include 'js_accomp_edit_template_prompt.js' %}
-    {% include 'js_accomp_new_accomp_prompt.js' %}
+
+
+    setTimeout(
+        function(){
+            if ("{{popup}}" == "add_new") {
+                resetNamePrompt();
+                openPopup("name-prompt-popup");
+            }
+        }
+    , 80)
 </script>
 {% endblock %}
