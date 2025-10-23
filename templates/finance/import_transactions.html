@@ -1,6 +1,8 @@
 {% extends "site/site_base.html" %}
 {% block append_to_head %}
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    {% load static %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.plot.ly/plotly-3.1.2.min.js" charset="utf-8"></script>
     <script src="https://unpkg.com/htmx.org@2.0.7/dist/htmx.min.js"></script>
     <style>
         body {
@@ -81,38 +83,258 @@
 
 <script>
 
-    // Change the edit profiles button link based on selected profile
-    function change(val){
-        document.getElementById("btnEditProfiles").href = "{% url 'finance:import_profiles' %}?selected_import_profile=" + val;
+// Change the edit profiles button link based on selected profile
+function change(val){
+    document.getElementById("btnEditProfiles").href = "{% url 'finance:import_profiles' %}?selected_import_profile=" + val;
+}
+
+document.body.addEventListener("htmx:beforeRequest", function (event) {
+    // Check if this is the load headers form submission
+    const isLoadHeadersForm = event.detail.requestConfig.path === "{% url 'finance:load_headers' %}" ||
+                              event.detail.elt.id === "btnLoadHeaders" ||
+                              (event.detail.triggeringElement && event.detail.triggeringElement.id === "btnLoadHeaders");
+    if (!isLoadHeadersForm) return;
+
+    const profileSelect = document.getElementById("import-profile-selector");
+    const fileInput = document.getElementById("formFile");
+
+    let blocked = false;
+
+    if (!profileSelect.value || profileSelect.value === "Create New") {
+        event.preventDefault();
+        profileSelect.classList.add("is-invalid");
+        alert("Please pick an import profile before loading headers.");
+        blocked = true;
+    } else {
+        profileSelect.classList.remove("is-invalid");
     }
 
-    document.body.addEventListener("htmx:beforeRequest", function (event) {
-        if (event.target.id !== "btnLoadHeaders") return;
+    if (!fileInput.files.length) {
+        event.preventDefault();
+        fileInput.classList.add("is-invalid");
+        if (!blocked) {
+            alert("Please select a file before loading headers.");
+        }
+    } else {
+        fileInput.classList.remove("is-invalid");
+    }
+});
 
-        const profileSelect = document.getElementById("import-profile-selector");
-        const fileInput = document.getElementById("formFile");
 
-        let blocked = false;
+////////////////////////////////////////// Plotly Pie Chart Functions ///////////////////////////
 
-        if (!profileSelect.value || profileSelect.value === "Create New") {
-            event.preventDefault();
-            profileSelect.classList.add("is-invalid");
-            alert("Please pick an import profile before loading headers.");
-            blocked = true;
-        } else {
-            profileSelect.classList.remove("is-invalid");
+// Function to update the pie chart when categories change
+function updatePieChart() {
+    generateIncomeExpenseCharts();
+}
+
+function getIncomeExpenseData() {
+    const table = document.getElementById('transactions-table');
+    if (!table) {
+        return { income: {}, expenses: {} };
+    }
+
+    const rows = table.querySelectorAll('tbody tr');
+
+    const incomeByCategory = {};
+    const expensesByCategory = {};
+    let unallocatedIncome = 0;
+    let unallocatedExpenses = 0;
+    let totalIncome = 0;
+    let totalExpenses = 0;
+
+    rows.forEach((row, index) => {
+        const categorySelect = row.querySelector('.category-select');
+        if (!categorySelect) {
+            return;
         }
 
-        if (!fileInput.files.length) {
-            event.preventDefault();
-            fileInput.classList.add("is-invalid");
-            if (!blocked) {
-                alert("Please select a file before loading headers.");
+        const categoryValue = categorySelect.value;
+        // Get the display name from the selected option
+        const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
+
+        const amountCell = row.querySelector('.amount-column');
+        if (!amountCell) {
+            return;
+        }
+
+        const amountText = amountCell.textContent.trim();
+
+        const amount = parseGermanNumber(amountText);
+
+        if (!isNaN(amount)) {
+            // Use category name for display, but keep track of unallocated by value
+            const displayCategory = categoryValue === "-1" ? "Unallocated" : categoryName;
+
+            if (amount >= 0) {
+                // Income
+                totalIncome += amount;
+                if (categoryValue === "-1") {
+                    unallocatedIncome += amount;
+                } else {
+                    incomeByCategory[displayCategory] = (incomeByCategory[displayCategory] || 0) + amount;
+                }
+            } else {
+                // Expenses (convert to positive for chart)
+                const expenseAmount = Math.abs(amount);
+                totalExpenses += expenseAmount;
+                if (categoryValue === "-1") {
+                    unallocatedExpenses += expenseAmount;
+                } else {
+                    expensesByCategory[displayCategory] = (expensesByCategory[displayCategory] || 0) + expenseAmount;
+                }
             }
-        } else {
-            fileInput.classList.remove("is-invalid");
         }
     });
+
+    // Add unallocated to respective objects
+    if (unallocatedIncome > 0) incomeByCategory["Unallocated"] = unallocatedIncome;
+    if (unallocatedExpenses > 0) expensesByCategory["Unallocated"] = unallocatedExpenses;
+
+    return { income: incomeByCategory, expenses: expensesByCategory };
+}
+
+function generateIncomeExpenseCharts() {
+    const data = getIncomeExpenseData();
+
+    // Income Chart Data
+    const incomeCategories = Object.keys(data.income);
+    const incomeAmounts = Object.values(data.income);
+
+    // Expenses Chart Data
+    const expenseCategories = Object.keys(data.expenses);
+    const expenseAmounts = Object.values(data.expenses);
+
+    // Define colors - green for income, red for expenses
+    const incomeColors = ['#2ca02c', '#98df8a', '#d9f0d3', '#c7e9c0', '#74c476', '#41ab5d', '#238b45', '#006d2c'];
+    const expenseColors = ['#d62728', '#ff9896', '#fdd', '#ff7f0e', '#ffbb78', '#e6550d', '#fd8d3c', '#fdae6b'];
+
+    const incomeTrace = {
+        values: incomeAmounts,
+        labels: incomeCategories,
+        type: 'pie',
+        hole: 0.4,
+        domain: { row: 0, column: 0 },
+        marker: {
+            colors: incomeColors.slice(0, incomeCategories.length)
+        },
+        name: 'Income',
+        textinfo: 'label+percent',
+        textposition: 'inside',
+        hovertemplate: '<b>%{label}</b><br>Amount: %{value:,.2f}€<br>Percentage: %{percent}<extra></extra>'
+    };
+
+    const expenseTrace = {
+        values: expenseAmounts,
+        labels: expenseCategories,
+        type: 'pie',
+        hole: 0.4,
+        domain: { row: 0, column: 1 },
+        marker: {
+            colors: expenseColors.slice(0, expenseCategories.length)
+        },
+        name: 'Expenses',
+        textinfo: 'label+percent',
+        textposition: 'inside',
+        hovertemplate: '<b>%{label}</b><br>Amount: %{value:,.2f}€<br>Percentage: %{percent}<extra></extra>'
+    };
+
+    const layout = {
+        title: {
+            text: 'Income vs Expenses by Category',
+            font: { size: 20 }
+        },
+        grid: { rows: 1, columns: 2, pattern: 'independent' },
+        height: 500,
+        showlegend: true,
+        legend: {
+            orientation: 'h',
+            y: -0.1
+        },
+        annotations: [
+            {
+                text: 'Income',
+                x: 0.18,
+                y: 0.5,
+                font: { size: 16, color: '#2ca02c' },
+                showarrow: false,
+                xref: 'paper',
+                yref: 'paper'
+            },
+            {
+                text: 'Expenses',
+                x: 0.82,
+                y: 0.5,
+                font: { size: 16, color: '#d62728' },
+                showarrow: false,
+                xref: 'paper',
+                yref: 'paper'
+            }
+        ]
+    };
+
+    const config = {
+        responsive: true,
+        displayModeBar: true
+    };
+
+    if (incomeCategories.length === 0 && expenseCategories.length === 0) {
+        document.getElementById('piechart').innerHTML =
+            '<p style="color: #666; text-align: center; padding: 50px;">No transaction data available</p>';
+        return;
+    }
+
+    try {
+        Plotly.newPlot('piechart', [incomeTrace, expenseTrace], layout, config);
+    } catch (error) {
+        return;
+    }
+}
+
+// Initialize chart and attach event listeners
+function initializeChart() {
+
+    const table = document.getElementById('transactions-table');
+    if (!table) {
+        return;
+    }
+
+    generateIncomeExpenseCharts();
+
+    const categorySelects = document.querySelectorAll('.category-select');
+
+    categorySelects.forEach(select => {
+        select.addEventListener('change', updatePieChart);
+    });
+}
+
+function parseGermanNumber(numberStr) {
+    // Remove any currency symbols and trim whitespace
+    let cleaned = numberStr.replace(/[^\d,.-]/g, '').trim();
+
+    // If there's no comma, it's a simple integer
+    if (!cleaned.includes(',')) {
+        const result = parseFloat(cleaned);
+        return result;
+    }
+
+    // German format: dots are thousands separators, comma is decimal
+    // Remove dots (thousands separators) first, then replace comma with dot
+    cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+
+    const result = parseFloat(cleaned);
+
+    return result;
+}
+
+// HTMX event listener to initialize chart when content is loaded
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'imported_transactions_container') {
+        setTimeout(function() {
+            initializeChart();
+        }, 100);
+    }
+});
 
 </script>
 

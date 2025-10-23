@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from finance.models import ImportProfile, ImportProfileMapping, Transaction, BusinessEntity, Currency, TransactionCategory
+from finance.models import ImportProfile, ImportProfileMapping, Transaction, BusinessEntity, Currency, TransactionCategory, TransactionPattern
 from core.models import CustomUser, FamilyUser
 import datetime
 import random
@@ -121,7 +121,7 @@ class Command(BaseCommand):
             {"name": "Entertainment", "description": "Category for entertainment expenses"},
             {"name": "Education", "description": "Category for education expenses"},
             {"name": "Healthcare", "description": "Category for healthcare expenses"},
-            {"name": "Utilities", "description": "Category for utility bills"},
+            {"name": "Telecommunications", "description": "Category for telephones, internet, etc."},
             {"name": "Other", "description": "Miscellaneous category for unclassified expenses"}
         ]
         category_objs = []
@@ -151,6 +151,38 @@ class Command(BaseCommand):
                 created_by=user,
                 transaction_category_id=category_objs[random.randint(0, 6)]
             )
+            total_record_count += 1
+
+        # Create 5 specific Transaction Patterns to test the transaction imports later
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            name_regex = "01664 MCDONALDS",
+            transaction_category_id=TransactionCategory.objects.get(name="Food")
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            name_regex = "KFZ Workshop",
+            transaction_category_id=TransactionCategory.objects.get(name="Transportation")
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            name_regex = "Telekom Deutschland GmbH",
+            transaction_category_id=TransactionCategory.objects.get(name="Telecommunications")
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            name_regex = "DIE NEUE APOTHEKE",
+            transaction_category_id=TransactionCategory.objects.get(name="Healthcare")
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            name_regex = "AMAZON PAYMENTS EUROPE S.C.A.",
+            transaction_category_id=TransactionCategory.objects.get(name="Other")
+        )
+        if iscreated:
             total_record_count += 1
 
         self.stdout.write(

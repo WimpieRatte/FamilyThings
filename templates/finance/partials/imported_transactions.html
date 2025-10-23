@@ -41,7 +41,7 @@
 
     {% if success %}
         <div class="alert alert-success">
-            Processed {{ row_count }} rows with columns: {{ column_names|join:", " }}
+            Processed {{ row_count }} rows. Row categories auto-detected: {{ detected_categories }}
         </div>
 
         <div class="row g-2 align-items-end">
@@ -54,57 +54,16 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            {% for column in column_names %}
-                                <th>{{ column }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in preview %}
-                            <tr>
-                                {% for column in column_names %}
-                                    <td>{{ row|get_item:column }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-
-            <div class="row align-items-center">
-                {% comment %}{% for col in columnHeaders %}
-                    <div class="col">
-                        {{ col }}
-                    </div> {% endcomment %}
-                    <div class="col">Date</div>
-                    <div class="col">Business Entity</div>
-                    <div class="col">Amount</div>
-                    <div class="col">Currency</div>
-                    <div class="col">Reference</div>
-                    <div class="col">Category</div>
-                    {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
-                {% endfor %}{% endcomment %}
-            </div>
-            <div class="row align-items-center">
-                {% comment %} {% for row in importedTransactions %} {% endcomment %}
-                    <div class="col">2023-06-19</div>
-                    <div class="col">Aldi</div>
-                    <div class="col">23.33</div>
-                    <div class="col">EUR</div>
-                    <div class="col">adsfadf</div>
-                    <div class="col">
-                        <div class="category_select_boxes">
-                            {% include "finance/partials/category_select_box.html" %}
-                        </div>
-                    </div>
-                    {% comment %} <div class="col"><a href="{{ url_for('edit_transaction', transaction_id=row[5]) }}">Edit Transaction</a></div>
-                {% endfor %}{% endcomment %}
+                {% if html_output %}
+                    {{ html_output|safe }}
+                {% endif %}
             </div>
         </div>
+        {% comment %} TODO: Add a button that saves all transactions: {% endcomment %}
+        {% comment %} <br>
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary" id="btnImportTransactions" onclick="saveAll()">Import All</button>
+        </div> {% endcomment %}
     {% endif %}
 </div>
 
@@ -113,28 +72,103 @@
 <div id="imported_transactions_container" class="container rounded bg-dark p-2 h-25 mh-25">
     <div class="row g-2 align-items-end">
         <div class="row">
-            <div class="col">
-                <label class="form-label">
-                    Summary by category
-                </label>
-            </div>
-        </div>
-        <div class="row">
             <div class="col" id="category-summary-chart">
-                <!-- The pie chart will be loaded here -->
-                {{ chart_html|safe }}
+                <!-- The pie chart gets loaded here -->
+                <div class="chart-container">
+                    <div id="piechart"></div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-{% comment %} <script>
-    // Fetch and load the pie chart once the DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-        fetch("{% url 'finance:plotly_pie' %}")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('category-summary-chart').innerHTML = data.html;
+
+<script>
+
+
+////////////////////////////////////////// Scripts for saving transactions: ///////////////////////////
+
+    // Function to read headers and build the data structure
+    function getTableStructure() {
+        const table = document.getElementById('transactions-table');
+        const headers = [];
+        const headerCells = table.querySelectorAll('thead tr th');
+
+        headerCells.forEach((th, index) => {
+            headers.push({
+                index: index,
+                name: th.textContent.trim(),
+                field: th.dataset.field || th.textContent.trim().toLowerCase().replace(/\s+/g, '_'),
+                editable: th.dataset.editable !== 'false',
+                lookup: th.dataset.lookup || null
+            });
+        });
+
+        return headers;
+    }
+
+    // Function to extract data from table
+    function extractTableData() {
+        const headers = getTableStructure();
+        const table = document.getElementById('transactions-table');
+        const rows = table.querySelectorAll('tbody tr');
+        const data = [];
+
+        rows.forEach(row => {
+            const rowData = { id: row.dataset.id || null };
+            const cells = row.querySelectorAll('td');
+
+            headers.forEach(header => {
+                if (cells[header.index]) {
+                    let value;
+
+                    if (header.editable && cells[header.index].querySelector('select, input')) {
+                        // Handle form elements
+                        const input = cells[header.index].querySelector('select, input');
+                        value = input.value;
+                    } else if (cells[header.index].hasAttribute('contenteditable')) {
+                        // Handle contenteditable cells
+                        value = cells[header.index].textContent;
+                    } else {
+                        // Handle regular cells
+                        value = cells[header.index].textContent;
+                    }
+
+                    rowData[header.field] = value;
+
+                    // Store original value for lookups if needed
+                    if (header.lookup) {
+                        rowData[`${header.field}_display`] = cells[header.index].textContent;
+                    }
+                }
+            });
+
+            data.push(rowData);
+        });
+
+        return { headers, data };
+    }
+
+    // Save data to server
+    function saveTableData() {
+        const tableData = extractTableData();
+
+        fetch('/save-dynamic-table/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                table_structure: tableData.headers,
+                table_data: tableData.data,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
             })
-            .catch(error => console.error('Error loading pie chart:', error));
-});
-</script> {% endcomment %}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Data saved successfully!');
+            }
+        });
+    }
+</script>

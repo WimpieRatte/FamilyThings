@@ -14,6 +14,8 @@ from django.template.loader import render_to_string
 import json  # add this line near the top with the other imports
 import pandas as pd
 import html
+import io
+from django.apps import apps
 
 # Create your views here.
 @login_required(login_url='user_login')
@@ -416,63 +418,65 @@ def load_headers(request, lang_code: str = ""):
         # Get selected Import Profile's Custom Mapping:
         import_profile = ImportProfile.objects.get(pk=request.POST.get('import_profile_selector'))
         import_profile_mappings = ImportProfileMapping.objects.filter(import_profile_id=import_profile.id).all()
-        columns_to_extract = []
+        columns_to_extract = set()  # using a set prevents duplicates added.
         column_names_lookup = {}
         for mapping in import_profile_mappings:
-            columns_to_extract.append(mapping.from_file_header)
+            columns_to_extract.add(mapping.from_file_header)
             column_names_lookup[mapping.to_transaction_header] = mapping.from_file_header
 
         try:
             # Read file
             if uploaded_file.name.lower().endswith('.csv'):
-                df = pd.read_csv(uploaded_file, sep=None, engine='python')  # This should auto-detect the separator
+                uploaded_file.seek(0)  # rewind just in case
+                # TextIOWrapper decodes the binary stream into text for pandas.
+                with io.TextIOWrapper(uploaded_file.file, encoding="utf-8", errors="ignore") as text_stream:
+                    df = pd.read_csv(text_stream, sep=None, engine="python")  # This should auto-detect the separator
             else:
+                uploaded_file.seek(0)  # rewind just in case
                 df = pd.read_excel(uploaded_file)
 
             # Extract only the columns specified in the Import Profile:
             df_reordered = extract_specific_columns(df, columns_to_extract)
 
             # Rename the column headers to the ones specified in the Import Profile:
-            df_reordered.rename(columns=column_names_lookup, inplace=True)
-
-            # print the new headers:
-            print("Updated headers:")
-            print(df_reordered.columns.tolist())
+            inverted_dict = {v: k for k, v in column_names_lookup.items()}
+            df_reordered.rename(columns=inverted_dict, inplace=True)
 
             # region Transaction Pattern matching
 
-            # # Get all Transaction Patters for all Transaction Categories this family has:
-            # transaction_patterns = TransactionPattern.objects.filter(category_id__family_id=family_id).all()
+            # Get all Transaction Patters for all Transaction Categories this family has:
+            transaction_patterns = TransactionPattern.objects.filter(transaction_category_id__family_id=family_id)
+            if len(transaction_patterns) > 0 and "Business Entity Name" in df_reordered.columns:
+                # Convert it to a dictionary for easy usage with dataframe
+                transaction_patterns_as_dict = {pattern.name_regex: pattern.transaction_category_id.id for pattern in transaction_patterns}
 
-            # # Mapping for category based on TransactionPattern matching
-            # def get_suggested_category(row):
-            #     """Determine suggested category based on historical TransactionPattern"""
+                # Mapping for category based on TransactionPattern matching
+                try:
+                    # Explicitly convert to Series and then map
+                    business_names_series = df_reordered["Business Entity Name"].squeeze()  # Convert single-column DataFrame to Series
+                    mapped_categories = business_names_series.map(transaction_patterns_as_dict)
+                    df_reordered['suggested_category'] = mapped_categories.fillna(-1)
+                except Exception as e:
+                    print(f"Error in mapping: {e}")
+                    df_reordered['suggested_category'] = categories[0].id
+            else:
+                # No Transaction Patterns defined yet, so default to the first category
+                df_reordered['suggested_category'] = categories[0].id
 
-            #     # If there are no Transaction Patterns defined, don't bother trying to match them:
-            #     if len(transaction_patterns) == 0:
-            #         return None
-            #     # If there are no Transaction Patterns mapped to name, don't bother trying to match them:
-            #     if column_names_lookup.get(ImportProfileMappingDestinationColumns.NAME.value) is None:
-            #         return None
-
-            #     # Get column that has the recipient name:
-            #     recipient = str(row.get(column_names_lookup[ImportProfileMappingDestinationColumns.NAME.value], ''))
-            #     return transaction_patterns.filter(name_regex=recipient).first().transaction_category_id
-
-            # # Add suggested category column for each row
-            # df['suggested_category'] = df_reordered.apply(get_suggested_category, axis=1)
-
-            # # Convert DataFrame to HTML with dropdowns
-            # html_output = generate_html_with_dropdowns(df_reordered, categories)
-            # *** then continue here ***
+            # Convert DataFrame to HTML with dropdowns
+            results = generate_html_with_dropdowns(df_reordered, categories)
+            html_output = results['html_output']
+            row_categories = results['row_categories']
 
             # endregion
 
             context.update({
                 'success': True,
-                'column_names': columns_to_extract,
                 'result': df_reordered.to_dict("records"),
-                'row_count': len(df_reordered)
+                'row_count': len(df_reordered),
+                "html_output": html_output,
+                "row_categories": row_categories,
+                "detected_categories": sum(1 for value in row_categories.values() if value != -1)
             })
 
             return render(request, 'finance/partials/imported_transactions.html', context)
@@ -492,20 +496,22 @@ def extract_specific_columns(df, desired_order):
     return df[common_columns]
 
 def generate_html_with_dropdowns(df, categories):
-    # TODO: *** first continue here ***
-    """Generate HTML table with category dropdowns"""
-    html_output = '<table class="table table-striped table-bordered">\n'
+    """Generate HTML table with category dropdowns. Returns a dictionary containing the generated HTML output and a mapping of row indexes to their corresponding categories."""
+    html_output = '<table id="transactions-table" class="table table-striped table-bordered">\n'
 
     # Header row
     html_output += '<thead><tr>'
+    header_counter = 0
     for column in df.columns:
         if column != 'suggested_category':  # Don't show suggested category column
             html_output += f'<th>{html.escape(str(column))}</th>'
-    html_output += '<th>Category</th>'
+            header_counter += 1
+    html_output += f'<th>Category</th>'
     html_output += '</tr></thead>\n'
 
     # Data rows
     html_output += '<tbody>'
+    row_categories = {}  # will store the indexes of each row and their corresponding categories
     for index, row in df.iterrows():
         html_output += '<tr>'
 
@@ -513,31 +519,100 @@ def generate_html_with_dropdowns(df, categories):
         for column in df.columns:
             if column != 'suggested_category':
                 value = str(row[column]) if pd.notna(row[column]) else ''
-                html_output += f'<td>{html.escape(value)}</td>'
+                # If Amount column, give it a specific class name
+                if column == 'Amount':
+                    html_output += f'<td class="amount-column">{value}</td>'
+                else:
+                    html_output += f'<td>{html.escape(value)}</td>'
 
         # Category dropdown
         suggested_category = row['suggested_category']
         html_output += f'<td>'
         html_output += f'<select name="category_{index}" class="form-select category-select">'
-
+        # First add select prompt
+        if suggested_category == -1:
+            selected = 'selected'
+            row_categories[index] = -1
+        else:
+            selected = ''
+        html_output += f'<option value="-1" {selected} disabled>Select...</option>'
+        # Then add the other options
         for category in categories:
-            selected = 'selected' if category == suggested_category else ''
-            html_output += f'<option value="{html.escape(category)}" {selected}>{html.escape(category)}</option>'
+            if category.id == suggested_category:
+                selected = 'selected'
+                row_categories[index] = category.id
+            else:
+                selected = ''
+            html_output += f'<option value="{category.id}" {selected}>{html.escape(category.name)}</option>'
 
         html_output += '</select>'
-        html_output += f'<input type="hidden" name="suggested_category_{index}" value="{html.escape(suggested_category)}">'
+        # html_output += f'<input type="hidden" name="suggested_category_{index}" value="{html.escape(suggested_category)}">'
         html_output += '</td>'
 
         html_output += '</tr>\n'
     html_output += '</tbody></table>'
 
-    # Add submit button
-    html_output += '''
-    <div class="mt-3">
-        <button type="button" class="btn btn-success" onclick="submitCategories()">
-            Save Categories
-        </button>
-    </div>
-    '''
+    return {"html_output": html_output, "row_categories": row_categories}
 
-    return html_output
+@require_http_methods(["POST"])
+def save_imported_transactions(request):
+    try:
+        data = json.loads(request.body)
+        table_structure = data.get('table_structure', [])
+        table_data = data.get('table_data', [])
+
+        results = []
+
+        for row_data in table_data:
+            try:
+                # Determine model based on your logic
+                # This could be passed from frontend or determined by context
+                model_name = "Transaction"  # or get from request/session
+                model = apps.get_model('finance', model_name)
+
+                # Handle lookups and foreign keys
+                processed_data = {}
+                for header in table_structure:
+                    field_name = header['field']
+                    value = row_data.get(field_name)
+
+                    if header.get('lookup') and value:
+                        # Handle foreign key lookups
+                        lookup_model = apps.get_model('finance', header['lookup'])
+                        if value.isdigit():
+                            # Value is ID
+                            processed_data[field_name + '_id'] = value
+                        else:
+                            # Value is display name - need to find or create
+                            lookup_obj, created = lookup_model.objects.get_or_create(
+                                name=value
+                            )
+                            processed_data[field_name + '_id'] = lookup_obj.id
+                    else:
+                        processed_data[field_name] = value
+
+                # Save or update record
+                if row_data.get('id'):
+                    # Update existing
+                    obj = model.objects.get(id=row_data['id'])
+                    for key, value in processed_data.items():
+                        setattr(obj, key, value)
+                    obj.save()
+                else:
+                    # Create new
+                    obj = model.objects.create(**processed_data)
+
+                results.append({'success': True, 'id': obj.id})
+
+            except Exception as e:
+                results.append({'success': False, 'error': str(e)})
+
+        return JsonResponse({'success': True, 'results': results})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def transaction_patterns(request, lang_code: str = ""):
+    """Manage Transaction Patterns"""
+    update_session(request=request, lang_code=lang_code)
+    # TODO: Add functionality here

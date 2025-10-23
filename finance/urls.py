@@ -18,4 +18,5 @@ urlpatterns = [
  	path('save_transaction_category', views.save_transaction_category, name='save_transaction_category'),
 	path('delete_transaction_category', views.delete_transaction_category, name='delete_transaction_category'),
 	path('load_headers', views.load_headers, name='load_headers'),
+ 	path('transaction_patterns', views.transaction_patterns, name='transaction_patterns'),
 ]
