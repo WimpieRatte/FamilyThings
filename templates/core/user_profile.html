@@ -70,10 +70,6 @@
 <script src="{% static 'rome/rome.js'%}"></script>
 <script>
     var calendarURL = "{% url 'calendar:calendar' %}"
-
-    // Set up calendar and make the day buttons tooltop triggers
-    function updateDate(){}
-
     {% include 'js_calendar_rome.js' %}
     $(".rd-next").hide();
     $(".rd-back").hide();

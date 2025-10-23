@@ -29,23 +29,32 @@ var calendar = rome(document.getElementById('rome-calendar'),
 
 var calendarEntries = []
 
-let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
-$.when( basicAJAX(type="POST", url=`{% url 'calendar:get' %}`, data=AJAXData) )
-    .done(function( accompData ) {
-        calendarEntries = accompData["entries"]
+function getEntries(){
+    calendarEntries = []
 
-        // Convert all date strings to native JS Date objects
-        calendarEntries.forEach(function(entry) {
-            entry["date"] = new Date(entry["date"])
-        });
-    })
+    let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
+    $.when( basicAJAX(type="POST", url=`{% url 'calendar:get' %}`, data=AJAXData) )
+        .done(function( accompData ) {
+            calendarEntries = accompData["entries"]
+
+            // Convert all date strings to native JS Date objects
+            calendarEntries.forEach(function(entry) {
+                entry["date"] = new Date(entry["date"])
+            });
+            setTimeout(function() {resetDayButtons();}, 500)
+            setTimeout(function() {updateDate()}, 502)
+        })
+}
+getEntries();
 
 function resetDayButtons(event){
-    let buttons = document.querySelectorAll(".rd-day-body");
+    let buttons = document.querySelectorAll(".rd-day-body:not(.rd-day-prev-month):not(.rd-day-next-month), .rd-day-selected");
     let dateToCheck = calendar.getDate();
 
     buttons.forEach(function(button) {
-        button.dataset.value = Number(button.textContent);
+        if (button.dataset.value == undefined){
+            button.dataset.value = button.textContent;
+        }
 
         entry = calendarEntries.filter((element) => 
         element["date"].getDate() == button.dataset.value
@@ -56,12 +65,15 @@ function resetDayButtons(event){
             button.className = button.className += " position-relative";
             button.innerHTML = `<span class="no-ptr-evt text-primary">${button.innerHTML}</span><span class="position-absolute translate-middle badge rounded-circle bg-success fw-normal fs-sm no-ptr-evt" style="font-size: 0.7em; top: 10%; left: 90%">${entry.length}</span>`;
         }
+        else {
+            button.innerHTML = `<span class="no-ptr-evt text-primary">${button.dataset.value}</span>`;
+            console.log(button)
+        }
     });
 
-
+    $(".rd-day-body").off()
     $(".rd-day-body").click(function(event) {
         // Execute with small delay to give the calendar system time to react to the selected date
         setTimeout(function() {updateDate(event)}, 10);
     });
 }
-setTimeout(function() {resetDayButtons();}, 500)

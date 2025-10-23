@@ -39,7 +39,7 @@ def create_or_edit_calendar_entry(request, event_id=None):
 
     if event_id:
         # ✏️ Editing an existing entry
-        calendar_entry = get_object_or_404(CalendarEntry, id=event_id, family_id=family_user.family_id)
+        calendar_entry = get_object_or_404(CalendarEntry, id=event_id, custom_user_id=request.user.id)
         calendar_entry.title = form.cleaned_data["title"]
         calendar_entry.description = form.cleaned_data.get("description", "")
         calendar_entry.date = form.cleaned_data["date"]
@@ -79,7 +79,7 @@ def delete_calendar_entry(request, event_id):
 
 def get(request):
     """Return all CalendarEntries tied to a User."""
-    query = CalendarEntry.objects.filter(custom_user_id=request.user)
+    query = CalendarEntry.objects.filter(custom_user_id=request.user).order_by("created_on")
 
     entries: list = []
     for entry in query:

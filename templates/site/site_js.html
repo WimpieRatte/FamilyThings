@@ -50,7 +50,7 @@
         /* Change the appearance of the cursor depending on the element you're hovering at. */
         /* Add here any more elements that require special cursors. */
         const link_selectors = 'a, button, select, option, input[type="checkbox"], .rd-day-body, .dropdown-toggle';
-        const text_selectors = 'textarea:enabled, input[type="text"]:enabled, input[type="password"]:enabled, input[type="search"]:enabled, input[type="number"]:enabled';
+        const text_selectors = 'textarea:enabled, input[type="text"]:enabled, input[type="password"]:enabled, input[type="search"]:enabled';
         const special_selectors = link_selectors + ", " + text_selectors
 
         /* Behavior for links, buttons, etc. */
@@ -247,6 +247,30 @@
             fire(0.1, { spread: 140, startVelocity: 55, scalar: 2.2-0.25, decay: 0.92, scalar: 1.2, zIndex: 2000 });
             fire(0.1, { spread: 140, startVelocity: 75, scalar: 2.2-0.25, zIndex: 2000});
         }, 1);
+    }
+
+    function getUser(ID, element) {
+        let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}', ID: ID};
+        $.when(basicAJAX(type = "POST", url = `${"{{HOST}}/family/get_user"}`, data = AJAXData))
+        .done(function (result) {
+            openPopup("user-details-popup")
+            document.querySelector("#user-details-popup #dropdown-user-icon").src = element.src
+            document.querySelector("#user-details-popup #dropdown-user-icon").style.borderColor = `var(--bs-${result['color']})`
+            document.querySelector("#user-details-popup #username").textContent = result["full_name"]
+            document.querySelector("#user-details-popup #email").textContent = `(${result["email"]})`
+            document.querySelector("#user-details-popup #joined-family").textContent = new Date(result["joined"]).toLocaleString('default', { weekday: "long", year: "numeric", month: "long", day: "numeric", })
+            document.querySelector("#user-details-popup #last-login").textContent = new Date(result["last_login"]).toLocaleString('default', { weekday: "long", year: "numeric", month: "long", day: "numeric", })
+            
+            document.querySelector("#user-details-popup #recent-activity").innerHTML = ""
+
+            result["recent_activity"].forEach(element => {
+                document.querySelector("#user-details-popup #recent-activity").innerHTML += 
+                `<div class="d-flex gap-2 rounded p-2 bg-gradient shadow-sm fs-sm" style="width: 260px; background-color: var(--bs-${result['color']}); color: var(--bs-${result['color']}-font);">
+                    <div class="accomplishment-icon pop rounded position-relative" style="height: 1.5em; width: 1.5em; background-color: #bcdcec;">
+                    <i class="bi bi-${element['icon']} h5 position-absolute top-50 start-50 translate-middle" style="color: black;" width="20" height="20" alt=""></i>
+                </div>${element['name']}</div></div>`
+            });
+        });
     }
 
 </script>
