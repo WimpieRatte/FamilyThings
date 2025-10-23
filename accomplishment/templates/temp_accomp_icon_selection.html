@@ -1,7 +1,9 @@
 <div class="w-100">
     {% include 'site/temp_form_field.html' with id="accomp-icon" field=form.icon hidden=True %}{# Hidden Field #}
     <div class="m-auto" style="width: fit-content; gap:.125em">
-        <div id="lb-accomp-icon">Icon</div>
+        <div id="lb-accomp-icon">
+            Icon
+        </div>
         <div class="d-flex flex-wrap">
         {% for icon in icons %}
             {% if icon == "$BREAK$" %}
@@ -9,7 +11,8 @@
             {% elif icon == "$SPACE$" %}
                 <div style="width: .5em;"></div>
             {% else %}
-                <button id="icon-btn-{{icon}}" type="button" onclick="input_change_value(this, '#id_icon')", value="{{icon}}" class="icon-btn btn btn-dark border border-secondary p-1 m-0 rounded">
+                <button id="icon-btn-{{icon}}" type="button" onclick="input_change_value(this, '#{{popup}} #id_icon')", value="{{icon}}" class="icon-btn btn btn-dark border border-secondary p-1 m-0 rounded tooltip-source"
+                data-tooltip-context="{{icon}}">
                     <div class="bi bi-{{icon}} h4 p-0 m-0"></div>
                 </button></i>
             {% endif %}
@@ -18,7 +21,9 @@
     </div>
 <div>
 <script>
-    const iconField = document.getElementById("id_icon");
+    var source = "{{popup}}"
+    var iconField = document.querySelector(`#${source} #id_icon`);
+
     iconField.disabled = false;
 
     function unfocus_all(elements){
@@ -38,8 +43,7 @@
         button.classList.add("active");
     }
 
-    var source = "{{popup}}"
     /* Check if an icon (when repeating an Accomplishment) is defined, if not use the default icon. */
-    if ('{{initial.icon}}' != ''){ input_change_value(document.querySelector(`${source} #icon-btn-{{initial.icon}}`), `${source} #id_icon`); }
-        else{ input_change_value(document.querySelector(`${source} .icon-btn`), `${source} #id_icon`); }
+    if ('{{initial.icon}}' != ''){ input_change_value(document.querySelector(`#${source} #icon-btn-{{initial.icon}}`), `#${source} #id_icon`); }
+        else{ input_change_value(document.querySelector(`#${source} .icon-btn`), `#${source} #id_icon`); }
 </script>

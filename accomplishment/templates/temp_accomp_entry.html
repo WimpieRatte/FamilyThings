@@ -13,7 +13,7 @@
             <li><button id="edit-accomp-%ID%" value="%ID%" class="dropdown-item" href="edit/%ID%"><span class="bi bi-journal-check"></span> <span id="lb-edit-accomp">Edit Accomplishment</span></button></li>
             <li><button id="repeat-accomp-%ID%" value='%content%' class="dropdown-item"><span class="bi bi-repeat"></span> <span id="lb-repeat-accomp">Repeat Accomplishment</span></button></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="edit/%ID%/details"><span class="bi bi-list-ul"></span> <span id="lb-edit-accomp-details">Edit Accomplishment Template</span></a></li>
+            <li><a class="dropdown-item" value="%ID%" onclick="editAccomplishmentPrompt(this.getAttribute('value'))"><span class="bi bi-list-ul"></span> <span id="lb-edit-accomp-details">Edit Accomplishment Template</span></a></li>
             <li><hr class="dropdown-divider"></li>
             <li id="delete-accomplishment-btn-%ID%" data-accomp-id="%ID%"><a class="dropdown-item text-danger"><span class="bi bi-x-circle"></span> <span id="lb-delete-accomp">Delete Accomplishment</span></a></li>
         </ul>

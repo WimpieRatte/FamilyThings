@@ -46,7 +46,7 @@ function resetNamePrompt() {
 
 $("#name-prompt-popup #btn-abort").click(function(event) { 
     resetNamePrompt();
-    closePopup();
+    movePopupDown();
 });
 
 $("#name-prompt-popup #btn-repeat").click(function(event) {
@@ -59,7 +59,7 @@ $("#name-prompt-popup #btn-repeat").click(function(event) {
     }
 });
 
-var previousName = ""
+let previousName = ""
 function nameCheckAvailable(enforceCheck = false) {
     if (nameField.value.length > 0 && (previousName != nameField.value || enforceCheck)){
         previousName = nameField.value;

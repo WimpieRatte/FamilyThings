@@ -1,20 +1,23 @@
 <div id="calendar-event-popup" class="container" style="display: none; margin-bottom: 12rem !important;">
     {% include 'site/heading_section.html' with label="Create Calendar Entry" id="lb-calendar-create" class='m-auto' %}
     <div class="rounded bg-dark px-5 d-block pb-4">
-        <span class="bi bi-calendar2-week background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
+        <span class="bi bi-calendar2-full background-bi bi-edit-accomp h1 p-0 m-0 position-absolute"></span>
         <div id="calendar-event-wrapper" class="px-5 py-2">
 
             <!-- Hidden field for edit -->
             <input type="hidden" id="event-id" value="">
 
+            <p class="m-0 p-0 align-text-top text-center"><span id="lb-title">Title</span></p>
             <!-- Event Title -->
             <input type="text" class="form-control text-center m-auto mb-3" id="event-title"
-                placeholder="Title" style="width: 20em; font-size: 1.25em !important;">
+                placeholder="..." style="width: 20em; font-size: 1.25em !important;">
 
+            <p class="m-0 p-0 align-text-top text-center"><span id="lb-description">Description</span></p>
             <!-- Event Description -->
-            <textarea class="form-control text-center m-auto mb-3" id="event-description"
-                placeholder="Description (Optional)" rows="3" style="width: 20em; font-size: 1.1em !important;"></textarea>
+            <textarea class="form-control m-auto mb-3" id="event-description"
+                placeholder="Optional" rows="3" style="width: 20em; font-size: 1.1em !important;"></textarea>
 
+            <p class="m-0 p-0 align-text-top text-center"><span id="lb-date">Date</span></p>
             <!-- Event Date -->
             <input type="date" class="form-control text-center m-auto mb-3" id="event-date"
                 style="width: 20em; font-size: 1.1em !important;">

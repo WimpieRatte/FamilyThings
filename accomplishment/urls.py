@@ -7,12 +7,7 @@ app_name = "accomplishment"
 
 urlpatterns = [
      # path(<URL>, <view>, <name>)
-     path("", views.page_overview, name="overview"),
-     path("add", views.page_new_accomplishment, name="add_new"),
-     path("add/text='<str:name>'", views.page_new_accomplishment, name="add_new"),
-     path("add?repeat=<int:ID>", views.page_new_accomplishment, name="add_new"),
-     path("edit/<uuid:ID>", views.page_edit_user_accomplishment, name="edit"),
-     path("edit/<uuid:ID>/details", views.page_edit_accomplishment_details, name="edit_details"),
+     re_path(r"^(?:show=(?P<popup>[a-zA-Z_]+)/)?$", views.page_overview, name="overview"),
 
      # AJAX Urls
      re_path(r"^get/(?:amount=(?P<amount>[0-9]+)/)?(?:start=(?P<start>[0-9]+)/)?(?:selector='(?P<selector>[a-zA-Z]+)'/)?(?:key='(?P<key>[0-9a-zA-Z ]+)')?$",
@@ -32,6 +27,8 @@ urlpatterns = [
           requests.edit_accomp, name="edit_accomp"),
      path("entry/repeat",
           requests.repeat_accomplishment, name="repeat_accomp"),
+     path("template/get", requests.get_template, name="get_template"),
+     path("template/save", requests.save_template, name="save_template"),
 
      # Operations (Creating/Deleting)
      path("submit",
