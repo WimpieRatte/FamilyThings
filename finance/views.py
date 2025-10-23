@@ -1,10 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from core.session import update_session, create_alert
 from core.views import render_if_logged_in
-from .models import ImportProfile, ImportProfileMapping, TransactionCategory
+from .models import ImportProfile, ImportProfileMapping, TransactionCategory, TransactionPattern
 from core.models import FamilyUser
-from django.http import JsonResponse
 from core.utils import ImportProfileMappingDestinationColumns, text_to_enum_destination_column
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -12,6 +11,12 @@ import plotly.graph_objects as go
 import plotly.express as px
 from django.template.loader import render_to_string
 import json  # add this line near the top with the other imports
+import pandas as pd
+import html
+import io
+from django.apps import apps
+from decimal import Decimal, InvalidOperation
+
 
 # Create your views here.
 @login_required(login_url='user_login')
@@ -284,12 +289,49 @@ def create_category(request):
         context = {"categories": categories}
         return render(request, "finance/partials/category_select_box.html", context=context)
     elif requested_from == "edit_categories":
-        # TODO:
         pass
     else:
-        # TODO:
         pass
     return HttpResponse("")
+
+def create_category_and_update_selects(request):
+    """Create Category via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # get current family from session
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family = fam_user.family_id
+
+    # Get category name from POST data
+    category_name = request.POST.get('category_name', '').strip()
+    if not category_name:
+        return JsonResponse({'success': False, 'error': 'Category name cannot be empty'})
+
+    print(f"Creating category: {category_name}")
+
+    try:
+        category, created = TransactionCategory.objects.get_or_create(
+            name=category_name,
+            family_id=family
+        )
+
+        if not created:
+            return JsonResponse({'success': False, 'error': 'Category already exists'})
+
+        # Return the new category data as JSON
+        return JsonResponse({
+            'success': True,
+            'category': {
+                'id': category.id,
+                'name': category.name
+            }
+        })
+
+    except Exception as e:
+        print(f"Error creating category: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)})
 
 def edit_categories(request, lang_code: str = ""):
     """Edit Categories"""
@@ -395,7 +437,345 @@ def category_controls(request, lang_code: str = ""):
 def load_headers(request, lang_code: str = ""):
     """Load Headers"""
     update_session(request=request, lang_code=lang_code)
+    context = {}
 
-    categories = TransactionCategory.objects.all()
-    context = {"categories": categories}
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    # Get all categories for current family
+    categories = TransactionCategory.objects.filter(family_id=family_id).all()
+    context["categories"] = categories
+
+
+    # Load all headers from file:
+    if request.method == 'POST' and request.FILES.get('formFile'):
+        uploaded_file = request.FILES['formFile']
+
+        # Get selected Import Profile's Custom Mapping:
+        import_profile = ImportProfile.objects.get(pk=request.POST.get('import_profile_selector'))
+        import_profile_mappings = ImportProfileMapping.objects.filter(import_profile_id=import_profile.id).all()
+        columns_to_extract = set()  # using a set prevents duplicates added.
+        column_names_lookup = {}
+        for mapping in import_profile_mappings:
+            columns_to_extract.add(mapping.from_file_header)
+            column_names_lookup[mapping.to_transaction_header] = mapping.from_file_header
+
+        try:
+            # Read file
+            if uploaded_file.name.lower().endswith('.csv'):
+                uploaded_file.seek(0)  # rewind just in case
+                # TextIOWrapper decodes the binary stream into text for pandas.
+                with io.TextIOWrapper(uploaded_file.file, encoding="utf-8", errors="ignore") as text_stream:
+                    df = pd.read_csv(text_stream, sep=None, engine="python")  # This should auto-detect the separator
+            else:
+                uploaded_file.seek(0)  # rewind just in case
+                df = pd.read_excel(uploaded_file)
+
+            # Extract only the columns specified in the Import Profile:
+            df_reordered = extract_specific_columns(df, columns_to_extract)
+
+            # Rename the column headers to the ones specified in the Import Profile:
+            inverted_dict = {v: k for k, v in column_names_lookup.items()}
+            df_reordered.rename(columns=inverted_dict, inplace=True)
+
+            # region Transaction Pattern matching
+
+            # Get all Transaction Patters for all Transaction Categories this family has:
+            transaction_patterns = TransactionPattern.objects.filter(transaction_category_id__family_id=family_id)
+            if len(transaction_patterns) > 0 and "Business Entity Name" in df_reordered.columns:
+                # Convert it to a dictionary for easy usage with dataframe
+                transaction_patterns_as_dict = {pattern.name_regex: pattern.transaction_category_id.id for pattern in transaction_patterns}
+
+                # Mapping for category based on TransactionPattern matching
+                try:
+                    # Explicitly convert to Series and then map
+                    business_names_series = df_reordered["Business Entity Name"].squeeze()  # Convert single-column DataFrame to Series
+                    mapped_categories = business_names_series.map(transaction_patterns_as_dict)
+                    df_reordered['suggested_category'] = mapped_categories.fillna(-1)
+                except Exception as e:
+                    print(f"Error in mapping: {e}")
+                    df_reordered['suggested_category'] = categories[0].id
+            else:
+                # No Transaction Patterns defined yet, so default to the first category
+                df_reordered['suggested_category'] = categories[0].id
+
+            # Convert DataFrame to HTML with dropdowns
+            results = generate_html_with_dropdowns(df_reordered, categories)
+            html_output = results['html_output']
+            row_categories = results['row_categories']
+
+            # endregion
+
+            context.update({
+                'success': True,
+                'result': df_reordered.to_dict("records"),
+                'row_count': len(df_reordered),
+                "html_output": html_output,
+                "row_categories": row_categories,
+                "detected_categories": sum(1 for value in row_categories.values() if value != -1)
+            })
+
+            return render(request, 'finance/partials/imported_transactions.html', context)
+
+        except Exception as e:
+            context['error'] = f'Unexpected error: {str(e)}'
+            return render(request, 'finance/partials/imported_transactions.html', context)
+
+
     return render(request, "finance/partials/imported_transactions.html", context=context)
+
+def extract_specific_columns(df, desired_order):
+    """Extract DataFrame columns based on a list of column names"""
+    # Get columns that exist in both DataFrame and desired order
+    common_columns = [col for col in desired_order if col in df.columns]
+
+    return df[common_columns]
+
+def generate_html_with_dropdowns(df, categories):
+    """Generate HTML table with category dropdowns. Returns a dictionary containing the generated HTML output and a mapping of row indexes to their corresponding categories."""
+    html_output = '<table id="transactions-table" class="table table-striped table-bordered">\n'
+
+    # Header row
+    html_output += '<thead><tr>'
+    header_counter = 0
+    for column in df.columns:
+        if column != 'suggested_category':  # Don't show suggested category column
+            html_output += f'<th>{html.escape(str(column))}</th>'
+            header_counter += 1
+    html_output += f'<th>Category</th>'
+    html_output += '</tr></thead>\n'
+
+    # Data rows
+    html_output += '<tbody>'
+    row_categories = {}  # will store the indexes of each row and their corresponding categories
+    for index, row in df.iterrows():
+        html_output += '<tr>'
+
+        # Data columns
+        for column in df.columns:
+            if column != 'suggested_category':
+                value = str(row[column]) if pd.notna(row[column]) else ''
+                # If Amount column, give it a specific class name
+                if column == 'Amount':
+                    html_output += f'<td class="amount-column">{value}</td>'
+                else:
+                    html_output += f'<td>{html.escape(value)}</td>'
+
+        # Category dropdown
+        suggested_category = row['suggested_category']
+        html_output += f'<td>'
+        html_output += f'<select name="category_{index}" class="form-select category-select">'
+        # First add select prompt
+        if suggested_category == -1:
+            selected = 'selected'
+            row_categories[index] = -1
+        else:
+            selected = ''
+        html_output += f'<option value="-1" {selected} disabled>Select...</option>'
+        # Then add the other options
+        for category in categories:
+            if category.id == suggested_category:
+                selected = 'selected'
+                row_categories[index] = category.id
+            else:
+                selected = ''
+            html_output += f'<option value="{category.id}" {selected}>{html.escape(category.name)}</option>'
+
+        html_output += '</select>'
+        # html_output += f'<input type="hidden" name="suggested_category_{index}" value="{html.escape(suggested_category)}">'
+        html_output += '</td>'
+
+        html_output += '</tr>\n'
+    html_output += '</tbody></table>'
+
+    return {"html_output": html_output, "row_categories": row_categories}
+
+@require_http_methods(["POST"])
+def save_imported_transactions(request):
+    try:
+        data = json.loads(request.body)
+        table_structure = data.get('table_structure', [])
+        table_data = data.get('table_data', [])
+
+        results = []
+
+        for row_data in table_data:
+            try:
+                # Determine model based on your logic
+                # This could be passed from frontend or determined by context
+                model_name = "Transaction"  # or get from request/session
+                model = apps.get_model('finance', model_name)
+
+                # Handle lookups and foreign keys
+                processed_data = {}
+                for header in table_structure:
+                    field_name = header['field']
+                    value = row_data.get(field_name)
+
+                    if header.get('lookup') and value:
+                        # Handle foreign key lookups
+                        lookup_model = apps.get_model('finance', header['lookup'])
+                        if value.isdigit():
+                            # Value is ID
+                            processed_data[field_name + '_id'] = value
+                        else:
+                            # Value is display name - need to find or create
+                            lookup_obj, created = lookup_model.objects.get_or_create(
+                                name=value
+                            )
+                            processed_data[field_name + '_id'] = lookup_obj.id
+                    else:
+                        processed_data[field_name] = value
+
+                # Save or update record
+                if row_data.get('id'):
+                    # Update existing
+                    obj = model.objects.get(id=row_data['id'])
+                    for key, value in processed_data.items():
+                        setattr(obj, key, value)
+                    obj.save()
+                else:
+                    # Create new
+                    obj = model.objects.create(**processed_data)
+
+                results.append({'success': True, 'id': obj.id})
+
+            except Exception as e:
+                results.append({'success': False, 'error': str(e)})
+
+        return JsonResponse({'success': True, 'results': results})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def transaction_patterns(request, lang_code: str = ""):
+    """Transaction Patterns management view"""
+    update_session(request=request, lang_code=lang_code)
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    # Get all categories and patterns for current family
+    categories = TransactionCategory.objects.filter(family_id=family_id).all()
+    patterns = TransactionPattern.objects.filter(transaction_category_id__family_id=family_id).all()
+
+    context = {
+        'categories': categories,
+        'patterns': patterns,
+    }
+
+    return render(request, 'finance/transaction_patterns.html', context)
+
+def create_transaction_pattern(request):
+    """Create Transaction Pattern via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    try:
+        name_regex = request.POST.get('name_regex', '').strip()
+        category_id = request.POST.get('category_id', '').strip()
+
+        # Validate required fields
+        if not name_regex:
+            return JsonResponse({'success': False, 'error': 'Name is required'})
+
+        if not category_id:
+            return JsonResponse({'success': False, 'error': 'Category is required'})
+
+        # Get category and verify it belongs to current family
+        category = get_object_or_404(TransactionCategory, id=category_id, family_id=family_id)
+
+        # Create the pattern
+        pattern = TransactionPattern.objects.create(
+            name_regex=name_regex,
+            transaction_category_id=category
+        )
+
+        return JsonResponse({
+            'success': True,
+            'pattern': {
+                'id': pattern.id,
+                'name_regex': pattern.name_regex,
+                'category_id': pattern.transaction_category_id.id,
+                'category_name': pattern.transaction_category_id.name
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def update_transaction_pattern(request, pattern_id):
+    """Update Transaction Pattern via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    try:
+        pattern = get_object_or_404(TransactionPattern, id=pattern_id, transaction_category_id__family_id=family_id)
+
+        name_regex = request.POST.get('name_regex', '').strip()
+        category_id = request.POST.get('category_id', '').strip()
+
+        # Validate required fields
+        if not name_regex:
+            return JsonResponse({'success': False, 'error': 'Name is required'})
+
+        if not category_id:
+            return JsonResponse({'success': False, 'error': 'Category is required'})
+
+        # Get category and verify it belongs to current family
+        category = get_object_or_404(TransactionCategory, id=category_id, family_id=family_id)
+
+        # Update the pattern
+        pattern.name_regex = name_regex
+        pattern.transaction_category_id = category
+        pattern.save()
+
+        return JsonResponse({
+            'success': True,
+            'pattern': {
+                'id': pattern.id,
+                'name_regex': pattern.name_regex,
+                'category_id': pattern.transaction_category_id.id,
+                'category_name': pattern.transaction_category_id.name
+            }
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def delete_transaction_pattern(request, pattern_id):
+    """Delete Transaction Pattern via fetch API"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+    # Get current family
+    fam_user = FamilyUser.objects.filter(
+        custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    try:
+        pattern = get_object_or_404(TransactionPattern, id=pattern_id, transaction_category_id__family_id=family_id)
+        pattern_name = pattern.name_regex
+        pattern.delete()
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Pattern "{pattern_name}" deleted successfully'
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

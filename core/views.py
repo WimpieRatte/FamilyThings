@@ -319,29 +319,46 @@ def user_login_page(request):
 
 def forgot_password(request):
     if request.method == "POST":
-        email = request.POST.get('email')
+        email = request.POST.get("email").strip()
 
         try:
+            # Check if user exists
             user = CustomUser.objects.get(email=email)
-            new_password_reset = PasswordReset.objects.get(custom_user_id=user)
-            new_password_reset.save()
-            password_reset_url = reverse('core:reset_password', kwargs={'reset_id': new_password_reset.reset_id})
-            full_password_reset_url = f'{request.scheme}://{request.get_host()}{password_reset_url}'
-            email_body = f'Reset your password using the link below:\n\n\n{full_password_reset_url}'
 
+            # Either get existing PasswordReset for this user or create a new one
+            password_reset, created = PasswordReset.objects.get_or_create(custom_user_id=user)
+
+            # Always update timestamp (optional, to reset expiration)
+            password_reset.save()
+
+            # Build the password reset URL
+            password_reset_url = reverse("core:reset_password", kwargs={"reset_id": password_reset.reset_id})
+            full_password_reset_url = f"{request.scheme}://{request.get_host()}{password_reset_url}"
+
+            # Compose email
+            email_subject = "Reset your password"
+            email_body = f"Reset your password using the link below:\n\n{full_password_reset_url}"
             email_message = EmailMessage(
-				'Reset your password', # email subject
-				email_body,
-				settings.EMAIL_HOST_USER, # email sender
-				[email] # email receiver
-			)
-            email_message.fail_silently = True
+                subject=email_subject,
+                body=email_body,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[email]
+            )
+
+            # Send email
+            email_message.fail_silently = False  # Set to False to catch errors while debugging
             email_message.send()
-            return redirect('core:password_reset_sent', reset_id=new_password_reset.reset_id)
+
+            # Redirect to a confirmation page
+            messages.success(request, "Password reset link sent to your email.")
+            return redirect("core:password_reset_sent", reset_id=password_reset.reset_id)
+
         except CustomUser.DoesNotExist:
-            messages.error(request, f"No user with email '{email}' found")
-            return redirect('core:forgot_password')
-    return render(request, 'core/forgot_password.html')
+            messages.error(request, f"No user with email '{email}' found.")
+            return redirect("core:forgot_password")
+
+    # GET request: render forgot password form
+    return render(request, "core/forgot_password.html")
 
 def password_reset_sent(request, reset_id):
     if PasswordReset.objects.filter(reset_id=reset_id).exists():
