@@ -186,6 +186,7 @@ def user_profile_page(request):
                 user_accomp["user_icon"] = user.custom_user_id.icon
                 user_accomp["date"] = create_date
                 user_accomp["fam_user_ID"] = str(user.id)
+                user_accomp["email"] = user.custom_user_id.email
                 accomplishments += [user_accomp]
             except (IndexError):
                 pass

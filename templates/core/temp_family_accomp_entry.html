@@ -3,18 +3,35 @@
 data-tooltip-context="Cleared on" data-tooltip-content="{{date}}">
     <div class="d-flex align-items-start p-0 m-0 position-relative">
         <img id="dropdown-user-icon" class="position-absolute top-50 start-0 translate-middle-y border border-3;" style="border-color: var(--bs-{{color}}) !important;" src="{% get_media_prefix %}{{user_icon}}" height="30" width="30" 
-        onerror="this.onerror=null; this.src='{% static 'default-user.png' %}'" onclick="getUser('{{user_ID}}')">
+        onerror="this.onerror=null; this.src='{% static 'default-user.png' %}'" onclick="getUser('{{user_ID}}', this)">
         <div class="flex-column p-0" style="margin-left: 36px; line-height: 1.35em;">
             <span class="fs-sm bi bi-{{icon}}"></span><span class="fs-sm">{{title}}</span>
         </div>
     </div>
 </div>
 <script>
-    function getUser(ID) {
+    function getUser(ID, element) {
         let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}', ID: ID};
         $.when(basicAJAX(type = "POST", url = `${"{{HOST}}/family/get_user"}`, data = AJAXData))
         .done(function (result) {
+            console.log(result)
             openPopup("user-details-popup")
+            document.querySelector("#user-details-popup #dropdown-user-icon").src = element.src
+            document.querySelector("#user-details-popup #dropdown-user-icon").style.borderColor = `var(--bs-${result['color']})`
+            document.querySelector("#user-details-popup #username").textContent = result["full_name"]
+            document.querySelector("#user-details-popup #email").textContent = `(${result["email"]})`
+            document.querySelector("#user-details-popup #joined-family").textContent = new Date(result["joined"]).toLocaleString('default', { weekday: "long", year: "numeric", month: "long", day: "numeric", })
+            document.querySelector("#user-details-popup #last-login").textContent = new Date(result["last_login"]).toLocaleString('default', { weekday: "long", year: "numeric", month: "long", day: "numeric", })
+            
+            document.querySelector("#user-details-popup #recent-activity").innerHTML = ""
+
+            result["recent_activity"].forEach(element => {
+                document.querySelector("#user-details-popup #recent-activity").innerHTML += 
+                `<div class="d-flex gap-2 rounded p-2 bg-gradient shadow-sm fs-sm" style="width: 260px; background-color: var(--bs-${result['color']}); color: var(--bs-${result['color']}-font);">
+                    <div class="accomplishment-icon pop rounded position-relative" style="height: 1.5em; width: 1.5em; background-color: #bcdcec;">
+                    <i class="bi bi-${element['icon']} h5 position-absolute top-50 start-50 translate-middle" style="color: black;" width="20" height="20" alt=""></i>
+                </div>${element['name']}</div></div>`
+            });
         });
     }
 </script>

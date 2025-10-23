@@ -35,6 +35,7 @@ class FamilyUser(models.Model):
                 'ID': str(self.custom_user_id.id),'fam_user_ID': str(self.id), 'is_manager': self.is_manager,
                 'username': self.custom_user_id.username, 'full_name': self.custom_user_id.full_name(),
                 'joined': self.join_date.strftime("%Y/%m/%d"), 'last_login': self.custom_user_id.last_login.strftime("%Y/%m/%d"),
+                'email': self.custom_user_id.email,
                 'icon': self.custom_user_id.icon.name, 'color': self.custom_user_id.color}
 
     class Meta:

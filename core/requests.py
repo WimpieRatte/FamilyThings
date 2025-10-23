@@ -7,7 +7,8 @@ from django.utils import timezone
 from core.models import Family, FamilyUser, FamilyInvite
 from core.forms import UserFinalizeForm
 from core.session import get_locale_text
-from accomplishment.models import Accomplishment
+from accomplishment.models import FamilyUserAccomplishment
+from accomplishment.requests import accomplishments_list_from_query
 from messenger.models import Message, FamilyChat
 
 
@@ -178,5 +179,13 @@ def get_messages(request):
 
 def get_user(request):
     result = FamilyUser.objects.get(id=request.POST['ID'])
+    output = result.serialized()
 
-    return JsonResponse(data=result.serialized())
+    yesterday: timezone.datetime = timezone.now() - timezone.timedelta(days=1)
+    query = FamilyUserAccomplishment.objects.filter(
+            created_by_id=result.custom_user_id,
+            created__lt=yesterday
+    ).order_by('-created')
+    output["recent_activity"] = accomplishments_list_from_query(query=query[:10])
+
+    return JsonResponse(data=output)
