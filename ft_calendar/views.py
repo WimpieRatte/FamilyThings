@@ -11,7 +11,6 @@ from core.session import update_user_session, create_alert, get_locale_text, Jso
 @update_user_session()
 def page_calendar(request, start: int = timezone.now().day):
     """Return the Calendar overview page."""
-    print(start)
     return render(
         request, "calendar.html",
         {

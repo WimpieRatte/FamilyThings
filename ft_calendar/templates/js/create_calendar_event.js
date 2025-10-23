@@ -93,7 +93,7 @@ $(document).ready(function() {
                 getEntries();
 
                 setTimeout(function() {
-                    movePopupDown();
+                    movePopup();
                 }, 2600);
             } else {
                 throw new Error(data.message || "Something went wrong");

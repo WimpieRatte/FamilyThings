@@ -152,7 +152,7 @@ def get_accomp_by_id(request, ID):
         'measurement_quantity': accom.measurement_quantity,
         'date_from': accom.from_date.strftime("%Y-%m-%d"), 'date_to': accom.to_date.strftime("%Y-%m-%d")
     })
-    print(accom_details)
+
     return JsonResponse(data=accom_details)
 
 
@@ -202,7 +202,6 @@ def submit_accomplishment(request):
                 default_text="You aren't part of a Family."))
 
     form = AccomplishmentForm(data=request.POST)
-    print(request.POST)
     if form.is_valid():
         # We want to be strict with the name matching, so we only
         # search an Accomplishment with the same name and user,
@@ -247,7 +246,6 @@ def submit_accomplishment(request):
             user_accomp.from_date = form.cleaned_data["date_from"]
             user_accomp.to_date = form.cleaned_data["date_to"]
             user_accomp.save()
-            print("works?")
         else:
             user_accomp.from_date = form.cleaned_data["date"]
             user_accomp.to_date = form.cleaned_data["date"]
@@ -316,7 +314,6 @@ def repeat_accomplishment(request):
 
         if (quantity == ""):
             quantity = 0
-        print(request.POST)
         user_accomp = FamilyUserAccomplishment.objects.create(
             family_user_id=family_user,
             accomplishment_id=Accomplishment.objects.get(id=request.POST["ID"]),
@@ -337,7 +334,6 @@ def repeat_accomplishment(request):
             request=request, message="Accomplishment successfully created!",
             type="success")
     except (Exception):
-        print("what?")
         return HttpResponseBadRequest(
             get_locale_text(
                 request=request, ID="accomplishment-create-failed",
@@ -347,7 +343,6 @@ def repeat_accomplishment(request):
 def get_template(request):
     """."""
     ID = request.POST["ID"]
-    print(ID)
     if ID != -1:
         accom_details: Accomplishment = FamilyUserAccomplishment.objects.get(
             id=ID).accomplishment_id.serialized()

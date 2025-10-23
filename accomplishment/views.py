@@ -102,7 +102,6 @@ def page_edit_user_accomplishment(request, ID: int = -1, cache_last_visited_page
 def page_edit_accomplishment_details(request, ID=-1):
     """."""
     form: AccomplishmentForm = AccomplishmentForm()
-    print(ID)
     if ID != -1:
         accom_details: Accomplishment = FamilyUserAccomplishment.objects.get(
             id=ID).accomplishment_id

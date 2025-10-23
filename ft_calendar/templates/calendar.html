@@ -71,13 +71,11 @@
         && element["date"].getMonth() == dateToCheck.getMonth()
         && element["date"].getYear() == dateToCheck.getYear());
 
-        // Put entries on screen
-        document.getElementById("accordion").innerHTML = ''; // Clear so that there's space for the list
-
+        let newContent = ""
+        
         if (entries.length > 0) {
-            document.getElementById("accordion").innerText = ''; // Clear so that there's space for the list
             entries.forEach(function(entry) {
-                $("#accordion").append(`<div id="card${entry["ID"]}" class="card"></div>`);
+                newContent += (`<div id="card${entry["ID"]}" class="card"></div>`);
 
                 let extraClasses = "";
                 if (entry["description"] && entry["description"].length > 0){ extraClasses = " bi-caret-down-fill bi-space" }
@@ -131,10 +129,10 @@
                     }
                 }, 1);
             });
-            $("#accordion").append('</div>')
+            newContent += '</div>'
         }
         else {
-            $("#accordion").append(`
+            newContent += `
             <div id="card" class="card">
                 <div class="card-header card-footer" id="">
                 <h5 class="mb-0">
@@ -142,8 +140,9 @@
                         <span class="bi bi bi-circle-fill bi-space bi-small">No entries.</span>
                     </button>
                 </h5>
-            </div>`);
+            </div>`;
         }
+        document.getElementById("accordion").innerHTML = newContent; // Clear so that there's space for the list
     }
 </script>
 <style>

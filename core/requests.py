@@ -79,8 +79,6 @@ def join_family(request, token: str = ""):
     if token == "":
         token = request.POST["token"]
 
-    print("checking token", token)
-
     family: Family = FamilyInvite.objects.get(token=token).family_id
 
     new_user, newly_created = FamilyUser.objects.get_or_create(
