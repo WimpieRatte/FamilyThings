@@ -1,5 +1,5 @@
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
 from core.models.family_user import FamilyUser
@@ -22,62 +22,59 @@ def page_calendar(request, start: int = timezone.now().day):
         })
 
 @update_user_session()
-def create_calendar_entry(request):
+def create_or_edit_calendar_entry(request, event_id=None):
     if not request.user.is_authenticated:
-        return HttpResponseBadRequest(
-            get_locale_text(
-                request=request, ID="login-required",
-                default_text="For this action, you need to login first."
-            )
-        )
+        return HttpResponseBadRequest("You must be logged in.")
 
     try:
         family_user: FamilyUser = FamilyUser.objects.filter(
             custom_user_id=request.user
         )[request.session["current_family"]]
     except (FamilyUser.DoesNotExist, IndexError, KeyError):
-        return HttpResponseBadRequest(
-            get_locale_text(
-                request=request, ID="not-in-a-family",
-                default_text="You aren't part of a Family."
-            )
-        )
+        return HttpResponseBadRequest("You aren't part of a family.")
 
     form = CalendarEventForm(data=request.POST)
-    if form.is_valid():
-        print(form.cleaned_data)
+    if not form.is_valid():
+        return HttpResponseBadRequest("Invalid form data.")
 
-        # Create or fetch calendar entry uniquely by family + user + title + date
-        new_calendar_entry, created = CalendarEntry.objects.get_or_create(
-            family_id=family_user.family_id,
-            custom_user_id=request.user,
-            title=form.cleaned_data.get("title"),
-            date=form.cleaned_data.get("date"),
-            defaults={
-                "description": form.cleaned_data.get("description", ""),
-                "created_on": timezone.now(),
-            }
-        )
+    if event_id:
+        # ✏️ Editing an existing entry
+        calendar_entry = get_object_or_404(CalendarEntry, id=event_id, family_id=family_user.family_id)
+        calendar_entry.title = form.cleaned_data["title"]
+        calendar_entry.description = form.cleaned_data.get("description", "")
+        calendar_entry.date = form.cleaned_data["date"]
+        calendar_entry.save()
+        return JsonResponse({"status": "success", "message": "Event updated successfully!"})
 
-        # If the entry already existed, update description if needed
-        if not created:
-            new_calendar_entry.description = form.cleaned_data.get("description", "")
-            new_calendar_entry.save()
-
-        return JsonResponseAlert(
-            request=request,
-            message="Calendar entry successfully created!",
-            type="success"
-        )
-    else:
-        print(form.errors)
-
-    return HttpResponseBadRequest(
-        get_locale_text(
-            request=request, ID="calendar-entry-create-failed",
-            default_text="Calendar entry couldn't be submitted."
-        )
+    # 🆕 Creating a new entry
+    CalendarEntry.objects.create(
+        family_id=family_user.family_id,
+        custom_user_id=request.user,
+        title=form.cleaned_data["title"],
+        description=form.cleaned_data.get("description", ""),
+        date=form.cleaned_data["date"],
+        created_on=timezone.now(),
     )
+    return JsonResponse({"status": "success", "message": "Event created successfully!"})
+
+@update_user_session()
+def delete_calendar_entry(request, event_id):
+    if request.method != "POST":
+        return HttpResponseBadRequest("Invalid request method.")
+
+    try:
+        # Ensure the user owns this event
+        event = CalendarEntry.objects.get(id=event_id, custom_user_id=request.user)
+        event.delete()
+        return JsonResponse({
+            "status": "success",
+            "message": "Calendar entry deleted successfully!"
+        })
+    except CalendarEntry.DoesNotExist:
+        return JsonResponse({
+            "status": "error",
+            "message": "Event not found or you don't have permission to delete it."
+        }, status=404)
 
 
 def get(request):
