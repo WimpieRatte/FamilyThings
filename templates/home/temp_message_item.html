@@ -1,13 +1,13 @@
-<div id="message-{{message.id}}" class="message d-flex gap-2 w-100 my-3 position-relative">
+<div id="message-{{message.id}}" class="message d-flex gap-2 w-100 my-3 position-relative" style="filter: drop-shadow(5px 5px black);">
     {% if can_delete %}
         <div id="delete-message" value="{{message.id}}" class="tooltip-source badge rounded-circle border bg-danger border-dark fs-sm position-absolute top-0 start-100 translate-middle" data-tooltip-context="Delete Message" data-tooltip-content=""
         style="display: none; width: 1.5em; height: 1.5em; z-index: 210;"><i class="bi bi-x h5 position-absolute top-50 start-50 translate-middle"></i></div>
     {% endif %}
     {% if 'text-end' in class %}
         {% include 'home/message_item_text.html' with name='You' content=message.content color=sender.color class=class date=message.created_on %}
-        {% include 'home/message_item_icon.html' with icon=sender.icon color=sender.color %}
+        {% include 'home/message_item_icon.html' with user_ID=sender.id icon=sender.icon color=sender.color %}
     {% else %}
-        {% include 'home/message_item_icon.html' with icon=sender.icon color=sender.color %}
+        {% include 'home/message_item_icon.html' with user_ID=sender.id icon=sender.icon color=sender.color %}
         {% include 'home/message_item_text.html' with name=sender.full_name content=message.content color=sender.color class=class date=message.created_on %}
     {% endif %}
 </div>

@@ -1,7 +1,7 @@
 <div class="carousel-item {% if active %}active{% endif %}">
     {% include 'home/temp_home_carousel_image.html' %}
     <div class="container {{class}}">
-        <div class="carousel-caption bg-dark px-5 rounded-2 {{caption_class}} text-light" style="--bs-bg-opacity: .4; max-height: 150px;">
+        <div class="carousel-caption bg-dark px-5 rounded-2 {{caption_class}} text-light m-auto" style="--bs-bg-opacity: .4; max-height: 150px; min-width: 1000px;">
             <h2>{{header}}</h2>
             <p class="fs-5 mb-2" style="line-height: 1.25em;">{{paragraph}}</p>
             {% if link %}<p><a class="btn btn-lg btn-primary" href="{% url link %}">{{link_caption}}</a></p>{% endif %}

@@ -20,7 +20,7 @@ buttonTemplateEditApply.addEventListener("click", function() {
 
         setTimeout(function() {
             movePopup()
-        }, 3000);
+        }, movePopupDelay);
     });
 });
 

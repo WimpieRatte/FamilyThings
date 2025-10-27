@@ -24,7 +24,7 @@
 </svg>
 <div id="popup-container" class="position-absolute vw-100 vh-100" style="display: none; z-index: 1051;">
     <div id="popup-cover" class="position-absolute vw-100 vh-100 top-0 start-0 no-ptr-evt"></div>
-    <div id="popups" class="position-absolute translate-middle overflow-visible">
+    <div id="popups" class="position-absolute overflow-visible">
       {% block popups %}{% endblock %}
     </div>
 </div>
@@ -32,7 +32,7 @@
 {% include 'site/site_js_preload.html' %}
 {% include 'site/site_header.html' with show_time=True %}
 <body>
-  <main class="container px-4 py-2 m-auto">
+  <main class="container px-4 py-2 mt-3 m-auto">
     {% block content %}
     {# Content will be injected here #}
     {% endblock %}

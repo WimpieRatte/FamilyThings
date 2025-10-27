@@ -11,11 +11,13 @@
                 <small class="m-0"><span id="lb-last-login">Last Login</span>: <span id="last-login">-</span></small>
             </div>
         </div>
-        {% include 'site/heading_section.html' with label="Recent Activity" id="lb-recent-activity" %}
-        <div id="recent-activity" style="width: 540px;" class="d-flex gap-2 flex-wrap m-auto">
-            
+        <div style="width: 540px; max-height: 300px; overflow-y: scroll;">
+            {% include 'site/heading_section.html' with label="Recent Activity" id="lb-recent-activity" class="px-0" %}
+            <div id="user-recent-activity" class="d-flex gap-1 flex-wrap align-items-end m-auto">
+                
+            </div>
         </div>
     </div>
-    <div id="close-details" onclick="movePopupDown()" value="" class="tooltip-source badge rounded-circle border bg-danger border-dark fs-sm position-absolute top-0 translate-middle"
+    <div id="btn-close-popup" onclick="movePopupDown()" value="" class="tooltip-source badge rounded-circle border bg-danger border-dark fs-sm position-absolute top-0 translate-middle"
         style="width: 2em; height: 2em; z-index: 210; line-height: 1em; left: 98.5% !important;"><i class="bi bi-x h3 position-absolute top-50 start-50 translate-middle" style="top: 51% !important; font-size: 2.5em;"></i></div>
 </div>
