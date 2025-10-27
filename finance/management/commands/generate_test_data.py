@@ -156,31 +156,36 @@ class Command(BaseCommand):
         # Create 5 specific Transaction Patterns to test the transaction imports later
         (record, iscreated) = TransactionPattern.objects.get_or_create(
             business_entity_name = "01664 MCDONALDS",
-            transaction_category_id=TransactionCategory.objects.get(name="Food")
+            transaction_category_id=TransactionCategory.objects.get(name="Food"),
+            family_id=family_id
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
             business_entity_name = "KFZ Workshop",
-            transaction_category_id=TransactionCategory.objects.get(name="Transportation")
+            transaction_category_id=TransactionCategory.objects.get(name="Transportation"),
+            family_id=family_id
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
             business_entity_name = "Telekom Deutschland GmbH",
-            transaction_category_id=TransactionCategory.objects.get(name="Telecommunications")
+            transaction_category_id=TransactionCategory.objects.get(name="Telecommunications"),
+            family_id=family_id
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
             business_entity_name = "DIE NEUE APOTHEKE",
-            transaction_category_id=TransactionCategory.objects.get(name="Healthcare")
+            transaction_category_id=TransactionCategory.objects.get(name="Healthcare"),
+            family_id=family_id
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
             business_entity_name = "AMAZON PAYMENTS EUROPE S.C.A.",
-            transaction_category_id=TransactionCategory.objects.get(name="Other")
+            transaction_category_id=TransactionCategory.objects.get(name="Other"),
+            family_id=family_id
         )
         if iscreated:
             total_record_count += 1
