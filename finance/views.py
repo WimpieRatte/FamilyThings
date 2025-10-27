@@ -690,6 +690,7 @@ def create_transaction_pattern(request):
     try:
         business_entity_name = request.POST.get('business_entity_name', '').strip()
         category_id = request.POST.get('category_id', '').strip()
+        transaction_pattern_id = request.POST.get('transaction_pattern_id')
 
         # Validate required fields
         if not business_entity_name:
@@ -701,19 +702,26 @@ def create_transaction_pattern(request):
         # Get category and verify it belongs to current family
         category = get_object_or_404(TransactionCategory, id=category_id, family_id=family_id)
 
-        # Create the pattern
-        pattern = TransactionPattern.objects.create(
-            business_entity_name=business_entity_name,
-            transaction_category_id=category
-        )
+        # Check if pattern id already exists:
+        if transaction_pattern_id == "-1":
+            # Create new pattern
+            transaction_pattern = TransactionPattern.objects.create(
+                business_entity_name=business_entity_name,
+                transaction_category_id=category
+            )
+        else:
+            transaction_pattern = get_object_or_404(TransactionPattern, id=transaction_pattern_id)
+            transaction_pattern.business_entity_name = business_entity_name
+            transaction_pattern.transaction_category_id = category
+            transaction_pattern.save()
 
         return JsonResponse({
             'success': True,
             'pattern': {
-                'id': pattern.id,
-                'business_entity_name': pattern.business_entity_name,
-                'category_id': pattern.transaction_category_id.id,
-                'category_name': pattern.transaction_category_id.name
+                'id': transaction_pattern.id,
+                'business_entity_name': transaction_pattern.business_entity_name,
+                'category_id': transaction_pattern.transaction_category_id.id,
+                'category_name': transaction_pattern.transaction_category_id.name
             }
         })
 
@@ -765,17 +773,13 @@ def update_transaction_pattern(request, pattern_id):
         return JsonResponse({'success': False, 'error': str(e)})
 
 def delete_transaction_pattern(request, pattern_id):
-    """Delete Transaction Pattern via fetch API"""
+    """Delete Transaction Pattern"""
+
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Method not allowed'})
 
-    # Get current family
-    fam_user = FamilyUser.objects.filter(
-        custom_user_id=request.user)[request.session["current_family"]]
-    family_id = fam_user.family_id
-
     try:
-        pattern = get_object_or_404(TransactionPattern, id=pattern_id, transaction_category_id__family_id=family_id)
+        pattern = get_object_or_404(TransactionPattern, id=pattern_id)
         pattern_name = pattern.business_entity_name
         pattern.delete()
 
@@ -830,6 +834,7 @@ def create_transaction_pattern_row(request):
     family_id = fam_user.family_id
 
     if request.method == "POST":
+
         form = TransactionPatternForm(request.POST)
         if form.is_valid():
 	        # Cater for possible hidden/session dependant values:
