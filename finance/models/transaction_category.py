@@ -4,6 +4,9 @@ from core.models import Family
 import uuid
 
 def get_first_family():
+    first_family = Family.objects.first()
+    if first_family is None:
+        return uuid.uuid4()
     return Family.objects.first().id
 
 class TransactionCategory(models.Model):
@@ -12,7 +15,8 @@ class TransactionCategory(models.Model):
     description = models.CharField(max_length=1000, null=True, blank=True)
     family_id = models.ForeignKey(Family,
                                   on_delete=models.CASCADE,
-                                  default=get_first_family)
+                                  # default=get_first_family)
+                                  default=None)
 
     class Meta:
         verbose_name = "Transaction Category"
