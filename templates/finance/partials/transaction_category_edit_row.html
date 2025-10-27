@@ -1,0 +1,30 @@
+<tr hx-target="this" hx-swap="outerHTML">
+    <td colspan="6">
+        <form hx-post="{% url 'finance:transaction_category_edit' transaction_category.pk %}" class="p-3 border rounded bg-light">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Name</label>
+                    {{ form.name }}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success btn-sm">Save</button>
+                <button type="button" class="btn btn-secondary btn-sm"
+                        hx-get="{% url 'finance:transaction_category_list' %}"
+                        hx-target="closest tr">Cancel</button>
+            </div>
+
+            {% if form.errors %}
+            <div class="alert alert-danger mt-2">
+                Please correct the errors below.
+            </div>
+            {% endif %}
+        </form>
+    </td>
+</tr>

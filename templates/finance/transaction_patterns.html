@@ -18,45 +18,61 @@
         <div class="row mb-4">
             <div class="col">
                 <h5 class="text-light mb-3">Add New Pattern</h5>
-                <form id="pattern-form" class="row g-3"
-                    hx-post="{% url 'finance:create_transaction_pattern' %}"
-                    hx-trigger="load, change"
-                    hx-target="#divnr2"
-                    hx-include="[name='name_regex'], [name='category_id']"
-                >
-                    {% csrf_token %}
-                    <div class="col-md-4">
-                        <label for="name_regex" class="form-label text-light">Name Pattern *</label>
-                        <input type="text" class="form-control" id="name_regex" name="name_regex" required>
-                        <div class="form-text text-light">Text to match in transaction names</div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <label for="category_id" class="form-label text-light">Category *</label>
-                        <select class="form-select" id="category_id" name="category_id" required>
-                            <option value="">Select Category</option>
-                            {% for category in categories %}
-                                <option value="{{ category.id }}">{{ category.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="align-middle">
-                        <button type="submit" class="btn btn-primary" id="btn-add-pattern">
-                            Add
-                        </button>
-                    </div>
-                </form>
-                <script>
-                // Direct event listener as fallback
-                document.getElementById('pattern-form')?.addEventListener('submit', function(event) {
-                    console.log('Direct event listener triggered!');
-                    handleAddPattern(event);
-                });
-                </script>
+                <div class="row g-3">
+                    <form id="pattern-form" class="col"
+                        hx-post="{% url 'finance:create_transaction_pattern' %}"
+                        hx-trigger="load, change"
+                        hx-target="#divnr2"
+                        hx-include="[name='business_entity_name'], [name='category_id']"
+                    >
+                        {% csrf_token %}
+                        <div class="row align-items-end">
+                            <div class="col-md-4">
+                                <label for="business_entity_name" class="form-label text-light">Name Pattern *</label>
+                            </div>
+                            <div class="col-md-3 d-flex flex-column justify-content-end pb-3">
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <label for="category_id" class="form-label text-light">Category *</label>
+                                    <a class="btn btn-primary" id="btnEditCategories" href="{% url 'finance:edit_categories' %}">Edit</a>
+                                </div>
+                            </div>
+                            <div class="col-auto d-flex align-items-center">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="business_entity_name" name="business_entity_name" required>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="category_id" name="category_id" required>
+                                    <option value="">Select Category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-auto d-flex align-items-center">
+                                <button type="submit" class="btn btn-success" id="btn-add-pattern">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-text text-light">Text to match in transaction names</div>
+                            </div>
+                            <div class="col-md-3">
+                            </div>
+                            <div class="col-auto d-flex align-items-center">
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
+    <div class="container rounded bg-dark p-4 mb-4">
         <!-- Patterns Table -->
         <div class="row">
             <div class="col">
@@ -74,7 +90,7 @@
                             {% if patterns %}
                                 {% for pattern in patterns %}
                                 <tr data-pattern-id="{{ pattern.id }}">
-                                    <td>{{ pattern.name_regex }}</td>
+                                    <td>{{ pattern.business_entity_name }}</td>
                                     <td>{{ pattern.transaction_category_id.name }}</td>
                                     <td class="action-buttons">
                                         <button class="btn btn-sm btn-outline-warning edit-pattern"
@@ -83,7 +99,7 @@
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger delete-pattern"
                                                 data-pattern-id="{{ pattern.id }}"
-                                                data-pattern-name="{{ pattern.name_regex }}">
+                                                data-pattern-name="{{ pattern.business_entity_name }}">
                                             Delete
                                         </button>
                                     </td>
@@ -113,7 +129,7 @@
     e.preventDefault();  // Prevent default form submission behavior
 
     // Check if Name field has been filled out before saving
-    if ($("#name_regex").val() == "") {
+    if ($("#business_entity_name").val() == "") {
       alert("Please enter a Business Entity Name first.");
       return false;
     }
@@ -122,7 +138,7 @@
       type: 'POST',
       url: '{% url 'finance:create_transaction_pattern' %}',  //which URL mapping to redirect to
       data: {
-        name_regex: $('#name_regex').val(),  // get current value set on the button
+        business_entity_name: $('#business_entity_name').val(),  // get current value set on the button
         category_id: $("#txtName").val(),
         csrfmiddlewaretoken: '{{ csrf_token }}',
         action: 'post'
