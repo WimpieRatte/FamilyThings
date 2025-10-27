@@ -1,0 +1,14 @@
+<tr>
+    <td>{{ record.business_entity_name }}</td>
+    <td>{{ record.transaction_category_id }}</td>
+    <td>
+        <button class="btn btn-sm btn-outline-primary me-1"
+                hx-get="{% url 'finance:transaction_pattern_edit' record.pk %}"
+                hx-target="closest tr"
+                hx-swap="outerHTML">Edit</button>
+        <button class="btn btn-sm btn-outline-danger"
+                hx-delete="{% url 'finance:transaction_pattern_delete' record.pk %}"
+                hx-target="closest tr"
+                hx-confirm="Are you sure?">Delete</button>
+    </td>
+</tr>

@@ -155,31 +155,31 @@ class Command(BaseCommand):
 
         # Create 5 specific Transaction Patterns to test the transaction imports later
         (record, iscreated) = TransactionPattern.objects.get_or_create(
-            name_regex = "01664 MCDONALDS",
+            business_entity_name = "01664 MCDONALDS",
             transaction_category_id=TransactionCategory.objects.get(name="Food")
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
-            name_regex = "KFZ Workshop",
+            business_entity_name = "KFZ Workshop",
             transaction_category_id=TransactionCategory.objects.get(name="Transportation")
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
-            name_regex = "Telekom Deutschland GmbH",
+            business_entity_name = "Telekom Deutschland GmbH",
             transaction_category_id=TransactionCategory.objects.get(name="Telecommunications")
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
-            name_regex = "DIE NEUE APOTHEKE",
+            business_entity_name = "DIE NEUE APOTHEKE",
             transaction_category_id=TransactionCategory.objects.get(name="Healthcare")
         )
         if iscreated:
             total_record_count += 1
         (record, iscreated) = TransactionPattern.objects.get_or_create(
-            name_regex = "AMAZON PAYMENTS EUROPE S.C.A.",
+            business_entity_name = "AMAZON PAYMENTS EUROPE S.C.A.",
             transaction_category_id=TransactionCategory.objects.get(name="Other")
         )
         if iscreated:

@@ -1,21 +1,28 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from .forms import TransactionCategoryForm, TransactionPatternForm
+from .models import ImportProfile, ImportProfileMapping, TransactionCategory, TransactionPattern
+from .tables import TransactionCategoryTable, TransactionPatternTable
 from core.session import update_session, create_alert
 from core.views import render_if_logged_in
-from .models import ImportProfile, ImportProfileMapping, TransactionCategory, TransactionPattern
 from core.models import FamilyUser
 from core.utils import ImportProfileMappingDestinationColumns, text_to_enum_destination_column
+from decimal import Decimal, InvalidOperation
+from django.apps import apps
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_http_methods
+from django.views.generic import ListView, CreateView, UpdateView
+from django_tables2 import SingleTableView, RequestConfig
 import plotly.graph_objects as go
 import plotly.express as px
-from django.template.loader import render_to_string
 import json  # add this line near the top with the other imports
 import pandas as pd
 import html
 import io
-from django.apps import apps
-from decimal import Decimal, InvalidOperation
 
 
 # Create your views here.
@@ -486,7 +493,7 @@ def load_headers(request, lang_code: str = ""):
             transaction_patterns = TransactionPattern.objects.filter(transaction_category_id__family_id=family_id)
             if len(transaction_patterns) > 0 and "Business Entity Name" in df_reordered.columns:
                 # Convert it to a dictionary for easy usage with dataframe
-                transaction_patterns_as_dict = {pattern.name_regex: pattern.transaction_category_id.id for pattern in transaction_patterns}
+                transaction_patterns_as_dict = {pattern.business_entity_name: pattern.transaction_category_id.id for pattern in transaction_patterns}
 
                 # Mapping for category based on TransactionPattern matching
                 try:
@@ -681,11 +688,12 @@ def create_transaction_pattern(request):
     family_id = fam_user.family_id
 
     try:
-        name_regex = request.POST.get('name_regex', '').strip()
+        business_entity_name = request.POST.get('business_entity_name', '').strip()
         category_id = request.POST.get('category_id', '').strip()
+        transaction_pattern_id = request.POST.get('transaction_pattern_id')
 
         # Validate required fields
-        if not name_regex:
+        if not business_entity_name:
             return JsonResponse({'success': False, 'error': 'Name is required'})
 
         if not category_id:
@@ -694,19 +702,26 @@ def create_transaction_pattern(request):
         # Get category and verify it belongs to current family
         category = get_object_or_404(TransactionCategory, id=category_id, family_id=family_id)
 
-        # Create the pattern
-        pattern = TransactionPattern.objects.create(
-            name_regex=name_regex,
-            transaction_category_id=category
-        )
+        # Check if pattern id already exists:
+        if transaction_pattern_id == "-1":
+            # Create new pattern
+            transaction_pattern = TransactionPattern.objects.create(
+                business_entity_name=business_entity_name,
+                transaction_category_id=category
+            )
+        else:
+            transaction_pattern = get_object_or_404(TransactionPattern, id=transaction_pattern_id)
+            transaction_pattern.business_entity_name = business_entity_name
+            transaction_pattern.transaction_category_id = category
+            transaction_pattern.save()
 
         return JsonResponse({
             'success': True,
             'pattern': {
-                'id': pattern.id,
-                'name_regex': pattern.name_regex,
-                'category_id': pattern.transaction_category_id.id,
-                'category_name': pattern.transaction_category_id.name
+                'id': transaction_pattern.id,
+                'business_entity_name': transaction_pattern.business_entity_name,
+                'category_id': transaction_pattern.transaction_category_id.id,
+                'category_name': transaction_pattern.transaction_category_id.name
             }
         })
 
@@ -726,11 +741,11 @@ def update_transaction_pattern(request, pattern_id):
     try:
         pattern = get_object_or_404(TransactionPattern, id=pattern_id, transaction_category_id__family_id=family_id)
 
-        name_regex = request.POST.get('name_regex', '').strip()
+        business_entity_name = request.POST.get('business_entity_name', '').strip()
         category_id = request.POST.get('category_id', '').strip()
 
         # Validate required fields
-        if not name_regex:
+        if not business_entity_name:
             return JsonResponse({'success': False, 'error': 'Name is required'})
 
         if not category_id:
@@ -740,7 +755,7 @@ def update_transaction_pattern(request, pattern_id):
         category = get_object_or_404(TransactionCategory, id=category_id, family_id=family_id)
 
         # Update the pattern
-        pattern.name_regex = name_regex
+        pattern.business_entity_name = business_entity_name
         pattern.transaction_category_id = category
         pattern.save()
 
@@ -748,7 +763,7 @@ def update_transaction_pattern(request, pattern_id):
             'success': True,
             'pattern': {
                 'id': pattern.id,
-                'name_regex': pattern.name_regex,
+                'business_entity_name': pattern.business_entity_name,
                 'category_id': pattern.transaction_category_id.id,
                 'category_name': pattern.transaction_category_id.name
             }
@@ -758,18 +773,14 @@ def update_transaction_pattern(request, pattern_id):
         return JsonResponse({'success': False, 'error': str(e)})
 
 def delete_transaction_pattern(request, pattern_id):
-    """Delete Transaction Pattern via fetch API"""
+    """Delete Transaction Pattern"""
+
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Method not allowed'})
 
-    # Get current family
-    fam_user = FamilyUser.objects.filter(
-        custom_user_id=request.user)[request.session["current_family"]]
-    family_id = fam_user.family_id
-
     try:
-        pattern = get_object_or_404(TransactionPattern, id=pattern_id, transaction_category_id__family_id=family_id)
-        pattern_name = pattern.name_regex
+        pattern = get_object_or_404(TransactionPattern, id=pattern_id)
+        pattern_name = pattern.business_entity_name
         pattern.delete()
 
         return JsonResponse({
@@ -779,3 +790,253 @@ def delete_transaction_pattern(request, pattern_id):
 
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+
+# region Datatable 2 views
+
+class TransactionPatternListView(SingleTableView):
+    model = TransactionPattern
+    table_class = TransactionPatternTable
+    template_name = 'finance/transaction_pattern_list.html'
+    paginate_by = 30
+
+    def get_template_names(self):
+        if self.request.htmx and not self.request.htmx.boosted:
+            return ['finance/partials/transaction_pattern_list_partial.html']
+        return [self.template_name]
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('transaction_category_id')
+
+        # Filter by transaction category if provided
+        transaction_category_id = self.request.GET.get('transaction_category_id')
+        if transaction_category_id:
+            queryset = queryset.filter(transaction_category_id=transaction_category_id)
+
+        return queryset.order_by('business_entity_name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # First get family_id
+        fam_user = FamilyUser.objects.filter(custom_user_id=self.request.user)[self.request.session["current_family"]]
+        family_id = fam_user.family_id
+
+        # Then get all categories for current family
+        context['transaction_categories'] = TransactionCategory.objects.filter(family_id=family_id).order_by('name').all()
+        return context
+
+def create_transaction_pattern_row(request):
+    """Handle inline transaction pattern creation"""
+
+    # Get family_id:
+    fam_user = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    if request.method == "POST":
+
+        form = TransactionPatternForm(request.POST)
+        if form.is_valid():
+	        # Cater for possible hidden/session dependant values:
+            if not form.instance.pk:
+                form.instance.family_id = family_id
+            transaction_pattern = form.save()
+            # Return the new row
+            table = TransactionPatternTable(TransactionPattern.objects.filter(transaction_category_id__family_id=family_id))
+            for row in table.rows:
+                if row.record.pk == transaction_pattern.pk:
+                    return HttpResponse(row)
+    else:
+        # Return form with errors
+        return render(request, 'finance/partials/transaction_pattern_create_row.html', {'form': form})
+
+    # GET request - show creation form
+    form = TransactionPatternForm()
+    return render(request, 'finance/partials/transaction_pattern_create_row.html', {
+        'form': form
+    })
+
+def edit_transaction_pattern_row(request, pk):
+    transaction_pattern = get_object_or_404(TransactionPattern, pk=pk)
+
+    # Get family_id:
+    fam_user = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    if request.method == "POST":
+        form = TransactionPatternForm(request.POST, instance=transaction_pattern)
+        if form.is_valid():
+	        # Cater for possible hidden/session dependant values:
+            if not form.instance.pk:
+                form.instance.family_id = family_id
+            form.save()
+            # Return the updated row
+            return render(request, 'finance/partials/transaction_pattern_table_row.html', {
+                'record': transaction_pattern,
+                'table': TransactionPatternTable(TransactionPattern.objects.filter(transaction_category_id__family_id=family_id))
+            })
+        else:
+            # Return form with errors
+            return render(request, 'finance/partials/transaction_pattern_edit_row.html', {
+                'form': form,
+                'transaction_pattern': transaction_pattern
+            })
+
+    # GET request - show edit form
+    form = TransactionPatternForm(instance=transaction_pattern)
+    return render(request, 'finance/partials/transaction_pattern_edit_row.html', {
+        'form': form,
+        'transaction_pattern': transaction_pattern
+    })
+
+def delete_transaction_pattern_row(request, pk):
+    transaction_pattern = get_object_or_404(TransactionPattern, pk=pk)
+    if request.method == "DELETE":
+        transaction_pattern.delete()
+        return HttpResponse('')  # Empty response removes the row
+
+    return HttpResponse(status=405)  # Method not allowed
+
+class TransactionPatternCreateView(CreateView):
+    model = TransactionPattern
+    form_class = TransactionPatternForm
+    template_name = 'finance/transaction_pattern_form.html'
+    success_url = reverse_lazy('transaction_pattern_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        # Get current family_id:
+        fam_user = FamilyUser.objects.filter(custom_user_id=self.request.user)[self.request.session["current_family"]]
+        family_id = fam_user.family_id
+
+        # Pass hidden/session values from session to the form
+        kwargs['family_id'] = family_id
+        return kwargs
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.htmx:
+            # Return a redirect that HTMX will follow
+            return HttpResponse(
+                f'<div hx-get="{self.success_url}" hx-trigger="load" hx-target="body"></div>'
+            )
+        return response
+
+class TransactionCategoryListView(SingleTableView):
+    model = TransactionCategory
+    table_class = TransactionCategoryTable
+    template_name = 'finance/transaction_category_list.html'
+    paginate_by = 30
+
+    def get_template_names(self):
+        if self.request.htmx and not self.request.htmx.boosted:
+            return ['finance/transaction_category_list_partial.html']
+        return [self.template_name]
+
+    def get_queryset(self):
+        return TransactionCategory.objects.annotate(
+            transaction_pattern_count=Count('transaction_patterns_of_category')
+        ).order_by('name')
+
+def create_transaction_category_row(request):
+    """Handle inline transaction category creation"""
+
+    # Get family_id:
+    fam_user = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    if request.method == "POST":
+        form = TransactionCategoryForm(request.POST)
+        if form.is_valid():
+	        # Cater for possible hidden/session dependant values:
+            if not form.instance.pk:
+                form.instance.family_id = family_id
+            transaction_category = form.save()
+            # Return the new row
+            table = TransactionCategoryTable(TransactionCategory.objects.filter(family_id=family_id))
+            for row in table.rows:
+                if row.record.pk == transaction_category.pk:
+                    return HttpResponse(row)
+    else:
+        # Return form with errors
+        return render(request, 'finance/partials/transaction_category_create_row.html', {'form': form})
+
+    # GET request - show creation form
+    form = TransactionCategoryForm()
+    return render(request, 'finance/partials/transaction_category_create_row.html', {
+        'form': form
+    })
+
+
+def edit_transaction_category_row(request, pk):
+    transaction_category = get_object_or_404(TransactionCategory, pk=pk)
+
+    # Get family id:
+    fam_user = FamilyUser.objects.filter(custom_user_id=request.user)[request.session["current_family"]]
+    family_id = fam_user.family_id
+
+    if request.method == "POST":
+        form = TransactionCategoryForm(request.POST, instance=transaction_category)
+        if form.is_valid():
+	        # Cater for possible hidden/session dependant values:
+            if not form.instance.pk:
+                form.instance.family_id = family_id
+            form.save()
+            # Return the updated row
+            return render(request, 'finance/partials/transaction_category_table_row.html', {
+                'record': transaction_category,
+                'table': TransactionCategoryTable(TransactionCategory.objects.filter(family_id=family_id)),
+            })
+        else:
+            return render(request, 'finance/partials/transaction_category_edit_row.html', {
+                'form': form,
+                'transaction_category': transaction_category
+            })
+
+    form = TransactionCategoryForm(instance=transaction_category)
+    return render(request, 'finance/partials/transaction_category_edit_row.html', {
+        'form': form,
+        'transaction_category': transaction_category
+    })
+
+def delete_transaction_category_row(request, pk):
+    transaction_category = get_object_or_404(TransactionCategory, pk=pk)
+    if request.method == "DELETE":
+        # Check if category has products
+        if transaction_category.transaction_patterns_of_category.exists():
+            return HttpResponse(
+                '<div class="alert alert-danger">Cannot delete transaction category with associated transaction patterns.</div>',
+                status=400
+            )
+        transaction_category.delete()
+        return HttpResponse('')
+    return HttpResponse(status=405)
+
+class TransactionCategoryCreateView(CreateView):
+    model = TransactionCategory
+    form_class = TransactionCategoryForm
+    template_name = 'finance/transaction_category_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        # Get current family_id:
+        fam_user = FamilyUser.objects.filter(custom_user_id=self.request.user)[self.request.session["current_family"]]
+        family_id = fam_user.family_id
+
+        # Pass hidden/session values from session to the form
+        kwargs['family_id'] = family_id
+        return kwargs
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.htmx:
+            return HttpResponse(
+                f'<div hx-get="{reverse("finance:transaction_category_list")}" hx-trigger="load" hx-target="body"></div>'
+            )
+        return response
+
+    def get_success_url(self):
+        return reverse('finance:transaction_category_list')
+# endregion

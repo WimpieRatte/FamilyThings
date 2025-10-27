@@ -19,8 +19,22 @@ urlpatterns = [
  	path('save_transaction_category', views.save_transaction_category, name='save_transaction_category'),
 	path('delete_transaction_category', views.delete_transaction_category, name='delete_transaction_category'),
 	path('load_headers', views.load_headers, name='load_headers'),
+
+	# Transaction Pattern URLs
+	# TODO: Phase out these old transaction pattern URLs in favor of DataTable 2 design.
     path('transaction-patterns/', views.transaction_patterns, name='transaction_patterns'),
     path('transaction-patterns/create/', views.create_transaction_pattern, name='create_transaction_pattern'),
     path('transaction-patterns/update/<int:pattern_id>/', views.update_transaction_pattern, name='update_transaction_pattern'),
     path('transaction-patterns/delete/<int:pattern_id>/', views.delete_transaction_pattern, name='delete_transaction_pattern'),
+    # Transaction Pattern URLs for Data Table 2 designs
+    path('transaction-patterns-list/', views.TransactionPatternListView.as_view(), name='transaction_pattern_list'),
+    path('transaction-patterns-list/new/', views.TransactionPatternCreateView.as_view(), name='transaction_pattern_create'),
+    path('transaction-patterns-list/<int:pk>/edit/', views.edit_transaction_pattern_row, name='transaction_pattern_edit'),
+    path('transaction-patterns-list/<int:pk>/delete/', views.delete_transaction_pattern_row, name='transaction_pattern_delete'),
+
+    # Transaction Category URLs
+    path('transaction_categories/', views.TransactionCategoryListView.as_view(), name='transaction_category_list'),
+    path('transaction_categories/new/', views.TransactionCategoryCreateView.as_view(), name='transaction_category_create'),
+    path('transaction_categories/<int:pk>/edit/', views.edit_transaction_category_row, name='transaction_category_edit'),
+    path('transaction_categories/<int:pk>/delete/', views.delete_transaction_category_row, name='transaction_category_delete'),
 ]

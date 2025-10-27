@@ -3,5 +3,6 @@
     "lb-password": "Password",
     "lb-language": "Language",
     "lb-recent-additions": "Recent Additions (Click to repeat)",
-    "lb-all-activity": "All Activity"
+    "lb-all-activity": "All Activity",
+    "formFile": "Choose File"
 }

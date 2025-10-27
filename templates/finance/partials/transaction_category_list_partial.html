@@ -1,0 +1,41 @@
+{% load render_table from django_tables2 %}
+
+<div class="card-body p-0">
+    {% render_table table %}
+</div>
+
+{% if table.page and table.paginator.num_pages > 1 %}
+<nav aria-label="Transaction Category pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if table.page.has_previous %}
+            <li class="page-item">
+                <a class="page-link"
+                   hx-get="{% querystring page=table.page.previous_page_number %}"
+                   hx-target="#transaction_category-table-container">&laquo; Previous</a>
+            </li>
+        {% endif %}
+
+        {% for page_num in table.page.paginator.page_range %}
+            {% if page_num == table.page.number %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="{% querystring page=page_num %}"
+                       hx-target="#transaction_category-table-container">{{ page_num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if table.page.has_next %}
+            <li class="page-item">
+                <a class="page-link"
+                   hx-get="{% querystring page=table.page.next_page_number %}"
+                   hx-target="#transaction_category-table-container">Next &raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
