@@ -14,7 +14,7 @@ let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}'};
 $.when( basicAJAX(type="POST", url=`{% url 'accomplishment:get_names' %}`, data=AJAXData) )
     .done(function( accompData ) {
         let dataList = document.getElementById("accomp-suggestions");
-        accompData["name"].forEach(function(name) {
+        accompData["names"].forEach(function(name) {
             dataList.appendChild(document.createElement("option")).value = name[0]
         });
     })
@@ -42,6 +42,19 @@ function resetNamePrompt() {
     foundAccompText.className = "";
     submitButton.disabled = true;
     repeatButton.disabled = true;
+
+
+    $.ajax({ 
+        type: 'POST', url: `${getNamesURL}`, data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}'},
+        success: function(result) {
+            accompNames = result.result;
+            console.log(accompNames)
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Couldn't get the names :(")
+        }
+    });
 }
 
 $("#name-prompt-popup #btn-abort").click(function(event) { 
@@ -59,12 +72,13 @@ $("#name-prompt-popup #btn-repeat").click(function(event) {
     }
 });
 
+var selectedAccomplishment = "" //Stores the ID of the Accomplishment/Template that is being edited.
 let previousName = ""
 function nameCheckAvailable(enforceCheck = false) {
-    if (nameField.value.length > 0 && (previousName != nameField.value || enforceCheck)){
+    if (nameField.value.length > 0 /*&& (previousName != nameField.value*/ || enforceCheck/*)*/){
         previousName = nameField.value;
 
-        $.ajax({ 
+        /*$.ajax({ 
             type: 'POST', url: `${nameCheckURL}${nameField.value}`, data: {
                 csrfmiddlewaretoken: '{{ csrf_token }}'},
             success: function(result) {
@@ -93,7 +107,36 @@ function nameCheckAvailable(enforceCheck = false) {
                 selectedAccomplishment = null;
                 accomplishmentStorage = null;
             }
-        });
+        });*/
+
+        result = accompNames.find((element) => element["name"].toLowerCase().trim() == nameField.value.toLowerCase().trim())
+
+        if (result != undefined) {
+            submitButton.style.display = "none";
+            nameAvailableText.style.display = "none";
+
+            repeatButton.style.display = "block";
+            repeatButton.disabled = false;
+            nameTakenText.style.display = "block";
+            foundAccompText.textContent = " " + result["name"];
+            foundAccompText.className = `bi bi-${result["icon"]} h5`;
+            
+            selectedAccomplishment = result["ID"];
+            accomplishmentStorage = result
+        }
+        else {
+            submitButton.style.display = "block";
+            submitButton.disabled = false;
+            nameAvailableText.style.display = "block";
+
+            repeatButton.style.display = "none";
+            nameTakenText.style.display = "none";
+            foundAccompText.textContent = "";
+            foundAccompText.className = "";
+
+            //selectedAccomplishment = null;
+            accomplishmentStorage = null;
+        }
     }
     setTimeout(function() { nameCheckAvailable() }, 1000);
 }

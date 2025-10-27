@@ -16,7 +16,7 @@
             <div id="new-accomplishment-wrapper" class="w-auto m-auto">
                 <a id="add-new-button" class="nav-link tooltip-source m-auto" style="width: fit-content;" href="{% url 'accomplishment:overview' 'add_new' %}" data-tooltip-context="Add New">
                     <h6 id="new-accomplishment-label" class="text-center m-0 p-1 bg-dark rounded p-1">
-                    <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3"></i></h6>
+                    <i id="new-accomplishment-icon" class="bi bi-plus-square-fill text-center fs-3" style="line-height: 1em;"></i></h6>
                 </a>
             </div>
         </div>
@@ -120,21 +120,27 @@
     .fail(function(err) {console.log(err);})
 
         /* Get Recent Accomplishments */
-    $.get( `{{HOST}}/accomplishments/get/recent/amount=${maxEntries}`, function() {})
-    .done(function(response) {
-        let entries = Object.entries(response.result);
-        maxEntries -= entries.length
+    if (maxEntries > 0){
+        $.get( `{{HOST}}/accomplishments/get/recent/amount=${maxEntries}`, function() {})
+        .done(function(response) {
+            let entries = Object.entries(response.result);
+            maxEntries -= entries.length
 
-        entries.forEach(function(entry) {
-            let data = entry[1]; //The key (0) is blank while (1) is the content
+            entries.forEach(function(entry) {
+                let data = entry[1]; //The key (0) is blank while (1) is the content
 
-            recentAccContainer.show();
-            /* Apply the accomplishment */
-            addAccomplishmentEntry(recentAccContainer, data)
-        });
-        updateTooltips(); // Required to make the new Entries interactable
-    })
-    .fail(function(err, err2) {console.log(err2);})
+                recentAccContainer.show();
+                /* Apply the accomplishment */
+                addAccomplishmentEntry(recentAccContainer, data)
+            });
+            updateTooltips(); // Required to make the new Entries interactable
+        })
+        .fail(function(err, err2) {console.log(err2);})
+            document.getElementById("header-recent-activities").style.display = "none";
+    }
+    else {
+        document.getElementById("header-recent-activities").style.display = "none";
+    }
 
     /* TODO: Move this + thie accomplishment functions to its own JS script/module of sorts */
     var localContext = new Object()

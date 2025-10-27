@@ -11,6 +11,8 @@ var totalEntries = 0;
 var searchText = "";
 var searchSelector = "name";
 
+var accompNames = []
+
 /* Get Today's Accomplishments */
 const queryURL = "{{HOST}}/accomplishments/get"
 function createAccomplishmentsTable(length = 15, start = 1, search = "", selector = "name") {
@@ -55,8 +57,12 @@ function createTableEntry(target_container, data, index, highlight = "", selecto
     let language = languageCode;
     if (language == "") { language = "en"; }
 
+    clear_date = new Date(data["fields"]["to_date"]).toLocaleTimeString(language, {
+        year: "numeric", month: "short", day: "2-digit",
+        hour: '2-digit', minute: '2-digit'
+    })
     creation_date = new Date(data["fields"]["created"]).toLocaleTimeString(language, {
-        year: "numeric", month: "short", day: "numeric",
+        year: "numeric", month: "short", day: "2-digit",
         hour: '2-digit', minute: '2-digit'
     })
 

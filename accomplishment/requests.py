@@ -131,9 +131,9 @@ def get_names(request):
         return HttpResponseBadRequest()
 
     try:
-        result: Accomplishment = Accomplishment.objects.filter(created_by=request.user).values_list("name")
+        result = Accomplishment.objects.filter(created_by=request.user)
         return JsonResponse(
-            data={'name': list(reversed(result))})
+            data={'result': accomplishments_list_from_query(result), 'names': list(result.values_list("name"))})
     except (Accomplishment.DoesNotExist):
         return HttpResponseNotFound()
 

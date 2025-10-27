@@ -22,22 +22,26 @@ buttonEditApply.addEventListener("click", function() {
         form_array.push({'name': 'date_to', 'value': document.querySelector('#edit-accomp-form #id_date').value});
     }
 
-    basicAJAX(type="POST", url=`${editAccompURL}${selectedAccomplishment}`, data=form_array)
+    console.log(form_data.serializeArray())
+
+    basicAJAX(type="POST", url=`${editAccompURL}${accompToEdit}`, data=form_array)
 
     playCheckmarkAnimation();
 
     setTimeout(function() {
         createAccomplishmentsTable(15, 1, searchBar.value, searchSelector);
-    }, 1600);
+    }, 1600-400);
 
     setTimeout(function() {
         movePopup();
-    }, movePopupDelay);
+    }, movePopupDelay-400);
 });
 
+
+var accompToEdit = -1
 //$(`#edit-accomp-${data["pk"]}`).click(function (event) {
 function openEditPrompt(ID) {
-    selectedAccomplishment = ID;
+    accompToEdit = ID;
     currentAJAXURL = editAccompURL;
 
     let AJAXData = { csrfmiddlewaretoken: '{{ csrf_token }}' };

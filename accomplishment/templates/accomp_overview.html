@@ -91,9 +91,9 @@
     var getTemplateURL = "{% url 'accomplishment:get_template' %}"
     var saveTemplateURL = "{% url 'accomplishment:save_template' %}"
     var nameCheckURL = "{{HOST}}/accomplishments/get/name=";
+    var getNamesURL = "{% url 'accomplishment:get_names' %}"
     var currentAJAXURL = editAccompURL;
 
-    var selectedAccomplishment = "" //Stores the ID of the Accomplishment/Template that is being edited.
 
     {% include 'js_accomp_search_table.js' %}
     {% include 'js_accomp_edit_accomp_prompt.js' %}

@@ -250,7 +250,7 @@
     }
 
     function getUser(ID, element) {
-        let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}', ID: ID};
+        let AJAXData = {csrfmiddlewaretoken: '{{ csrf_token }}', ID: ID, sorting: "-to_date"};
         $.when(basicAJAX(type = "POST", url = `${"{{HOST}}/family/get_user"}`, data = AJAXData))
         .done(function (result) {
             openPopup("user-details-popup")
@@ -264,25 +264,34 @@
             document.querySelector("#user-details-popup #joined-family").textContent = new Date(result["joined"]).toLocaleString('default', { weekday: "long", year: "numeric", month: "long", day: "numeric", })
             document.querySelector("#user-details-popup #last-login").textContent = new Date(result["last_login"]).toLocaleString('default', { weekday: "long", year: "numeric", month: "long", day: "numeric", })
             
-            document.querySelector("#user-details-popup #recent-activity").innerHTML = ""
+            userRecentActivityTab = document.querySelector("#user-details-popup #user-recent-activity");
+            userRecentActivityTab.innerHTML = "";
 
+            let lastDate = "-";
             result["recent_activity"].forEach(element => {
-                date = new Date(element["cleared_date"]).toLocaleDateString(navigator.language, {
+                let accompDate = new Date(element["cleared_date"]).toLocaleDateString(navigator.language, {
                 weekday: "short", year: "numeric",
                 month: "short", day: "numeric",})
-
-                let tooltip = date;
+                
+                let tooltip = accompDate
                 if (element["measurement_quantity"] > 0) {
                     tooltip += `<br><h6 class='p-0 m-0'>${element["measurement_quantity"]}${element["measurement"]}</h6>`.replace("null", "x").replace(".00", "")
                 }
                 
-                document.querySelector("#user-details-popup #recent-activity").innerHTML += 
+                let accompItem = 
                 `<div id="accomplishment-item" class="d-flex gap-2 rounded p-2 bg-gradient shadow-sm fs-sm tooltip-source"
-                data-tooltip-context="Accomplished on" data-tooltip-content="%tooltip%"
-                style="width: 260px; background-color: var(--bs-${result['color']}); color: var(--bs-${result['color']}-font);">
+                data-tooltip-context="Accomplished on" data-tooltip-content="${tooltip}"
+                style="width: 250px; background-color: var(--bs-${result['color']}); color: var(--bs-${result['color']}-font);">
                     <div class="accomplishment-icon pop rounded position-relative" style="height: 1.5em; width: 1.5em; background-color: #bcdcec;">
                     <i class="bi bi-${element['icon']} h5 position-absolute top-50 start-50 translate-middle" style="color: black;" width="20" height="20" alt=""></i>
-                </div>${element['name']}</div></div>`.replace("%tooltip%", tooltip)
+                </div>${element['name']}</div></div>`
+
+                if (accompDate != lastDate){
+                    accompItem = `<div class="w-100" style="margin-bottom: -0.25em;"><small class="w-100">${accompDate}</small></div>${accompItem}`;
+                    lastDate = accompDate;
+                }
+
+                userRecentActivityTab.innerHTML += accompItem;
             });
             applyLocaleToTooltips();
         });

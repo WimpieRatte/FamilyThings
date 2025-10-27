@@ -8161,11 +8161,6 @@ input:disabled {
   padding: 3rem !important;
 }
 
-.px-0 {
-  padding-right: 0 !important;
-  padding-left: 0 !important;
-}
-
 .px-1 {
   padding-right: 0.25rem !important;
   padding-left: 0.25rem !important;
@@ -8191,9 +8186,9 @@ input:disabled {
   padding-left: 3rem !important;
 }
 
-.py-0 {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+.px-0 {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
 }
 
 .py-1 {
@@ -8221,8 +8216,9 @@ input:disabled {
   padding-bottom: 3rem !important;
 }
 
-.pt-0 {
+.py-0 {
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .pt-1 {
@@ -8243,6 +8239,10 @@ input:disabled {
 
 .pt-5 {
   padding-top: 3rem !important;
+}
+
+.pt-0 {
+  padding-top: 0 !important;
 }
 
 .pe-0 {

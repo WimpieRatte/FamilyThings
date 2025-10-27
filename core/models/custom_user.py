@@ -49,7 +49,7 @@ class CustomUser(AbstractUser):
     def full_name(self):
         """Return either the Username or, if defined, the First and Last Names."""
         if self.first_name != "":
-            return f"{self.first_name} {self.last_name}".replace(" None", "")
+            return f"{self.first_name} {self.last_name}".replace(" None", "").strip()
         return self.username
 
     class Meta:
