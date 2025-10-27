@@ -122,6 +122,11 @@ class Command(BaseCommand):
             {"name": "Education", "description": "Category for education expenses"},
             {"name": "Healthcare", "description": "Category for healthcare expenses"},
             {"name": "Telecommunications", "description": "Category for telephones, internet, etc."},
+            {"name": "Home", "description": "Expenses related to home maintenance and utilities."},
+            {"name": "Salary", "description": "Income from employment."},
+            {"name": "Social Benefits", "description": "Benefits such as social security payments."},
+            {"name": "Charity", "description": "Donations to charity organizations."},
+            {"name": "Family", "description": "Money to or from family members."},
             {"name": "Other", "description": "Miscellaneous category for unclassified expenses"}
         ]
         category_objs = []
@@ -185,6 +190,76 @@ class Command(BaseCommand):
         (record, iscreated) = TransactionPattern.objects.get_or_create(
             business_entity_name = "AMAZON PAYMENTS EUROPE S.C.A.",
             transaction_category_id=TransactionCategory.objects.get(name="Other"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "My Best Employer",
+            transaction_category_id=TransactionCategory.objects.get(name="Salary"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "Bundesagentur fur Arbeit -Kindergeldt",
+            transaction_category_id=TransactionCategory.objects.get(name="Social Benefits"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "E.ON Deutschland GmbH",
+            transaction_category_id=TransactionCategory.objects.get(name="Home"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "Stadt Recklinghausen",
+            transaction_category_id=TransactionCategory.objects.get(name="Home"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "Die Kirche",
+            transaction_category_id=TransactionCategory.objects.get(name="Charity"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "Zahnartz Dr. Utker",
+            transaction_category_id=TransactionCategory.objects.get(name="Healthcare"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "Johnny Smith R",
+            transaction_category_id=TransactionCategory.objects.get(name="Family"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "ARAL AG",
+            transaction_category_id=TransactionCategory.objects.get(name="Transportation"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "PayPal Europe S.a.r.l. et Cie S.C.A",
+            transaction_category_id=TransactionCategory.objects.get(name="Other"),
+            family_id=family_id
+        )
+        if iscreated:
+            total_record_count += 1
+        (record, iscreated) = TransactionPattern.objects.get_or_create(
+            business_entity_name = "Netto Marken-Discoun",
+            transaction_category_id=TransactionCategory.objects.get(name="Food"),
             family_id=family_id
         )
         if iscreated:
