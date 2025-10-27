@@ -7,9 +7,9 @@
     /* Preload Constants */
     const languageCode = '{{request.session.lang_code}}'
 
-    /* Load the translated JSON into browser memory. */ 
+    /* Load the translated JSON into browser memory. */
     var localAlertText = null
-    $.getJSON('/static/localization/{{request.session.lang_code}}/alerts.json', 
+    $.getJSON('/static/localization/{{request.session.lang_code}}/alerts.json',
         function(json_data){localAlertText = json_data})
 
     function autoCloseAlert(alert){
@@ -29,7 +29,7 @@
             `<div class="alert alert-dismissible fade show m-0 mt-1 alert-${type}" role="alert" style="pointer-events: auto;"><span>${text}</span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`).children()[0]);
 
-        setTimeout(function() { 
+        setTimeout(function() {
             new bootstrap.Alert(alertList.shift()).close();
         }, 4000);
     }
@@ -71,7 +71,7 @@
             popups.style.animation = "";
         }
 
-        function movePopup() { 
+        function movePopup() {
             popups.style.animationFillMode = "forwards";
             popups.style.animation = "popup-leave 0.45s ease-in 1";
 
@@ -112,13 +112,13 @@
     // AJAX
     function basicAJAX(type = "POST", url, data) {
         enableLoadingScreen();
-        return $.ajax({ 
+        return $.ajax({
             type: type, url: url, data: data,
             success: function(result) {
                 if (result["alert-message"]) { createAlert(text=result["alert-message"], key="", type=result["alert-type"]); }
-                disableLoadingScreen(); 
+                disableLoadingScreen();
                 return result; },
-            error: function(result) { 
+            error: function(result) {
                 if (result["responseText"]) { createAlert(text=result["responseText"], key="", type="danger"); }
                 disableLoadingScreen();
                 return null; }

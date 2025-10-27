@@ -9,6 +9,7 @@
             {% include 'header/temp_header_nav.html' with id='finance' icon='piggy-bank' label='Finance' color="#ddc67f" tooltip='Keep your finances in check.' dropdown=True %}
             <div class="dropdown-menu dropdown-menu-lg-start" aria-labelledby="dropdownMenuButton" style="inset: -4px auto auto 0px !important;">
               {% include 'header/temp_dropdown_item.html' with href='finance:transaction_patterns' id="admin" icon='card-list' label='Transaction Patterns' %}
+              {% comment %} {% include 'header/temp_dropdown_item.html' with href='finance:transaction_pattern_list' id="admin" icon='card-list' label='Transaction Patterns2' %} {% endcomment %}
               {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='plus-square' label='Import Transactions' %}
               {% comment %} {% include 'header/temp_dropdown_item.html' with href='finance:import_transactions' id="admin" icon='bar-chart-fill' label='Statistics' %} {% endcomment %}
             </div>
