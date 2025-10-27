@@ -97,7 +97,7 @@
                                     data-bs-target="#calendarEntry${entry["ID"]}"
                                     aria-controls="collapseOne"
                                 >
-                                    <span class="bi ${extraClasses} me-2"></span>${entry["title"]}
+                                    <span class="bi ${extraClasses}"></span>${entry["title"]}
                                 </button>
                             </h5>
 
@@ -143,13 +143,13 @@
                 <div class="card-header card-footer" id="">
                 <h5 class="mb-0">
                     <button class="btn btn-link link-underline link-underline-opacity-0 text-body-emphasis py-2">
-                        <span class="bi bi bi-circle-fill bi-space bi-small">No entries.</span>
+                        <span class="bi bi bi-circle-fill bi-space bi-small">${getLocaleText(key="lb-no-entries", default_text="No entries.")}</span>
                     </button>
                 </h5>
             </div>`;
         }
         document.getElementById("accordion").innerHTML = newContent; // Clear so that there's space for the list
-        setTimeout(function(){applyLocaleToTooltips();}, 10)
+        setTimeout(function(){applyLocaleToPage(); applyLocaleToTooltips();}, 10)
     }
 </script>
 <style>

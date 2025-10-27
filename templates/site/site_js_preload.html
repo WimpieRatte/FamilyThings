@@ -12,6 +12,19 @@
     $.getJSON('/static/localization/{{request.session.lang_code}}/alerts.json',
         function(json_data){localAlertText = json_data})
 
+    var localText = null
+    $.getJSON('/static/localization/{{request.session.lang_code}}/main.json',
+        function(json_data){
+            localText = json_data
+        })
+
+    function getLocaleText(key = "", default_text = ""){
+        if (localText != null && localText[key])
+            return localText[key];
+        else
+            return default_text;
+    }
+
     function autoCloseAlert(alert){
         setTimeout(function() {alert.close();}, 5000);
     }

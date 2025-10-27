@@ -168,13 +168,6 @@
         })
     }
     applyLocaleToTooltips();
-    
-    function getLocaleText(key = "", default_text = ""){
-        if (locale_json[key])
-            return locale_json[key];
-        else
-            return default_text;
-    }
 
     /* Chane Language Button behaviors */
     $(".language-btn").on( "click", function() {
