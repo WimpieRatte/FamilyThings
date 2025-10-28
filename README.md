@@ -34,3 +34,5 @@ Calendar powered through Rome by Nicolás Bevacqua: https://bevacqua.github.io/r
 canvas-confetti by catdad: https://github.com/catdad/canvas-confetti
 check-mark-animation by rharkor: https://github.com/rharkor/check-mark-animation
 
+Presentation link:
+https://www.canva.com/design/DAG17-tJ0g8/FGQkGpxdA6EIWdBUeOGsiA/edit?utm_content=DAG17-tJ0g8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
